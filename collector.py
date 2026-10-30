@@ -270,7 +270,7 @@ def from_greenhouse(board: str, company: str, r: dict) -> Job:
     return Job("greenhouse", company, str(r["id"]), r["title"].strip(), "", "", loc,
                parse_date(r.get("first_published") or r.get("updated_at") or ""),
                r.get("absolute_url") or f"https://job-boards.greenhouse.io/{board}/jobs/{r['id']}",
-               pay_text=pay_text[:4000] if not r.get("pay_text") else pay_text)
+               pay_text=pay_text)  # completo: el salario suele estar al final de la descripción
 
 
 def from_ashby(org: str, company: str, r: dict) -> Job:
@@ -321,19 +321,37 @@ def fetch_amazon() -> list[dict]:
                 break
             time.sleep(0.5)
     techs = [r for r in seen.values() if is_tech_title(r["t"])]
+    # Amazon publica muchas vacantes idénticas (mismo puesto y ciudad). Se agrupan en una sola fila
+    # con el número de vacantes, y solo se descarga el pago de una por grupo.
+    groups: dict[tuple, list[dict]] = {}
+    for r in techs:
+        groups.setdefault((r["t"].strip().lower(), r["loc"].strip().lower()), []).append(r)
+    reps = []
+    for rows in groups.values():
+        rows.sort(key=lambda r: parse_date(r.get("d", "")) or "", reverse=True)
+        rep = dict(rows[0])
+        rep["n"] = len(rows)
+        reps.append(rep)
     pay_re = re.compile(r"(\d[\d,]*\.?\d*)\s*-\s*(\d[\d,]*\.?\d*)\s*USD\s*(hourly|annually|annual|yearly)", re.I)
 
     def add_pay(r):
-        try:
-            page = strip_html(get("https://www.amazon.jobs" + r["path"], as_json=False))
-            m = pay_re.search(page)
-            r["pay"] = list(m.groups()) if m else None
-        except Exception:
-            r["pay"] = None
+        r["pay"] = None
+        for intento in range(4):  # Amazon a veces responde "Server Busy": reintentar con espera
+            try:
+                page = strip_html(get("https://www.amazon.jobs" + r["path"], as_json=False))
+                m = pay_re.search(page)
+                if m:
+                    r["pay"] = list(m.groups())
+                    return r
+                if "Server Busy" not in page:
+                    return r
+            except Exception:
+                pass
+            time.sleep(2 * (intento + 1))
         return r
 
-    with ThreadPoolExecutor(max_workers=6) as ex:
-        return list(ex.map(add_pay, techs))
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        return list(ex.map(add_pay, reps))
 
 
 def fetch_greenhouse(board: str) -> list[dict]:

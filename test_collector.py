@@ -66,6 +66,14 @@ def test_build_from_saved_sample():
     assert jobs[1].days_posted == 144
 
 
+def test_greenhouse_pay_at_end_of_long_description():
+    content = "&lt;p&gt;" + "Lorem ipsum. " * 500 + "The base salary range for this role is $65.000 to $85,000.&lt;/p&gt;"
+    j = c.finalize(c.from_greenhouse("coreweave", "CoreWeave", {
+        "id": 1, "title": "Data Center Technician - Chester, VA", "location": {"name": "Chester, VA"},
+        "first_published": "2026-10-01T00:00:00Z", "content": content}))
+    assert (j.pay_min, j.pay_max, j.pay_unit, j.state) == (65000, 85000, "year", "VA")
+
+
 def test_keep_previous_if_source_failed():
     import json, tempfile
     from pathlib import Path
