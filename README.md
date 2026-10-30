@@ -26,21 +26,14 @@ python build_site.py --out site     # construye el sitio
 python -m http.server -d site 8000  # ábrelo en http://localhost:8000
 ```
 
-## Publicarlo gratis (una sola vez, unos 20 minutos)
+## Dónde está publicado
 
-1. Crea una cuenta en GitHub (gratis) y un repositorio nuevo, por ejemplo `datacenterjobusa`.
-2. Sube todos estos archivos al repositorio (botón "Add file > Upload files", arrastra la carpeta).
-3. En el repositorio: **Settings > Pages > Source: GitHub Actions**.
-4. En **Actions**, abre "Actualizar sitio" y pulsa **Run workflow**. En unos minutos el sitio queda en
-   `https://TU-USUARIO.github.io/datacenterjobusa/`.
-5. Desde ese momento se actualiza solo todos los días a las 6:17 am hora de Texas.
+- Sitio: https://datacenterjobusa.com (dominio en GoDaddy, cuenta de Enmanuel; renovación manual, vence 30 oct 2027).
+- Código: https://github.com/enmanuelv24-stack/datacenterjobusa (GitHub Pages, fuente "GitHub Actions").
+- Se actualiza solo todos los días a las 6:17 am hora de Texas. Para forzarlo: **Actions > Actualizar sitio > Run workflow**.
+- Para cambiar algo: edita el archivo en GitHub (o súbelo de nuevo con "Add file > Upload files") y el sitio se reconstruye solo.
 
-## Conectar tu dominio
-
-1. Compra el dominio (Cloudflare Registrar, Namecheap o Porkbun; unos $10–$15 al año para un .com).
-2. En GitHub: **Settings > Pages > Custom domain**, escribe el dominio y guarda.
-3. En tu registrador, crea los registros DNS que GitHub te indica.
-4. Cambia `SITE_URL` en `site_config.py` por tu dominio.
+DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, .111.153) y un CNAME `www` a `enmanuelv24-stack.github.io`.
 
 ## Agregar una empresa
 
