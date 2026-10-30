@@ -58,7 +58,7 @@ KEEP = re.compile(
     r"critical (environment|facilit)|hvac|\bmechanic\b|chief engineer|"
     r"facilit(y|ies) (engineer|tech)|\bEOT\b|\bDCO\b|"
     # contratistas de despliegue: la carrera del técnico sigue en lead/foreman de cuadrilla
-    r"deployment (lead|foreman)|field lead|lead data center|data center support services",
+    r"deployment (lead|foreman)|field lead|lead data center",
     re.I,
 )
 DROP = re.compile(
@@ -68,7 +68,8 @@ DROP = re.compile(
     r"superintendent|supervisor|foreman|commissioning (lead|engineer)|"
     # manufactura de fábrica (p. ej. plantas de Crusoe), no operación de data center
     r"\bcnc\b|press brake|assembly|quality|inspector|wiring technician|plant maintenance|"
-    r"\bstaff\b|mechanical engineer|electrical engineer|internship|\bHRP\b|human resources partner",
+    r"\bstaff\b|mechanical engineer|electrical engineer|internship|\bHRP\b|human resources partner|"
+    r"instructional|designer|trainer|coordinator",
     re.I,
 )
 

@@ -35,10 +35,30 @@ python -m http.server -d site 8000  # ábrelo en http://localhost:8000
 
 DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, .111.153) y un CNAME `www` a `enmanuelv24-stack.github.io`.
 
+## Empresas que se leen hoy
+
+| Empresa | Tipo | Cómo se lee |
+|---|---|---|
+| Amazon (AWS) | Operador | API de amazon.jobs |
+| Microsoft, Google, Oracle | Operador | API pública de su sitio de empleos |
+| Equinix | Operador | Workday |
+| Cologix | Operador | Lever |
+| CoreWeave, xAI, Nebius | Operador (nube IA) | Greenhouse |
+| Crusoe, Lambda | Operador (nube IA) | Ashby |
+| Introl | Contratista de despliegue | HTML de introl.com/careers |
+| TDS (Total Deployment Solutions) | Contratista de despliegue | Greenhouse |
+| Network Connex (antes NTI Connect) | Contratista de cableado | Lever (solo puestos de data center) |
+| AFL | Contratista de cableado | Phenom (solo puestos de data center) |
+| Compu Dynamics | Contratista eléctrico | Greenhouse |
+
+Pendientes: Salute Mission Critical (usa ADP, difícil de leer), Megawatt Construction (no tiene bolsa pública),
+Digital Realty (Workday en mantenimiento al conectarlo), QTS, Vantage, Meta, CBRE/JLL.
+
 ## Agregar una empresa
 
 - Si usa Greenhouse: agrega `"nombre-del-board": "Empresa"` en `GREENHOUSE_BOARDS` dentro de `collector.py`.
 - Si usa Ashby: igual, en `ASHBY_ORGS`.
+- Si usa Lever: igual, en `LEVER_ORGS`. Si la empresa también publica puestos que no son de data center (fibra, torres), agrégala a `DC_ONLY`.
 - Si usa Workday: agrega una línea en `WORKDAY_SITES` con `(empresa, host, tenant, sitio)`, tomados de la dirección de su página de empleos.
 
 Nunca agregues Indeed, LinkedIn ni otros agregadores: sus términos lo prohíben.
