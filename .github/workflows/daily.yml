@@ -1,0 +1,51 @@
+# Cada día recolecta las vacantes, reconstruye el sitio y lo publica en GitHub Pages.
+name: Actualizar sitio
+
+on:
+  schedule:
+    - cron: "17 11 * * *"   # todos los días a las 11:17 UTC (6:17 am en Texas)
+  workflow_dispatch: {}      # botón para correrlo a mano
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pruebas
+        run: python test_collector.py
+      - name: Recolectar vacantes
+        run: python collector.py --out data
+      - name: Construir sitio
+        run: python build_site.py --out site
+      - name: Guardar los datos del día en el repositorio
+        run: |
+          git config user.name "data-bot"
+          git config user.email "data-bot@users.noreply.github.com"
+          git add data/jobs.csv data/jobs.json
+          git commit -m "Vacantes $(date -u +%F)" || echo "sin cambios"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
