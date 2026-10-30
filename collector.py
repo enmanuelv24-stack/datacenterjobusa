@@ -21,6 +21,7 @@ import json
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -310,9 +311,17 @@ def from_other(r: dict) -> Job:
 # ---------------------------------------------------------------------------
 def get(url: str, as_json: bool = True):
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        body = resp.read().decode("utf-8", "replace")
-    return json.loads(body) if as_json else body
+    for intento in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                body = resp.read().decode("utf-8", "replace")
+            return json.loads(body) if as_json else body
+        except urllib.error.HTTPError as e:
+            # 429 = demasiadas peticiones, 5xx = servidor caído: esperar y reintentar
+            if e.code not in (429, 500, 502, 503, 504) or intento == 3:
+                raise
+            time.sleep(8 * (intento + 1))
+    raise RuntimeError("sin respuesta")  # no se llega aquí
 
 
 def fetch_amazon() -> list[dict]:
@@ -581,7 +590,8 @@ def fetch_oracle() -> list[dict]:
     for kw in ("technician", "data center facilities", "critical facilities"):
         offset = 0
         while True:
-            url = (f"{ORACLE_API}recruitingCEJobRequisitions?onlyData=true&finder=findReqs;siteNumber={ORACLE_SITE},"
+            url = (f"{ORACLE_API}recruitingCEJobRequisitions?onlyData=true&expand=requisitionList.secondaryLocations"
+                   f"&finder=findReqs;siteNumber={ORACLE_SITE},"
                    f"keyword=%22{urllib.parse.quote(kw)}%22,locationId={ORACLE_US},limit=200,offset={offset},"
                    f"sortBy=POSTING_DATES_DESC")
             items = get(url).get("items") or [{}]
