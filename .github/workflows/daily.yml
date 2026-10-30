@@ -34,8 +34,13 @@ jobs:
           git config user.name "data-bot"
           git config user.email "data-bot@users.noreply.github.com"
           git add data/jobs.csv data/jobs.json
-          git commit -m "Vacantes $(date -u +%F)" || echo "sin cambios"
-          git push
+          if git commit -m "Vacantes $(date -u +%F)"; then
+            # si alguien subió un cambio mientras corría, se trae primero y se vuelve a intentar
+            git pull --rebase origin main || true
+            git push || (git pull --rebase origin main && git push)
+          else
+            echo "sin cambios"
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
