@@ -31,7 +31,12 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Configuración de fuentes. Para agregar una empresa, agrégala aquí.
 # ---------------------------------------------------------------------------
-GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave"}
+GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius",
+                     "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics"}
+# Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
+LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix"}
+DC_ONLY = {"Network Connex", "AFL"}
+DC_TITLE = re.compile(r"data ?cent|\bISP\b|\bDC\b|low voltage|structured cabl|white space", re.I)
 ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda"}
 AMAZON_QUERIES = [
     "data center technician",
@@ -50,7 +55,9 @@ USER_AGENT = "dc-tech-jobs-collector/0.1 (+contact: site owner)"
 KEEP = re.compile(
     r"technician|\btech\b|electrician|operator|controls specialist|"
     r"critical (environment|facilit)|hvac|\bmechanic\b|chief engineer|"
-    r"facilit(y|ies) (engineer|tech)|\bEOT\b|\bDCO\b",
+    r"facilit(y|ies) (engineer|tech)|\bEOT\b|\bDCO\b|"
+    # contratistas de despliegue: la carrera del técnico sigue en lead/foreman de cuadrilla
+    r"deployment (lead|foreman)|field lead|lead data center|data center support services",
     re.I,
 )
 DROP = re.compile(
@@ -109,6 +116,8 @@ class Job:
 # Normalización
 # ---------------------------------------------------------------------------
 def is_tech_title(title: str) -> bool:
+    if re.search(r"deployment foreman", title, re.I):
+        return True
     return bool(KEEP.search(title)) and not DROP.search(title)
 
 
@@ -465,6 +474,147 @@ def fetch_google() -> list[dict]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Lever (Network Connex, Cologix)
+# ---------------------------------------------------------------------------
+def fetch_lever(org: str, company: str) -> list[dict]:
+    rows = get(f"https://api.lever.co/v0/postings/{org}?mode=json")
+    out = []
+    for r in rows:
+        title = (r.get("text") or "").strip()
+        if not is_tech_title(title):
+            continue
+        if company in DC_ONLY and not DC_TITLE.search(title):
+            continue
+        sr = r.get("salaryRange") or {}
+        pay = None
+        if sr.get("min") and sr.get("max"):
+            unit = "hour" if "hour" in str(sr.get("interval", "")) else "year"
+            pay = [sr["min"], sr["max"], unit]
+        else:
+            pay = r.get("descriptionPlain") or ""
+        posted = ""
+        if r.get("createdAt"):
+            posted = datetime.utcfromtimestamp(r["createdAt"] / 1000).strftime("%Y-%m-%d")
+        out.append({"company": company, "title": title, "loc": (r.get("categories") or {}).get("location", ""),
+                    "posted": posted, "pay": pay, "url": r.get("hostedUrl", ""), "id": r.get("id"), "source": "lever"})
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Introl (tarjetas en el HTML de introl.com/careers)
+# ---------------------------------------------------------------------------
+INTROL_CARD = re.compile(
+    r'<a href="([^"]+)"[^>]*class="job-card[^"]*"[^>]*>.*?<h3 class="job-title">(.*?)</h3>\s*'
+    r'<p class="job-location">(.*?)</p>(.*?)</a>', re.S)
+
+
+def parse_introl(html_text: str) -> list[dict]:
+    out = []
+    for url, title, loc, rest in INTROL_CARD.findall(html_text):
+        title = html.unescape(title).strip()
+        if not is_tech_title(title):
+            continue
+        m = re.search(r'job-salary">(.*?)<', rest)
+        pay = html.unescape(m.group(1)).strip() if m else ""
+        jid = url.rstrip("/").rsplit("/", 1)[-1]
+        out.append({"company": "Introl", "title": title, "loc": html.unescape(loc).strip(), "posted": "",
+                    "pay": pay, "url": url, "id": "introl-" + jid, "source": "introl"})
+    return out
+
+
+def fetch_introl() -> list[dict]:
+    return parse_introl(get("https://introl.com/careers", as_json=False))
+
+
+# ---------------------------------------------------------------------------
+# AFL (Phenom People: el JSON de resultados viene dentro del HTML)
+# ---------------------------------------------------------------------------
+def parse_phenom(html_text: str) -> tuple[list[dict], int]:
+    i = html_text.find("phApp.ddo")
+    if i < 0:
+        return [], 0
+    j = html_text.find("{", i)
+    data, _ = json.JSONDecoder().raw_decode(html_text[j:])
+    e = data.get("eagerLoadRefineSearch") or {}
+    return (e.get("data") or {}).get("jobs") or [], int(e.get("totalHits") or 0)
+
+
+def fetch_afl() -> list[dict]:
+    base = "https://careers.aflglobal.com/us/en/search-results?keywords=data%20center"
+    seen, out = set(), []
+    start, total = 0, 1
+    while start < total and start < 400:
+        jobs, total = parse_phenom(get(f"{base}&from={start}&s=1", as_json=False))
+        if not jobs:
+            break
+        for r in jobs:
+            title = (r.get("title") or "").strip()
+            jid = r.get("jobId") or r.get("reqId")
+            if jid in seen or not is_tech_title(title):
+                continue
+            seen.add(jid)
+            if not (DC_TITLE.search(title) or DC_TITLE.search(r.get("descriptionTeaser") or "")):
+                continue
+            url = r.get("applyUrl") or r.get("jobUrl") or ""
+            if url.startswith("/"):
+                url = "https://careers.aflglobal.com" + url
+            out.append({"company": "AFL", "title": title, "loc": f"{r.get('city', '')}, {r.get('state', '')}",
+                        "posted": (r.get("postedDate") or "")[:10], "pay": (r.get("descriptionTeaser") or ""),
+                        "url": url, "id": "afl-" + str(jid), "source": "afl"})
+        start += len(jobs)
+        time.sleep(0.5)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Oracle (Oracle Cloud HCM, API pública del sitio de empleos)
+# ---------------------------------------------------------------------------
+ORACLE_API = "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/"
+ORACLE_SITE = "CX_45001"
+ORACLE_US = "300000000149325"
+ORACLE_PAY = re.compile(r"from \$([\d,.]+) to \$([\d,.]+) per (hour|annum|year)", re.I)
+
+
+def fetch_oracle() -> list[dict]:
+    seen, out = set(), []
+    for kw in ("technician", "data center facilities", "critical facilities"):
+        offset = 0
+        while True:
+            url = (f"{ORACLE_API}recruitingCEJobRequisitions?onlyData=true&finder=findReqs;siteNumber={ORACLE_SITE},"
+                   f"keyword=%22{urllib.parse.quote(kw)}%22,locationId={ORACLE_US},limit=200,offset={offset},"
+                   f"sortBy=POSTING_DATES_DESC")
+            items = get(url).get("items") or [{}]
+            rows = items[0].get("requisitionList") or []
+            for r in rows:
+                title = (r.get("Title") or "").strip()
+                if r["Id"] in seen or not is_tech_title(title) or not DC_TITLE.search(title) and "facilit" not in title.lower():
+                    continue
+                seen.add(r["Id"])
+                out.append({"company": "Oracle", "title": title, "loc": (r.get("PrimaryLocation") or "").replace(", United States", ""),
+                            "posted": (r.get("PostedDate") or "")[:10], "pay": None,
+                            "url": f"https://careers.oracle.com/jobs/#en/sites/jobsearch/job/{r['Id']}",
+                            "id": "oracle-" + str(r["Id"]), "source": "oracle"})
+            if len(rows) < 200:
+                break
+            offset += 200
+
+    def add_pay(r):
+        try:
+            d = get(f"{ORACLE_API}recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;"
+                    f"Id=%22{r['id'].split('-')[1]}%22,siteNumber={ORACLE_SITE}")
+            text = " ".join(str(v) for v in (d.get("items") or [{}])[0].values() if isinstance(v, str))
+            m = ORACLE_PAY.search(strip_html(text))
+            if m:
+                r["pay"] = [m.group(1), m.group(2), "hour" if m.group(3).lower() == "hour" else "year"]
+        except Exception:
+            pass
+        return r
+
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        return list(ex.map(add_pay, out))
+
+
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
     try:
@@ -481,11 +631,16 @@ def collect_live() -> dict:
             raw["ashby"][o] = fetch_ashby(o)
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
-    for fn in (fetch_microsoft, fetch_google):
+    for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo
             print("aviso:", fn.__name__, e, file=sys.stderr)
+    for org, company in LEVER_ORGS.items():
+        try:
+            raw["other"] += fetch_lever(org, company)
+        except Exception as e:
+            print("aviso: lever", org, e, file=sys.stderr)
     for args in WORKDAY_SITES:
         try:
             raw["other"] += fetch_workday(*args)

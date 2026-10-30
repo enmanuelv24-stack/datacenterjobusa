@@ -74,6 +74,22 @@ def test_greenhouse_pay_at_end_of_long_description():
     assert (j.pay_min, j.pay_max, j.pay_unit, j.state) == (65000, 85000, "year", "VA")
 
 
+def test_contractor_filters_and_introl():
+    # contratistas: entran los puestos de data center, no los de fibra/torres
+    assert c.is_tech_title("Data Center Deployment Foreman I") and c.DC_TITLE.search("Data Center Deployment Foreman I")
+    assert c.is_tech_title("Fiber Technician 1 - Travel") and not c.DC_TITLE.search("Fiber Technician 1 - Travel")
+    assert not c.is_tech_title("Data Center Technician Manager")
+    html = ('<a href="https://apply.appone.com/job/abc" class="job-card "><div class="job-card-content">'
+            '<h3 class="job-title">Data Center Technician</h3><p class="job-location">San Antonio, TX</p>'
+            '<div class="job-meta"><span class="job-salary">$30-$36/hr</span><span class="job-type">Temporary</span>'
+            '</div></div></a>')
+    rows = c.parse_introl(html)
+    assert len(rows) == 1 and rows[0]["id"] == "introl-abc"
+    j = c.build({"other": rows}, date(2026, 10, 30))[0]
+    assert (j.company, j.city, j.state, j.hourly_min, j.hourly_max) == ("Introl", "San Antonio", "TX", 30.0, 36.0)
+    assert c.ORACLE_PAY.search("from $27.64 to $56.83 per hour; from: $57,500").groups() == ("27.64", "56.83", "hour")
+
+
 def test_keep_previous_if_source_failed():
     import json, tempfile
     from pathlib import Path
