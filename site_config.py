@@ -17,6 +17,7 @@ ROLE_EN = {
     "Mecánico / HVAC": "Mechanical & HVAC",
     "Soporte TI": "IT support",
     "Operador": "Operations center",
+    "Construcción": "Construction site",
     "Otro técnico": "Other technician",
 }
 

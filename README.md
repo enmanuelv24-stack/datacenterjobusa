@@ -50,9 +50,12 @@ DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, 
 | Network Connex (antes NTI Connect) | Contratista de cableado | Lever (solo puestos de data center) |
 | AFL | Contratista de cableado | Phenom (solo puestos de data center) |
 | Compu Dynamics | Contratista eléctrico | Greenhouse |
+| Rosendin | Contratista eléctrico | Su sitio (admin-ajax); solo electricistas de campo |
+| Holder Construction | Constructora de data centers | Greenhouse; solo técnicos de obra por hora |
+| QTS | Operador | Workday |
 
 Pendientes: Salute Mission Critical (usa ADP, difícil de leer), Megawatt Construction (no tiene bolsa pública),
-Digital Realty (Workday en mantenimiento al conectarlo), QTS, Vantage, Meta, CBRE/JLL.
+Digital Realty (su Workday no responde desde fuera), Vantage, Meta, CBRE/JLL, DPR, Turner, Mortenson.
 
 ## Agregar una empresa
 

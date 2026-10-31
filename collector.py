@@ -32,7 +32,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Configuración de fuentes. Para agregar una empresa, agrégala aquí.
 # ---------------------------------------------------------------------------
-GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius",
+GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius", "holderconstruction": "Holder Construction",
                      "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics"}
 # Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
 LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix"}
@@ -118,8 +118,8 @@ class Job:
 # Normalización
 # ---------------------------------------------------------------------------
 def is_tech_title(title: str) -> bool:
-    if re.search(r"deployment foreman", title, re.I):
-        return True
+    if re.search(r"deployment foreman|foreman.*data ?cent|data ?cent.*foreman|electrical (general )?foreman", title, re.I):
+        return True  # en contratistas, foreman de cuadrilla es el siguiente paso del técnico
     return bool(KEEP.search(title)) and not DROP.search(title)
 
 
@@ -127,7 +127,7 @@ def classify_role(title: str) -> str:
     t = title.lower()
     if re.search(r"power generation|turbine|megapack|plant tech|generator", t):
         return "Energía / generación"
-    if re.search(r"engineer(ing)? operations? tech|critical (environment|facilit)|facilit|chief engineer|"
+    if re.search(r"engineer(ing)? operations? tech|critical (environment|facilit|operations)|facilit|chief engineer|"
                  r"\beot\b|\bdceo\b|command center|maint(enance)? tech|operations service", t):
         return "Instalaciones críticas"
     if re.search(r"\bit (support|services)\b|tech ops", t):
@@ -142,6 +142,8 @@ def classify_role(title: str) -> str:
         return "Controles / BMS"
     if re.search(r"install|deploy|network|fiber|cabl|infra delivery", t):
         return "Instalación / red"
+    if re.search(r"field engineer tech|engineer technician", t):
+        return "Construcción"
     if re.search(r"data ?cent(er|re)|\bdct\b|\bdco\b|server|hardware|linux", t):
         return "Técnico de data center (DCT)"
     if "operator" in t:
@@ -373,9 +375,32 @@ def fetch_amazon() -> list[dict]:
         return list(ex.map(add_pay, reps))
 
 
+# Constructoras: solo los puestos de obra con pago por hora que son camino de entrada para técnicos
+BUILDER_KEEP = {"holderconstruction": re.compile(r"field engineer technician|engineer technician|energy marshall", re.I)}
+
+
 def fetch_greenhouse(board: str) -> list[dict]:
     data = get(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true")
-    return [j for j in data.get("jobs", []) if is_tech_title(j.get("title", ""))]
+    keep = BUILDER_KEEP.get(board)
+    return [j for j in data.get("jobs", [])
+            if (keep.search(j.get("title", "")) if keep else is_tech_title(j.get("title", "")))]
+
+
+def fetch_rosendin() -> list[dict]:
+    """Rosendin (contratista eléctrico): su sitio WordPress expone las vacantes por admin-ajax."""
+    req = urllib.request.Request("https://www.rosendin.com/wp-admin/admin-ajax.php",
+                                 data=b"action=openings_listing&per_page=1000&page=1",
+                                 headers={"User-Agent": USER_AGENT, "Content-Type": "application/x-www-form-urlencoded"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        posts = json.loads(resp.read().decode("utf-8", "replace")).get("posts", [])
+    out = []
+    for r in posts:
+        title = (r.get("title") or "").strip()
+        if r.get("category") != "Field" or not re.search(r"electrician|journeyman|foreman", title, re.I):
+            continue
+        out.append({"company": "Rosendin", "title": title, "loc": r.get("location", ""), "posted": "",
+                    "pay": None, "url": r.get("url", ""), "id": "rosendin-" + str(r.get("id")), "source": "rosendin"})
+    return out
 
 
 def fetch_ashby(org: str) -> list[dict]:
@@ -384,7 +409,8 @@ def fetch_ashby(org: str) -> list[dict]:
 
 
 # Workday: (empresa, host, tenant, sitio). Sus páginas de empleo usan este API público.
-WORKDAY_SITES = [("Equinix", "equinix.wd1.myworkdayjobs.com", "equinix", "External")]
+WORKDAY_SITES = [("Equinix", "equinix.wd1.myworkdayjobs.com", "equinix", "External"),
+                 ("QTS", "qtsdatacenters.wd5.myworkdayjobs.com", "qtsdatacenters", "qts")]
 WORKDAY_QUERIES = ["technician", "engineer", "data center", "facilities", "operations"]
 # Ciudades de Workday sin estado -> estado (Workday a veces solo da la ciudad)
 CITY_STATE = {"Englewood": "CO", "Sunnyvale": "CA", "Culpeper": "VA", "San Jose": "CA", "Torrance": "CA",
@@ -424,6 +450,9 @@ def fetch_workday(company: str, host: str, tenant: str, site: str) -> list[dict]
         m = re.search(r"([\d,]+(?:\.\d+)?)\s*-\s*([\d,]+(?:\.\d+)?)\s*USD\s*/\s*(Annual|Hourly|Year|Hour)", desc, re.I)
         pay = f"${m.group(1)} - ${m.group(2)} per {'hour' if 'hour' in m.group(3).lower() else 'year'}" if m else desc
         city = re.sub(r"^[A-Z]{2}\d+\w*\s+", "", info.get("location") or p.get("locationsText", ""))
+        m2 = re.match(r"^US ([A-Z]{2}) (.+?)(?: \d+)?(?: DC\d+)?$", city)  # QTS: "US TX Turkey 1 DC1"
+        if m2:
+            city = f"{m2.group(2)}, {m2.group(1)}"
         loc = f"{city}, {CITY_STATE[city]}" if city in CITY_STATE else city
         out.append({"company": company, "title": p["title"], "loc": loc, "posted": info.get("startDate", ""),
                     "pay": pay, "url": info.get("externalUrl") or f"https://{host}/{site}{path}",
@@ -492,9 +521,11 @@ def fetch_lever(org: str, company: str) -> list[dict]:
     out = []
     for r in rows:
         title = (r.get("text") or "").strip()
+        team = (r.get("categories") or {}).get("team", "") or ""
         if not is_tech_title(title):
             continue
-        if company in DC_ONLY and not DC_TITLE.search(title):
+        # contratistas: solo data center, por título o por el equipo que la empresa asigna
+        if company in DC_ONLY and not (DC_TITLE.search(title) or ("data center" in team.lower() and not re.search(r"\bOSP\b|splic", title, re.I))):
             continue
         sr = r.get("salaryRange") or {}
         pay = None
@@ -642,7 +673,7 @@ def collect_live() -> dict:
             raw["ashby"][o] = fetch_ashby(o)
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
-    for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle):
+    for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo
