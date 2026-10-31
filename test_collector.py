@@ -144,6 +144,22 @@ def test_linx():
     assert (j.city, j.state, j.hourly_min, j.hourly_max, j.days_posted) == ("Dallas", "TX", 20.0, 29.0, 35)
 
 
+def test_jazzhr():
+    html = '''<ul class="list-group"><li class="list-group-item">
+<h3 class="list-group-item-heading"><a href="https://archetypestrategy.applytojob.com/apply/QUWzOWLFZD/Access-Control">
+Access Control / Low Voltage Security Technician </a></h3>
+<ul class="list-inline list-group-item-text"><li><i class="fa fa-map-marker"></i>Phoenix, AZ</li></ul></li>
+<li class="list-group-item"><h3 class="list-group-item-heading">
+<a href="https://archetypestrategy.applytojob.com/apply/8B7SQebvNJ/Data-Center-Technician">Data Center Technician </a></h3>
+<ul class="list-inline list-group-item-text"><li><i class="fa fa-map-marker"></i>Abeline, TX</li></ul></li>
+<li class="list-group-item"><h3><a href="https://x/apply/abc/Fiber">Fiber Optic Splicer</a></h3>
+<ul><li><i></i>(Multiple states)</li></ul></li></ul>'''
+    rows = c.parse_jazz_list(html, "The Archetype Strategy", c.JAZZ_SITES[0][2])
+    assert [(r["title"], r["loc"], r["id"]) for r in rows] == [("Data Center Technician", "Abilene, TX", "jazz-8B7SQebvNJ")]
+    assert c.parse_jazz_job("<p>Pay: $22-$27 per hour based on experience</p>") == (22.0, 27.0, "hour")
+    assert c.parse_jazz_job("<p>Great benefits. Apply by 5/5.</p>") is None
+
+
 if __name__ == "__main__":
     import sys
     fails = 0

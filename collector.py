@@ -892,6 +892,55 @@ def fetch_linx() -> list[dict]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# JazzHR (applytojob.com): The Archetype Strategy, proveedor de mano de obra para data centers (Tye, TX / Abilene)
+# ---------------------------------------------------------------------------
+JAZZ_ROW = re.compile(r'<li class="list-group-item">\s*<h3[^>]*>\s*<a href="([^"]+)">\s*(.*?)\s*</a>\s*</h3>\s*<ul[^>]*>\s*<li>(?:<i[^>]*></i>)?\s*(.*?)\s*</li>', re.S)
+JAZZ_SITES = [("The Archetype Strategy", "https://archetypestrategy.applytojob.com/apply",
+               re.compile(r"data center|fiber|splic|cable (puller|technician)|cabling", re.I))]
+JAZZ_PAY = re.compile(r"(?:Pay|Compensation|Rate|Salary)[^$]{0,40}(\$\s?\d[\d,.]*\s*(?:-|–|to)\s*\$?\s?\d[\d,.]*\s*(?:per hour|/\s?hour|/hr|an hour|hourly|per year|/yr|annually)?)", re.I)
+TYPO_CITIES = {"Abeline": "Abilene", "Road Oak": "Red Oak", "Loudon": "Loudoun", "Louden": "Loudoun", "Spartansburg": "Spartanburg"}
+
+
+def parse_jazz_list(html_text: str, company: str, keep: "re.Pattern") -> list[dict]:
+    out = []
+    for href, title, loc in JAZZ_ROW.findall(html_text):
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).replace("–", "-").strip()
+        loc = html.unescape(re.sub(r"<[^>]+>", "", loc)).strip()
+        if not keep.search(title) or not is_tech_title(title):
+            continue
+        if re.search(r"cleaning|security|access control|cctv|electrician|project manager", title, re.I):
+            continue
+        city, st = (loc.rsplit(",", 1) + [""])[:2] if "," in loc else ("", loc)
+        city, st = TYPO_CITIES.get(city.strip(), city.strip()), st.strip()
+        if st not in US_STATES:
+            continue  # "TX", "United States", "(Multiple states)": sin ciudad no se publica
+        jid = href.rstrip("/").split("/apply/")[-1].split("/")[0]
+        out.append({"company": company, "title": title, "loc": f"{city}, {st}" if city else US_STATES[st], "posted": "",
+                    "pay": None, "url": href, "id": f"jazz-{jid}", "source": "jazzhr"})
+    return out
+
+
+def parse_jazz_job(html_text: str):
+    text = html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"<script[\s\S]*?</script>", "", html_text)))
+    m = JAZZ_PAY.search(text)
+    if not m:
+        return None
+    lo, hi, unit = parse_pay(m.group(1))
+    return (lo, hi, unit) if lo else None
+
+
+def fetch_jazz(company: str, board: str, keep: "re.Pattern") -> list[dict]:
+    rows = parse_jazz_list(get(board, as_json=False), company, keep)
+    for r in rows:
+        try:
+            r["pay"] = parse_jazz_job(get(r["url"], as_json=False))
+        except Exception as e:
+            print("aviso: jazz", r["url"], e, file=sys.stderr)
+        time.sleep(0.2)
+    return rows
+
+
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
     try:
@@ -919,6 +968,11 @@ def collect_live() -> dict:
             raw["other"] += fetch_ultipro(company, board, keep)
         except Exception as e:
             print("aviso: ultipro", company, e, file=sys.stderr)
+    for company, board, keep in JAZZ_SITES:
+        try:
+            raw["other"] += fetch_jazz(company, board, keep)
+        except Exception as e:
+            print("aviso: jazzhr", company, e, file=sys.stderr)
     for org, company in LEVER_ORGS.items():
         try:
             raw["other"] += fetch_lever(org, company)
