@@ -38,3 +38,6 @@ MIN_CITY_OPENINGS = 3  # una ciudad tiene página propia si tiene al menos estas
 
 # Enlace de la encuesta de turnos (Google Forms, Tally, etc.). Vacío = el sitio dice "muy pronto".
 SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdAiL_Nd9-OX5mNSFFdpO6MuF6_aGw-_2hpg5V9P-P706oPVQ/viewform"
+
+# Formulario de suscripción (Buttondown). El sitio envía el correo a esta dirección.
+NEWSLETTER_ACTION = "https://buttondown.com/api/emails/embed-subscribe/datacenterjobusa"

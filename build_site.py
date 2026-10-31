@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-from site_config import (MIN_CITY_OPENINGS, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -33,6 +33,17 @@ def money(v, unit="hour"):
     return f"${v:,.2f}" if unit == "hour" else f"${v:,.0f}"
 
 
+LOGO_COLORS = ["#2b6cb0", "#1f7a4d", "#6b46c1", "#b7791f", "#c53030", "#2c7a7b", "#4a5568", "#d53f8c", "#3182ce", "#805ad5"]
+
+
+def logo(company: str) -> str:
+    """Avatar de letras para la empresa (sin usar logotipos ajenos)."""
+    words = [w for w in re.split(r"[\s(]+", company) if w and w[0].isalpha()]
+    txt = (words[0][:2] if len(words) == 1 else "".join(w[0] for w in words[:2])).upper()
+    col = LOGO_COLORS[sum(map(ord, company)) % len(LOGO_COLORS)]
+    return f'<span class="logo" style="background:{col}" aria-hidden="true">{E(txt)}</span>'
+
+
 def clean_title(t: str) -> str:
     t = re.sub(r"\s+,", ",", t)
     t = re.sub(r",\s*(DCC Communities|Amazon Web Services|AWS Support|AWS)\b", "", t)
@@ -42,77 +53,7 @@ def clean_title(t: str) -> str:
 # ---------------------------------------------------------------------------
 # Estilos y plantilla
 # ---------------------------------------------------------------------------
-CSS = r"""
-/* Layout: one reading column with a wide data band; tables scroll inside their own box. */
-:root{
-  --bg:#f3f6f8; --panel:#ffffff; --ink:#14212b; --muted:#566673; --line:#d6dee4;
-  --cold:#2f6f9f; --hot:#c8531c; --accent:#0d5c63; --chip:#e6eef2; --good:#2c7a4b;
-  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --body:"Source Sans 3","Segoe UI",Arial,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0f161c; --panel:#16212a; --ink:#e4ecf1; --muted:#9fb0bc; --line:#26343f;
-  --cold:#6fb0e0; --hot:#f08a4b; --accent:#5cc3c9; --chip:#1f2d38; --good:#6cc48f; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f161c; --panel:#16212a; --ink:#e4ecf1; --muted:#9fb0bc; --line:#26343f;
-  --cold:#6fb0e0; --hot:#f08a4b; --accent:#5cc3c9; --chip:#1f2d38; --good:#6cc48f; color-scheme:dark}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);}
-a{color:var(--accent)} a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
-.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header.site{border-bottom:1px solid var(--line);background:var(--panel)}
-header.site .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding-block:14px}
-.brand{font:700 26px/1 var(--display);letter-spacing:.02em;text-transform:uppercase;color:var(--ink);text-decoration:none;display:flex;gap:10px;align-items:center}
-.brand i{display:inline-block;width:22px;height:22px;border-radius:3px;background:linear-gradient(90deg,var(--cold) 0 50%,var(--hot) 50% 100%)}
-nav.main{display:flex;flex-wrap:wrap;gap:6px 18px;font-weight:600}
-nav.main a{color:var(--ink);text-decoration:none} nav.main a:hover{color:var(--accent)}
-main{padding-block:28px 56px}
-h1,h2,h3{font-family:var(--display);line-height:1.08;text-wrap:balance;margin:0}
-h1{font-size:clamp(34px,6vw,56px);font-weight:700;letter-spacing:.005em}
-h2{font-size:30px;font-weight:700;margin-top:40px} h3{font-size:22px;font-weight:600}
-.lede{font-size:19px;color:var(--muted);max-width:62ch;margin:12px 0 0}
-.crumbs{font:500 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.crumbs a{color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:24px 0 8px}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
-.stat b{display:block;font:700 34px/1 var(--display);font-variant-numeric:tabular-nums}
-.stat span{font-size:14px;color:var(--muted)}
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;margin-top:20px}
-.filters label{display:flex;flex-direction:column;gap:4px;font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.filters input,.filters select{font:16px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);min-width:0}
-.count{margin:16px 0 8px;color:var(--muted);font-size:15px}
-.jobs{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
-.job{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:6px 20px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 16px}
-.job .t{font-weight:700;font-size:17px;color:var(--ink);text-decoration:none} .job .t:hover{color:var(--accent)}
-.job .meta{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px}
-.chip{display:inline-block;background:var(--chip);border-radius:3px;padding:1px 7px;font:500 12px/1.6 var(--mono);color:var(--ink)}
-.chip.new{background:var(--good);color:var(--panel)}
-.pay{font:600 15px/1.2 var(--mono);font-variant-numeric:tabular-nums;text-align:right}
-.pay small{display:block;font:400 12px var(--body);color:var(--muted)}
-.bar{position:relative;height:6px;border-radius:3px;background:var(--chip);margin-top:6px}
-.bar span{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--cold),var(--hot))}
-.nopay{color:var(--muted);font:400 13px var(--body)}
-@media (max-width:640px){.job{grid-template-columns:1fr}.pay{text-align:left}}
-.more{margin-top:14px;font:600 16px var(--body);padding:10px 18px;border-radius:4px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
-.tablebox{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:6px;margin-top:14px}
-table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
-th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{font:600 12px/1.2 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
-td.num{text-align:right;font-family:var(--mono)} tr:last-child td{border-bottom:0}
-.grid-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:12px;padding:0;list-style:none}
-.grid-links a{display:flex;justify-content:space-between;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 12px;text-decoration:none;color:var(--ink)}
-.grid-links a:hover{border-color:var(--accent)} .grid-links small{color:var(--muted);font-family:var(--mono)}
-.note{font-size:14px;color:var(--muted);max-width:75ch}
-.prose{max-width:68ch} .prose p,.prose li{font-size:18px}
-.callout{border-left:4px solid var(--hot);background:var(--panel);padding:14px 18px;border-radius:0 6px 6px 0;margin-top:22px;max-width:75ch}
-.signup{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.signup input{flex:1 1 220px;min-width:0;font:16px var(--body);padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink)}
-.signup button{font:600 16px var(--body);padding:10px 18px;border:0;border-radius:4px;background:var(--hot);color:#fff;cursor:pointer}
-footer.site{border-top:1px solid var(--line);color:var(--muted);font-size:14px}
-footer.site .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-"""
+CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700'
@@ -146,10 +87,10 @@ class Site:
              + f'<meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
              + FONTS + f"<style>{CSS}</style>{head_extra}"
              + ("" if bare else "</head><body>")
-             + f'<header class="site"><div class="wrap"><a class="brand" href="{r("index.html")}"><i aria-hidden="true"></i>{E(SITE_NAME)}</a>{nav}</div></header>'
-             + f'<main><div class="wrap">{body}</div></main>'
+             + f'<header class="site"><div class="wrap"><a class="brand" href="{r("index.html")}"><i aria-hidden="true"></i>Data Center <em>Job USA</em></a>{nav}</div></header>'
+             + (f'<main>{body}</main>' if body.startswith('<section class="hero">') else f'<main><div class="wrap">{body}</div></main>')
              + f'<footer class="site"><div class="wrap"><span>{E(SITE_NAME)} · {E(SITE_TAGLINE)}</span>'
-             + f'<span>Pay ranges come from each employer\'s own posting. Updated {self.today:%B %-d, %Y}.</span></div></footer>'
+             + f'<span>Pay ranges come from each employer\'s own posting · Updated {self.today:%B %-d, %Y} · <a href="{r("about.html")}">About</a> · <a href="{r("shift-survey.html")}">Shift survey</a></span></div></footer>'
              + ("" if bare else "</body></html>"))
         f = self.out / path
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -175,8 +116,8 @@ class Site:
                    + f'</small><div class="bar" aria-hidden="true"><span style="left:{left:.1f}%;width:{width:.1f}%"></span></div></div>')
         else:
             pay = '<div class="pay nopay">Pay not posted</div>'
-        return (f'<li class="job"><div><a class="t" href="{E(href)}"{ext}>{E(title)}</a>'
-                f'<div class="meta"><span>{E(j["company"])}</span><span>{E(loc)}</span>{chips}</div></div>{pay}</li>')
+        return (f'<li class="job">{logo(j["company"])}<div><a class="t" href="{E(href)}"{ext}>{E(title)}</a>'
+                f'<div class="meta"><span class="co">{E(j["company"])}</span><span>{E(loc)}</span>{chips}</div></div>{pay}</li>')
 
     def job_list(self, rows, depth: int, limit: int | None = None) -> str:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
@@ -203,10 +144,12 @@ class Site:
 
     def signup(self) -> str:
         return ('<div class="callout"><h3>Get the best new jobs every Monday</h3>'
-                '<p class="note">One email a week: the highest-paying new technician openings and one real number about pay or shifts. No spam.</p>'
-                '<form class="signup" onsubmit="event.preventDefault();this.querySelector(\'button\').textContent=\'Thanks — you\\u2019re on the list\';">'
+                '<p class="note">One email a week: the highest-paying new technician openings and one real number about pay or shifts. No spam, no recruiters.</p>'
+                f'<form class="signup" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" '
+                'onsubmit="const f=this;fetch(f.action,{method:\'POST\',mode:\'no-cors\',body:new FormData(f)}).then(()=>{f.innerHTML=\'<p class=ok>Check your inbox and confirm your email. Welcome aboard.</p>\'});event.preventDefault();">'
                 '<label for="nl-email" class="note" style="flex-basis:100%">Email</label>'
-                '<input id="nl-email" type="email" required placeholder="you@example.com" autocomplete="email">'
+                '<input id="nl-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">'
+                '<input type="hidden" name="tag" value="site">'
                 '<button type="submit">Join the weekly list</button></form></div>')
 
     # -------------------------------------------------------------- pages
@@ -228,9 +171,15 @@ class Site:
                  "u": (f'jobs/{j["slug"]}.html' if not self.preview else j["url"])} for j in js]
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
-        body = (f'<h1>{E(SITE_TAGLINE)}.</h1>'
-                f'<p class="lede">{total:,} open technician jobs at {len(companies)} data center operators, pulled straight from their own career pages. '
-                f'{paid / total:.0%} show the pay range, and you can sort by it.</p>'
+        top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
+        quick = ("".join(f'<a href="{E(u)}">{E(n)}</a>' for n, u in top_states)
+                 + '<a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+        body = ('<section class="hero"><div class="wrap">'
+                '<p class="kicker">Built by a working data center tech</p>'
+                '<h1>Data center tech jobs with the <mark>pay up front</mark>.</h1>'
+                f'<p class="lede">{total:,} open technician jobs at {len(companies)} data center operators and contractors, pulled straight from their own career pages every morning. '
+                f'{paid / total:.0%} show the pay range, and you can sort by it. No agencies, no call centers.</p>'
+                f'<div class="quick">{quick}</div></div></section><div class="wrap">'
                 f'<div class="stats"><div class="stat"><b>{total:,}</b><span>open technician jobs</span></div>'
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
                 f'<div class="stat"><b>{len(states)}</b><span>states</span></div>'
@@ -245,7 +194,7 @@ class Site:
                 '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
                 + self.signup()
-                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};'
+                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LG={json.dumps({c: logo(c) for c in companies})};'
                 + r"""
 const $=id=>document.getElementById(id);let N=40;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -253,7 +202,7 @@ const m=v=>'$'+v.toFixed(2);
 function row(j){let pay='<div class="pay nopay">Pay not posted</div>';
  if(j.lo){const l=j.lo/SC*100,w=Math.max(2,(j.hi-j.lo)/SC*100);pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour</small><div class="bar" aria-hidden="true"><span style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
- return `<li class="job"><div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span>${esc(j.c)}</span><span>${esc(j.ci)}, ${j.s}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}</div></div>${pay}</li>`}
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${esc(j.ci)}, ${j.s}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}</div></div>${pay}</li>`}
 function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value;
  let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
@@ -261,7 +210,7 @@ function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$(
  $('list').innerHTML=r.slice(0,N).map(row).join('');$('more').hidden=r.length<=N}
 ['q','st','co','ro','pay','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
-</script>""")
+</script></div>""")
         self.page("index.html", SITE_NAME if self.preview else f"{SITE_NAME}: {SITE_TAGLINE}",
                   f"{total:,} data center technician jobs with pay ranges, from {len(companies)} employers.", body)
 
@@ -281,7 +230,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   "Posted pay ranges for data center technicians at Amazon, Google, Microsoft and more, by company, job type and state.", body)
 
         # ---- companies
-        links = "".join(f'<li><a href="companies/{slug(c)}.html"><span>{E(c)}</span><small>{n:,}</small></a></li>'
+        links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n:,}</small></a></li>'
                         for c, n in companies.most_common())
         self.page("companies.html", f"Data Center Companies Hiring Technicians | {SITE_NAME}",
                   "Data center operators hiring technicians now, with open jobs and pay.",
@@ -369,7 +318,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         f'<tr><th>Job type</th><td>{E(ROLE_EN.get(j["role"], j["role"]))}</td></tr>'
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
                         f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
-                        f'<p><a class="more" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">Apply on {E(j["company"])}\'s site</a></p>'
+                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">Apply on {E(j["company"])}\'s site</a></p>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
                         + self.signup())
@@ -394,7 +343,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   'or whether you can switch to days. Techs know. Share yours anonymously and see what others report.</p>'
                   '<p class="note">We only ask about schedule, pay and general conditions. Never share site names, room locations, access '
                   'procedures or anything your employer considers confidential.</p></div>'
-                  + (f'<p><a class="more" href="{E(SURVEY_URL)}" rel="noopener" target="_blank">Take the 2-minute survey</a></p>' if SURVEY_URL
+                  + (f'<p><a class="more primary" href="{E(SURVEY_URL)}" rel="noopener" target="_blank">Take the 2-minute survey</a></p>' if SURVEY_URL
                    else '<p class="callout">The survey opens soon. Join the weekly list below and we will send you the link.</p>') + self.signup())
 
         # ---- content pages (content/*.html): first lines carry <!--title: ...--> and <!--desc: ...-->
