@@ -303,6 +303,10 @@ def from_other(r: dict) -> Job:
     if isinstance(p, (list, tuple)) and len(p) == 3 and p[0]:
         lo, hi = float(str(p[0]).replace(",", "")), float(str(p[1]).replace(",", ""))
         unit = "hour" if str(p[2]).lower().startswith("h") else "year"
+        ok = (10 <= lo <= 250) if unit == "hour" else (20_000 <= lo <= 600_000)
+        if not ok or hi < lo:  # p. ej. "$0.02 - $0.03": un error en la publicación, no un salario
+            lo = hi = None
+            unit = ""
     elif isinstance(p, str):
         pay_text = p
     return Job(r.get("source", "other"), r["company"], r.get("id") or r["url"], r["title"].strip(), "", "",
@@ -691,7 +695,7 @@ def fetch_blackbox() -> list[dict]:
 # Vision Technologies (tablero Loxo, lista en el HTML)
 # ---------------------------------------------------------------------------
 VISION_URL = "https://vision-technologies.app.loxo.co/vision-technologies"
-VISION_CARD = re.compile(r'class="job-title"[^>]*href="([^"]+)"[^>]*>\s*(.*?)\s*</a>.*?location_on</i>\s*(.*?)\s*</div>', re.S)
+VISION_CARD = re.compile(r"""class=['"]job-title['"][^>]*href=['"]([^'"]+)['"][^>]*>\s*(.*?)\s*</a>.*?location_on</i>\s*(.*?)\s*</div>""", re.S)
 
 
 def parse_vision(html_text: str) -> list[dict]:
@@ -714,7 +718,7 @@ def fetch_vision() -> list[dict]:
 # ---------------------------------------------------------------------------
 # M.C. Dean (iCIMS): eléctrico, cableado y operación de instalaciones críticas
 # ---------------------------------------------------------------------------
-MCDEAN_KEEP = re.compile(r"critical facilit|data ?cent|\bUPS\b|medium voltage|communications technician|electrician|cabl|generator", re.I)
+MCDEAN_KEEP = re.compile(r"critical facilit|\bUPS\b|medium voltage|communications technician|electrician|cabl|generator|data ?cent.*technician", re.I)
 MCDEAN_PAY = re.compile(r"USD\s*\$([\d,.]+)\s*-\s*USD\s*\$([\d,.]+)\s*/\s*(Hr|Yr|Hour|Year)", re.I)
 
 
