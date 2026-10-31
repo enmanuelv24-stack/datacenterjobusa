@@ -163,7 +163,9 @@ Access Control / Low Voltage Security Technician </a></h3>
 def test_perks():
     t = "Travel position. Per diem of $150/day and company-paid lodging. Rotation: 3 weeks on / 1 week off. Overtime available after 40 hours."
     assert c.extract_perks(t) == ("per_diem|housing|travel|overtime|rotation:3/1", 150.0)
-    assert c.extract_perks("Housing Provided. $27.50 - $30/hr. 6x10 schedule.") == ("housing|overtime", None)
+    assert c.extract_perks("Housing Provided. $27.50 - $30/hr. 6x10 schedule.") == ("housing|overtime|schedule:10h/6d", None)
+    assert c.extract_perks("12-hour shifts, 6 days a week during the project.") == ("schedule:12h/6d", None)
+    assert c.extract_perks("Schedule: 5x12s, overtime after 40.") == ("overtime|schedule:12h/5d", None)
     assert c.extract_perks("$178 per day per diem for travelers; sign-on bonus $1,000") == ("per_diem|signon", 178.0)
     assert c.extract_perks("Great benefits, medical, dental, 401k.") == ("", None)
     assert c.extract_perks("") == ("", None)

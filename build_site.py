@@ -73,6 +73,16 @@ def perk_labels(j) -> list[str]:
             out.append(f'Per diem {money(j["per_diem"]).replace(".00", "")}/day' if j.get("per_diem") else "Per diem")
         elif t.startswith("rotation:"):
             out.append("Rotation " + t.split(":", 1)[1] + " wks")
+        elif t.startswith("schedule:"):
+            parts = []
+            for x in t.split(":", 1)[1].split("/"):
+                if x.endswith("hw"):
+                    parts.append(x[:-2] + " hrs/wk")
+                elif x.endswith("h"):
+                    parts.append(x[:-1] + "-hr shifts")
+                elif x.endswith("d"):
+                    parts.append(x[:-1] + " days/wk")
+            out.append("Schedule " + " · ".join(parts))
         else:
             out.append(PERK_EN.get(t, t))
     return out
@@ -215,7 +225,7 @@ class Site:
                 f'<label for="ro">Type<select id="ro"><option value="">All types</option>{opts(sorted({d["r"] for d in data}))}</select></label>'
                 '<label for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
                 '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
-                '<option value="Travel">Travel job</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
+                '<option value="Travel">Travel job</option><option value="Schedule">Schedule stated (12s, 6 days…)</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
                 '<label for="so">Sort<select id="so"><option value="pay">Highest pay</option><option value="new">Newest</option></select></label>'
                 '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'

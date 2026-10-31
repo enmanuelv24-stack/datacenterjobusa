@@ -254,6 +254,9 @@ PER_DIEM_AMOUNT = re.compile(r"(?:per[ -]?diem[^$\n]{0,40}\$\s?(\d{2,3})(?:\.\d\
                              r"(?:\$\s?(\d{2,3})(?:\.\d\d)?\s*(?:/|per|a)\s*(?:day|diem)\b[^.\n]{0,40}per[ -]?diem)|"
                              r"(?:\$\s?(\d{2,3})(?:\.\d\d)?\s*(?:/|per|a)?\s*(?:day|daily)\s+per[ -]?diem)|"
                              r"(?:per[ -]?diem\s*(?:of|:|-|–|is|at)?\s*\$\s?(\d{2,3}))", re.I)
+SHIFT_HOURS = re.compile(r"\b(1[02])[- ]?(?:hour|hr)s?\s*(?:shift|day|schedule|work ?day)s?|\b(1[02])s\b(?! ?%)|\b([56])\s?x\s?(1[02])s?\b", re.I)
+DAYS_WEEK = re.compile(r"\b([5-7])\s*(?:days?|days a|days per|days/)\s*(?:a |per |/)?\s*(?:week|wk)\b|\bmonday\s*(?:-|to|through|thru)\s*(saturday|sunday)\b", re.I)
+HOURS_WEEK = re.compile(r"\b([4-8]\d)\+?\s*(?:hours|hrs)\s*(?:per|a|/)\s*(?:week|wk)\b", re.I)
 ROTATION = re.compile(r"(\d{1,2})\s*(weeks?|wks?|days?)?\s*(?:on|-on)\s*(?:/|,|and|&)?\s*(\d{1,2})\s*(weeks?|wks?|days?)?\s*(?:off|-off)", re.I)
 
 
@@ -271,6 +274,24 @@ def extract_perks(text: str) -> tuple[str, float | None]:
             per_diem = amt
             if "per_diem" not in tags:
                 tags.insert(0, "per_diem")
+    sh = SHIFT_HOURS.search(text)
+    hours = next((g for g in sh.groups() if g), None) if sh else None
+    if sh and sh.group(3):  # "5x12"
+        hours = sh.group(4)
+    dw = DAYS_WEEK.search(text)
+    days = (dw.group(1) or {"saturday": "6", "sunday": "7"}[dw.group(2).lower()]) if dw else None
+    if sh and sh.group(3) and not days:
+        days = sh.group(3)
+    hw = HOURS_WEEK.search(text)
+    sched = []
+    if hours:
+        sched.append(f"{hours}h")
+    if days:
+        sched.append(f"{days}d")
+    if hw and not (hours and days):
+        sched.append(f"{hw.group(1)}hw")
+    if sched:
+        tags.append("schedule:" + "/".join(sched))
     r = ROTATION.search(text)
     if r and (r.group(2) or r.group(4)):
         on, off = int(r.group(1)), int(r.group(3))
