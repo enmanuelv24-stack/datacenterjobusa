@@ -750,7 +750,7 @@ def fetch_mcdean() -> list[dict]:
 # ---------------------------------------------------------------------------
 # E2 Optics (iCIMS clásico): contratista de cableado ISP para hyperscale
 # ---------------------------------------------------------------------------
-E2_ROW = re.compile(r'Location</span>\s*<span>\s*US-([A-Z]{2})-([^<]+?)\s*</span>.*?<a href="([^"]+)"[^>]*class="iCIMS_Anchor"[^>]*>.*?<h3>\s*(.*?)\s*</h3>', re.S)
+E2_ROW = re.compile(r'Location</span>\s*<span\s*>\s*US-([A-Z]{2})-([^<]+?)\s*</span>.*?<a href="([^"]+)"[^>]*class="iCIMS_Anchor"[^>]*>.*?<h3\s*>\s*(.*?)\s*</h3>', re.S)
 E2_KEEP = re.compile(r"technician|installer|network specialist|lead tech|splicer|low voltage|cabl", re.I)
 
 
