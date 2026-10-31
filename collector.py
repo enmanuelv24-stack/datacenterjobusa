@@ -823,6 +823,75 @@ def fetch_ultipro(company: str, board: str, keep: "re.Pattern") -> list[dict]:
 STATE_BY_NAME_UPPER = {v.upper(): k for k, v in US_STATES.items()}
 
 
+# ---------------------------------------------------------------------------
+# Team LINX (teamlinx.com): contratista de bajo voltaje / cableado ISP para data centers
+# (Oracle Abilene, entre otros). Tabla HTML "Job Position | Location" + página por puesto con "Pay:".
+# ---------------------------------------------------------------------------
+LINX_ROW = re.compile(r'<tr[^>]*>\s*<td[^>]*>\s*<a href="(https://teamlinx\.com/career/[^"]+)"[^>]*>\s*(.*?)\s*</a>\s*</td>\s*<td[^>]*>\s*(.*?)\s*</td>'
+                      r'(?:\s*<!--td>(\d\d-\d\d-\d{4})</td-->)?', re.S)
+LINX_KEEP = re.compile(r"technician|foreman|splic|installer|lead tech", re.I)
+LINX_PAY = re.compile(r"Pay(?: Rate)?(?:</strong>)?:\s*(?:</strong>\s*)?(.{0,200}?)(?:&nbsp;|</p|<br)", re.S)
+LINX_AMOUNT = re.compile(r"\$\s?(\d{1,3}(?:\.\d\d)?)\b")
+
+
+def parse_linx_table(html_text: str) -> list[dict]:
+    out = []
+    for href, title, locs, d in LINX_ROW.findall(html_text):
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).replace("–", "-").strip()
+        locs = html.unescape(re.sub(r"<[^>]+>", "", locs)).strip()
+        if not LINX_KEEP.search(title) or re.search(r"quality|training|superintend|manager|estimator|commercial construction", title, re.I):
+            continue
+        if not (DC_TITLE.search(title) or re.search(r"splic|fiber", title, re.I)):
+            continue  # solo data center / fibra; lo comercial no va en el sitio
+        posted = f"{d[6:10]}-{d[0:2]}-{d[3:5]}" if d else ""  # la fecha viene en un comentario HTML (MM-DD-YYYY)
+        out.append({"title": title, "href": href, "locs": locs, "posted": posted})
+    return out
+
+
+def parse_linx_job(html_text: str) -> tuple:
+    """Devuelve (pay, posted): pay = (min, max, 'hour') o None."""
+    pay = None
+    m = LINX_PAY.search(html_text)
+    if m:
+        nums = [float(x) for x in LINX_AMOUNT.findall(html.unescape(m.group(1)))]
+        if nums and min(nums) >= 10:
+            pay = (min(nums), max(nums), "hour")
+    d = re.search(r'datePublished"\s*:\s*"(\d{4}-\d\d-\d\d)', html_text)
+    return pay, (d.group(1) if d else "")
+
+
+def linx_locations(locs: str) -> list[str]:
+    out = []
+    for part in re.split(r"\s*[|,]\s*(?=[A-Z][a-z]|Travel)", locs):
+        part = part.strip().rstrip(",")
+        if not part:
+            continue
+        if part.lower() == "travel":
+            out.append("Travel - US")
+            continue
+        m = re.match(r"^(.*?),?\s+([A-Z]{2})$", part)
+        if m:
+            out.append(f"{m.group(1).strip()}, {m.group(2)}")
+    return out
+
+
+def fetch_linx() -> list[dict]:
+    out = []
+    for r in parse_linx_table(get("https://teamlinx.com/careers/", as_json=False)):
+        try:
+            pay, posted = parse_linx_job(get(r["href"], as_json=False))
+        except Exception as e:
+            print("aviso: linx", r["href"], e, file=sys.stderr)
+            pay, posted = None, ""
+        posted = posted or r["posted"]
+        slug = r["href"].rstrip("/").rsplit("/", 1)[-1]
+        for loc in linx_locations(r["locs"]):
+            out.append({"company": "Team LINX", "title": r["title"], "loc": loc, "posted": posted, "pay": pay,
+                        "url": r["href"], "id": f"linx-{slug}-{re.sub(r'[^a-z]', '', loc.lower())}", "source": "linx"})
+        time.sleep(0.3)
+    return out
+
+
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
     try:
@@ -840,7 +909,7 @@ def collect_live() -> dict:
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
     for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin,
-               fetch_blackbox, fetch_vision, fetch_mcdean, fetch_e2):
+               fetch_blackbox, fetch_vision, fetch_mcdean, fetch_e2, fetch_linx):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo

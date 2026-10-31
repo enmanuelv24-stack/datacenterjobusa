@@ -110,6 +110,40 @@ def test_keep_previous_if_source_failed():
     assert [j for j in out if j.company == "Google"][0].days_posted == 10
 
 
+def test_linx():
+    table = '''<table><tr><th>Job Position</th><th>Location</th></tr>
+<tr>
+    <td><a href="https://teamlinx.com/career/data-center-technician/" class="text-dark" title="x">Data Center Technician</a></td>
+    <td>Dallas TX</td>
+    <!--td>09-25-2026</td-->
+  </tr>
+<tr>
+    <td><a href="https://teamlinx.com/career/low-voltage-foreman-data-center-construction/" class="text-dark">Low Voltage Foreman &#8211; Data Center Construction</a></td>
+    <td>Travel, Dallas TX, El Paso TX, Salt Lake City UT</td>
+  </tr>
+<tr>
+    <td><a href="https://teamlinx.com/career/low-voltage-technician-commercial-construction/" class="text-dark">Low Voltage Technician &#8211; Commercial Construction</a></td>
+    <td>Denver CO</td>
+  </tr>
+<tr>
+    <td><a href="https://teamlinx.com/career/marketing-coordinator/" class="text-dark">Marketing Coordinator</a></td>
+    <td>Denver CO</td>
+  </tr></table>'''
+    rows = c.parse_linx_table(table)
+    assert [r["title"] for r in rows] == ["Data Center Technician", "Low Voltage Foreman - Data Center Construction"]
+    assert rows[0]["posted"] == "2026-09-25"
+    assert c.linx_locations("Travel, Dallas TX, El Paso TX, Salt Lake City UT") == ["Travel - US", "Dallas, TX", "El Paso, TX", "Salt Lake City, UT"]
+    assert c.linx_locations("Cheyenne, WY | Salt Lake City, UT") == ["Cheyenne, WY", "Salt Lake City, UT"]
+    page = ('<p>Pay: Tech I: $20.00 &#8211; $23.00/hour | Tech II: $22.00 &#8211; $25.00/hour | Tech III: $25.00 &#8211; $29.00/hour&nbsp;'
+            '</p><script>{"datePublished":"2026-09-29T03:07:54+00:00"}</script>')
+    assert c.parse_linx_job(page) == ((20.0, 29.0, "hour"), "2026-09-29")
+    assert c.parse_linx_job("<p>Pay Rate: $30.00 &#8211; $38.00</p>")[0] == (30.0, 38.0, "hour")
+    j = c.build({"other": [{"company": "Team LINX", "title": "Data Center Technician", "loc": "Dallas, TX", "posted": "2026-09-25",
+                            "pay": (20.0, 29.0, "hour"), "url": "https://teamlinx.com/career/data-center-technician/",
+                            "id": "linx-x", "source": "linx"}]}, date(2026, 10, 30))[0]
+    assert (j.city, j.state, j.hourly_min, j.hourly_max, j.days_posted) == ("Dallas", "TX", 20.0, 29.0, 35)
+
+
 if __name__ == "__main__":
     import sys
     fails = 0
