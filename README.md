@@ -56,6 +56,8 @@ DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, 
 | Black Box | Contratista de cableado y despliegue | Oracle HCM (API) |
 | Vision Technologies | Contratista de cableado | Loxo (lista en HTML) |
 | M.C. Dean | Eléctrico y operación de instalaciones críticas | iCIMS (API) |
+| E2 Optics | Contratista de cableado ISP (hyperscale) | iCIMS clásico (HTML) |
+| ADB Companies | Fibra ISP/OSP y empalme en data center | UKG/UltiPro (API) |
 
 Pendientes: Salute Mission Critical (usa ADP, difícil de leer), Megawatt Construction (no tiene bolsa pública),
 Digital Realty (su Workday no responde desde fuera), WWT (ADP), Wachter (seguridad, no DC), Telaid (subcontrata), Vantage, Meta, CBRE/JLL, DPR, Turner, Mortenson.

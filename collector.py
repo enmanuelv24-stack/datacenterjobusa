@@ -58,7 +58,7 @@ KEEP = re.compile(
     r"critical (environment|facilit)|hvac|\bmechanic\b|chief engineer|"
     r"facilit(y|ies) (engineer|tech)|\bEOT\b|\bDCO\b|"
     # contratistas de despliegue: la carrera del técnico sigue en lead/foreman de cuadrilla
-    r"deployment (lead|foreman)|field lead|lead data center",
+    r"deployment (lead|foreman)|field lead|lead data center|\binstaller\b|network specialist|\bsplicer\b",
     re.I,
 )
 DROP = re.compile(
@@ -140,7 +140,7 @@ def classify_role(title: str) -> str:
         return "Mecánico / HVAC"
     if "controls" in t:
         return "Controles / BMS"
-    if re.search(r"install|deploy|network|fiber|cabl|infra delivery", t):
+    if re.search(r"install|deploy|network|fiber|cabl|splic|infra delivery", t):
         return "Instalación / red"
     if re.search(r"field engineer tech|engineer technician", t):
         return "Construcción"
@@ -747,6 +747,81 @@ def fetch_mcdean() -> list[dict]:
             time.sleep(0.3)
     return out
 
+# ---------------------------------------------------------------------------
+# E2 Optics (iCIMS clásico): contratista de cableado ISP para hyperscale
+# ---------------------------------------------------------------------------
+E2_ROW = re.compile(r'Location</span>\s*<span>\s*US-([A-Z]{2})-([^<]+?)\s*</span>.*?<a href="([^"]+)"[^>]*class="iCIMS_Anchor"[^>]*>.*?<h3>\s*(.*?)\s*</h3>', re.S)
+E2_KEEP = re.compile(r"technician|installer|network specialist|lead tech|splicer|low voltage|cabl", re.I)
+
+
+def parse_e2(html_text: str) -> list[dict]:
+    out = []
+    for st, city, href, title in E2_ROW.findall(html_text):
+        title = html.unescape(title).strip()
+        if not E2_KEEP.search(title) or not is_tech_title(title) and not re.search(r"installer|network specialist|splicer", title, re.I):
+            continue
+        city = html.unescape(city).split(" - ")[0].strip()  # "Salt Lake City - Eagle Mountain" -> ciudad principal
+        jid = (re.search(r"/jobs/(\d+)/", href) or [None, href])[1]
+        out.append({"company": "E2 Optics", "title": title, "loc": f"{city}, {st}", "posted": "", "pay": None,
+                    "url": href.split("?")[0], "id": f"e2-{jid}", "source": "e2optics"})
+    return out
+
+
+def fetch_e2() -> list[dict]:
+    out, seen = [], set()
+    for pr in range(0, 10):
+        rows = parse_e2(get(f"https://careers-e2optics.icims.com/jobs/search?ss=1&searchRelation=keyword_all&pr={pr}&in_iframe=1", as_json=False))
+        new = [r for r in rows if r["id"] not in seen]
+        if not new:
+            break
+        seen.update(r["id"] for r in new)
+        out += new
+        time.sleep(0.3)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# UKG / UltiPro (ADB Companies): tablero con API JSON
+# ---------------------------------------------------------------------------
+ULTIPRO_SITES = [("ADB Companies", "https://recruiting2.ultipro.com/ADB1000ADBC/JobBoard/41648143-db27-4906-836e-7f9a417d1a19",
+                  re.compile(r"data center|\bISP\b|structure cabl|structured cabl", re.I))]
+
+
+def fetch_ultipro(company: str, board: str, keep: "re.Pattern") -> list[dict]:
+    payload = {"opportunitySearch": {"Top": 500, "Skip": 0, "QueryString": "",
+                                     "OrderBy": [{"Value": "postedDateDesc", "PropertyName": "PostedDate", "Ascending": False}], "Filters": []},
+               "matchCriteria": {"PreferredJobs": [], "Educations": [], "LicenseAndCertifications": [], "Skills": [],
+                                 "hasNoLicenses": False, "SkillAssessments": []}}
+    data = post_json(board + "/JobBoardView/LoadSearchResults", payload)
+    out = []
+    for o in data.get("opportunities") or []:
+        title = re.sub(r"^\W+|\W+$", "", (o.get("Title") or "").strip())
+        if not keep.search(title) or not is_tech_title(title):
+            continue
+        locs = [l.get("LocalizedName") or "" for l in (o.get("Locations") or [])]
+        locs = [re.sub(r"^Data Center - ", "", x).strip() for x in locs if x and x.strip() not in ("Remote", "")]
+        # ADB usa nombres sueltos ("Abilene", "New Albany", "TEXAS"); se completan con ciudades conocidas
+        known = {"Abilene": "Abilene, TX", "New Albany": "New Albany, OH", "Columbus": "Columbus, OH", "Chicago": "Chicago, IL",
+                 "Pittsburgh": "Pittsburgh, PA", "Denver": "Denver, CO", "Atlanta": "Atlanta, GA"}
+        loc = ""
+        for x in locs:
+            if "," in x:
+                loc = x; break
+            if x.title() in known:
+                loc = known[x.title()]; break
+        if not loc:
+            for x in locs:
+                if x.upper() in STATE_BY_NAME_UPPER:
+                    loc = STATE_BY_NAME_UPPER[x.upper()]; break
+        if not loc:
+            continue
+        out.append({"company": company, "title": title, "loc": loc, "posted": (o.get("PostedDate") or "")[:10], "pay": None,
+                    "url": f"{board}/OpportunityDetail?opportunityId={o.get('Id')}", "id": f"ultipro-{o.get('Id')}", "source": "ultipro"})
+    return out
+
+
+STATE_BY_NAME_UPPER = {v.upper(): k for k, v in US_STATES.items()}
+
 
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
@@ -765,11 +840,16 @@ def collect_live() -> dict:
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
     for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin,
-               fetch_blackbox, fetch_vision, fetch_mcdean):
+               fetch_blackbox, fetch_vision, fetch_mcdean, fetch_e2):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo
             print("aviso:", fn.__name__, e, file=sys.stderr)
+    for company, board, keep in ULTIPRO_SITES:
+        try:
+            raw["other"] += fetch_ultipro(company, board, keep)
+        except Exception as e:
+            print("aviso: ultipro", company, e, file=sys.stderr)
     for org, company in LEVER_ORGS.items():
         try:
             raw["other"] += fetch_lever(org, company)
