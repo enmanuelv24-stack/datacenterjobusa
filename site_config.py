@@ -37,4 +37,4 @@ STATE_NAMES = {
 MIN_CITY_OPENINGS = 3  # una ciudad tiene página propia si tiene al menos estas vacantes
 
 # Enlace de la encuesta de turnos (Google Forms, Tally, etc.). Vacío = el sitio dice "muy pronto".
-SURVEY_URL = ""
+SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdAiL_Nd9-OX5mNSFFdpO6MuF6_aGw-_2hpg5V9P-P706oPVQ/viewform"
