@@ -60,6 +60,24 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
          '&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;600;700&display=swap">')
 
 
+PERK_EN = {"per_diem": "Per diem", "housing": "Housing", "travel": "Travel", "overtime": "Overtime", "signon": "Sign-on bonus",
+           "relocation": "Relocation", "shift_diff": "Shift differential", "vehicle": "Company vehicle", "retention": "Completion bonus"}
+
+
+def perk_labels(j) -> list[str]:
+    out = []
+    for t in (j.get("perks") or "").split("|"):
+        if not t:
+            continue
+        if t == "per_diem":
+            out.append(f'Per diem {money(j["per_diem"]).replace(".00", "")}/day' if j.get("per_diem") else "Per diem")
+        elif t.startswith("rotation:"):
+            out.append("Rotation " + t.split(":", 1)[1] + " wks")
+        else:
+            out.append(PERK_EN.get(t, t))
+    return out
+
+
 class Site:
     def __init__(self, jobs, out: Path, preview: bool, today: date):
         self.jobs, self.out, self.preview, self.today = jobs, out, preview, today
@@ -74,6 +92,7 @@ class Site:
         nav = (f'<nav class="main" aria-label="Main"><a href="{r("index.html")}">Jobs</a>'
                f'<a href="{r("salaries.html")}">Salaries</a><a href="{r("companies.html")}">Companies</a>'
                f'<a href="{r("states.html")}">States</a><a href="{r("certifications.html")}">Certifications</a>'
+               f'<a href="{r("travel-jobs.html")}">Per diem</a>'
                f'<a href="{r("shift-schedules.html")}">Shifts</a>'
                f'<a href="{r("about.html")}">About</a></nav>')
         url = f"{SITE_URL}/{path}".replace("/index.html", "/")
@@ -98,6 +117,10 @@ class Site:
         self.pages.append(path)
 
     # -------------------------------------------------------------- pieces
+    @staticmethod
+    def perk_chips(j) -> str:
+        return "".join(f'<span class="chip perk">{E(t)}</span>' for t in perk_labels(j))
+
     def job_row(self, j, depth: int, scale_max: float) -> str:
         title = clean_title(j["title"])
         loc = f'{j["city"]}, {j["state"]}' if j["city"] else STATE_NAMES.get(j["state"], j["state"])
@@ -108,6 +131,7 @@ class Site:
             chips += f' <span class="chip">{j["openings"]} openings</span>'
         if j.get("days_posted") is not None and j["days_posted"] <= 7:
             chips += ' <span class="chip new">New</span>'
+        chips += self.perk_chips(j)
         if j["hourly_min"]:
             lo, hi = j["hourly_min"], j["hourly_max"] or j["hourly_min"]
             left, width = lo / scale_max * 100, max(2, (hi - lo) / scale_max * 100)
@@ -167,13 +191,13 @@ class Site:
         # ---- index with client-side filters
         data = [{"t": clean_title(j["title"]), "c": j["company"], "ci": j["city"], "s": j["state"],
                  "r": ROLE_EN.get(j["role"], j["role"]), "n": j["openings"], "lo": j["hourly_min"],
-                 "hi": j["hourly_max"], "d": j["days_posted"],
+                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j),
                  "u": (f'jobs/{j["slug"]}.html' if not self.preview else j["url"])} for j in js]
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
         quick = ("".join(f'<a href="{E(u)}">{E(n)}</a>' for n, u in top_states)
-                 + '<a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+                 + '<a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
         body = ('<section class="hero"><div class="wrap">'
                 '<p class="kicker">Built by a working data center tech</p>'
                 '<h1>Data center tech jobs with the <mark>pay up front</mark>.</h1>'
@@ -190,6 +214,8 @@ class Site:
                 f'<label for="co">Company<select id="co"><option value="">All companies</option>{opts(sorted(companies))}</select></label>'
                 f'<label for="ro">Type<select id="ro"><option value="">All types</option>{opts(sorted({d["r"] for d in data}))}</select></label>'
                 '<label for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
+                '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
+                '<option value="Travel">Travel job</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
                 '<label for="so">Sort<select id="so"><option value="pay">Highest pay</option><option value="new">Newest</option></select></label>'
                 '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
@@ -202,13 +228,13 @@ const m=v=>'$'+v.toFixed(2);
 function row(j){let pay='<div class="pay nopay">Pay not posted</div>';
  if(j.lo){const l=j.lo/SC*100,w=Math.max(2,(j.hi-j.lo)/SC*100);pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour</small><div class="bar" aria-hidden="true"><span style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
- return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}</div></div>${pay}</li>`}
-function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value;
- let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p));
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
+function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value;
+ let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk))));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
  const n=r.reduce((s,j)=>s+j.n,0);$('cnt').textContent=`${n.toLocaleString()} openings in ${r.length.toLocaleString()} listings`;
  $('list').innerHTML=r.slice(0,N).map(row).join('');$('more').hidden=r.length<=N}
-['q','st','co','ro','pay','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
+['q','st','co','ro','pay','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 </script></div>""")
         self.page("index.html", SITE_NAME if self.preview else f"{SITE_NAME}: {SITE_TAGLINE}",
@@ -317,7 +343,8 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         f'<tr><th>Posted pay</th><td>{pay}</td></tr>'
                         f'<tr><th>Job type</th><td>{E(ROLE_EN.get(j["role"], j["role"]))}</td></tr>'
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
-                        f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
+                        + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
+                        + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
                         f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">Apply on {E(j["company"])}\'s site</a></p>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
@@ -325,6 +352,29 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"]} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {j["city"]}, {j["state"]}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>')
+
+        # ---- travel jobs: per diem, housing, rotations
+        travel = [j for j in js if j.get("perks")]
+        pd = [j for j in travel if j.get("per_diem")]
+        by_co = Counter()
+        for j in travel:
+            by_co[j["company"]] += j["openings"]
+        co_rows = "".join(f'<tr><td><a href="companies/{slug(c)}.html">{E(c)}</a></td><td class=num>{n}</td>'
+                          f'<td>{E(", ".join(sorted({t for j in travel if j["company"] == c for t in perk_labels(j)})))}</td></tr>'
+                          for c, n in by_co.most_common())
+        med_pd = statistics.median([j["per_diem"] for j in pd]) if pd else None
+        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Per diem &amp; housing</p>'
+                '<h1>Travel jobs with per diem, housing and rotations</h1>'
+                f'<p class="lede">{sum(j["openings"] for j in travel):,} openings where the employer\'s own posting mentions per diem, paid housing or lodging, '
+                f'a travel rotation, overtime or a bonus. {len(pd)} postings state the per diem amount'
+                + (f' (typical: {money(med_pd).replace(".00", "")}/day).' if med_pd else '.')
+                + ' For a traveling tech, $28/hr plus $150/day and a hotel beats $34/hr with nothing — this page is where you compare that.</p>'
+                '<p class="note">We only tag what the employer wrote in the posting. If a perk is not listed here, ask the recruiter; many contractors pay per diem without posting it.</p>'
+                '<h2>Employers posting travel perks</h2><div class="tablebox"><table><thead><tr><th>Employer</th><th>Openings</th><th>Perks mentioned</th></tr></thead>'
+                f'<tbody>{co_rows}</tbody></table></div>'
+                '<h2>Open jobs</h2>' + self.job_list(travel, 0) + self.signup())
+        self.page("travel-jobs.html", f"Data Center Travel Jobs with Per Diem and Housing | {SITE_NAME}",
+                  "Data center technician and fiber jobs that pay per diem, provide housing or run on a travel rotation, with pay ranges.", body)
 
         # ---- about + survey
         self.page("about.html", f"About | {SITE_NAME}", f"Why {SITE_NAME} exists and where the data comes from.",

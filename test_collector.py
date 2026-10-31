@@ -136,7 +136,7 @@ def test_linx():
     assert c.linx_locations("Cheyenne, WY | Salt Lake City, UT") == ["Cheyenne, WY", "Salt Lake City, UT"]
     page = ('<p>Pay: Tech I: $20.00 &#8211; $23.00/hour | Tech II: $22.00 &#8211; $25.00/hour | Tech III: $25.00 &#8211; $29.00/hour&nbsp;'
             '</p><script>{"datePublished":"2026-09-29T03:07:54+00:00"}</script>')
-    assert c.parse_linx_job(page) == ((20.0, 29.0, "hour"), "2026-09-29")
+    assert c.parse_linx_job(page)[:2] == ((20.0, 29.0, "hour"), "2026-09-29")
     assert c.parse_linx_job("<p>Pay Rate: $30.00 &#8211; $38.00</p>")[0] == (30.0, 38.0, "hour")
     j = c.build({"other": [{"company": "Team LINX", "title": "Data Center Technician", "loc": "Dallas, TX", "posted": "2026-09-25",
                             "pay": (20.0, 29.0, "hour"), "url": "https://teamlinx.com/career/data-center-technician/",
@@ -158,6 +158,19 @@ Access Control / Low Voltage Security Technician </a></h3>
     assert [(r["title"], r["loc"], r["id"]) for r in rows] == [("Data Center Technician", "Abilene, TX", "jazz-8B7SQebvNJ")]
     assert c.parse_jazz_job("<p>Pay: $22-$27 per hour based on experience</p>") == (22.0, 27.0, "hour")
     assert c.parse_jazz_job("<p>Great benefits. Apply by 5/5.</p>") is None
+
+
+def test_perks():
+    t = "Travel position. Per diem of $150/day and company-paid lodging. Rotation: 3 weeks on / 1 week off. Overtime available after 40 hours."
+    assert c.extract_perks(t) == ("per_diem|housing|travel|overtime|rotation:3/1", 150.0)
+    assert c.extract_perks("Housing Provided. $27.50 - $30/hr. 6x10 schedule.") == ("housing|overtime", None)
+    assert c.extract_perks("$178 per day per diem for travelers; sign-on bonus $1,000") == ("per_diem|signon", 178.0)
+    assert c.extract_perks("Great benefits, medical, dental, 401k.") == ("", None)
+    assert c.extract_perks("") == ("", None)
+    j = c.build({"other": [{"company": "X", "title": "Fiber Splicer", "loc": "Abilene, TX", "posted": "2026-10-20",
+                            "pay": (34.0, 38.0, "hour"), "url": "https://x/1", "id": "x1", "source": "x",
+                            "desc": "Per diem: $178/day. Hotel provided. 2 weeks on 1 week off."}]}, date(2026, 10, 30))[0]
+    assert (j.perks, j.per_diem, j.desc) == ("per_diem|housing|rotation:2/1", 178.0, "")
 
 
 if __name__ == "__main__":

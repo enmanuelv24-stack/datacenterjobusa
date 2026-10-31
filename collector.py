@@ -35,7 +35,7 @@ from pathlib import Path
 GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius", "holderconstruction": "Holder Construction",
                      "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics"}
 # Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
-LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix"}
+LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix", "midtechgroup": "MidPoint Technology Group"}
 DC_ONLY = {"Network Connex", "AFL"}
 DC_TITLE = re.compile(r"data ?cent|\bISP\b|\bDC\b|low voltage|structured cabl|white space", re.I)
 ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda"}
@@ -112,6 +112,9 @@ class Job:
     hourly_max: float | None = field(default=None)
     days_posted: int | None = field(default=None)  # días desde que se publicó
     openings: int = 1   # vacantes con el mismo puesto y ubicación (Amazon publica muchas iguales)
+    desc: str = ""      # descripción completa (no se guarda; sirve para detectar per diem, hospedaje, etc.)
+    perks: str = ""     # beneficios detectados, separados por "|": per_diem, housing, travel, rotation:3/1, overtime, ...
+    per_diem: float | None = None  # monto diario del per diem si lo dicen
 
 
 # ---------------------------------------------------------------------------
@@ -232,9 +235,58 @@ def to_hourly(v: float | None, unit: str) -> float | None:
     return round(v if unit == "hour" else v / HOURS_PER_YEAR, 2)
 
 
+PERK_RULES = [
+    ("per_diem", re.compile(r"per[ -]?diem|\bperdiem\b|daily allowance|meal allowance|M&IE", re.I)),
+    ("housing", re.compile(r"housing (is )?(provided|included|paid|available|covered|offered)|(company|employer)[- ]paid (housing|lodging|hotel)|"
+                           r"lodging (provided|included|paid|covered)|hotel (provided|paid|included|covered)|free (housing|lodging)|"
+                           r"housing (allowance|stipend)|lodging (allowance|stipend)|provided housing|furnished housing|corporate housing", re.I)),
+    ("travel", re.compile(r"\btravel(ing|ling)? (position|role|job|crew|technician|required|is required|is a requirement|assignment)|\d{2,3}\s?% travel|"
+                          r"nationwide travel|extensive travel|must be (able|willing) to travel|willing to travel|travel (up to|across|to project|away from home)|"
+                          r"travel (may be |will be |is )?required|^travel\b", re.I)),
+    ("overtime", re.compile(r"\bovertime\b|\bOT\b|time and a half|\d{2}\+?\s?(hours|hrs)\s?(per|a|/)\s?(week|wk)|\b[56]\s?x\s?1[02]\b", re.I)),
+    ("signon", re.compile(r"sign[- ]?on bonus|signing bonus|hiring bonus", re.I)),
+    ("relocation", re.compile(r"relocation (assistance|package|bonus|support|available|provided)", re.I)),
+    ("shift_diff", re.compile(r"shift differential|night differential|night shift premium", re.I)),
+    ("vehicle", re.compile(r"company (vehicle|truck|van)|vehicle (allowance|stipend)|truck allowance|mileage reimburse", re.I)),
+    ("retention", re.compile(r"retention bonus|completion bonus|project bonus", re.I)),
+]
+PER_DIEM_AMOUNT = re.compile(r"(?:per[ -]?diem[^$\n]{0,40}\$\s?(\d{2,3})(?:\.\d\d)?\s*(?:/|per|a|each)?\s*(?:day|daily|diem)?)|"
+                             r"(?:\$\s?(\d{2,3})(?:\.\d\d)?\s*(?:/|per|a)\s*(?:day|diem)\b[^.\n]{0,40}per[ -]?diem)|"
+                             r"(?:\$\s?(\d{2,3})(?:\.\d\d)?\s*(?:/|per|a)?\s*(?:day|daily)\s+per[ -]?diem)|"
+                             r"(?:per[ -]?diem\s*(?:of|:|-|–|is|at)?\s*\$\s?(\d{2,3}))", re.I)
+ROTATION = re.compile(r"(\d{1,2})\s*(weeks?|wks?|days?)?\s*(?:on|-on)\s*(?:/|,|and|&)?\s*(\d{1,2})\s*(weeks?|wks?|days?)?\s*(?:off|-off)", re.I)
+
+
+def extract_perks(text: str) -> tuple[str, float | None]:
+    """Detecta beneficios de viaje en la descripción: per diem (y monto), hospedaje, rotación, horas extra, bonos."""
+    text = strip_html(text or "")
+    if not text:
+        return "", None
+    tags = [name for name, rx in PERK_RULES if rx.search(text)]
+    per_diem = None
+    m = PER_DIEM_AMOUNT.search(text)
+    if m:
+        amt = float(next(g for g in m.groups() if g))
+        if 30 <= amt <= 400:
+            per_diem = amt
+            if "per_diem" not in tags:
+                tags.insert(0, "per_diem")
+    r = ROTATION.search(text)
+    if r and (r.group(2) or r.group(4)):
+        on, off = int(r.group(1)), int(r.group(3))
+        if 1 <= on <= 60 and 1 <= off <= 30:
+            tags.append(f"rotation:{on}/{off}")
+    return "|".join(tags), per_diem
+
+
 def finalize(job: Job) -> Job:
     if job.pay_min is None and job.pay_text:
         job.pay_min, job.pay_max, job.pay_unit = parse_pay(job.pay_text)
+    if not job.perks:
+        job.perks, job.per_diem = extract_perks(job.desc or job.pay_text)
+        if re.search(r"\btravel(ing)?\b", job.title, re.I) and "travel" not in job.perks.split("|"):
+            job.perks = "|".join(x for x in ["travel", job.perks] if x)
+    job.desc = ""
     job.hourly_min = to_hourly(job.pay_min, job.pay_unit)
     job.hourly_max = to_hourly(job.pay_max, job.pay_unit)
     job.level = classify_level(job.title)
@@ -310,7 +362,8 @@ def from_other(r: dict) -> Job:
     elif isinstance(p, str):
         pay_text = p
     return Job(r.get("source", "other"), r["company"], r.get("id") or r["url"], r["title"].strip(), "", "",
-               r.get("loc", ""), parse_date(r.get("posted", "")), r["url"], lo, hi, unit, pay_text=pay_text)
+               r.get("loc", ""), parse_date(r.get("posted", "")), r["url"], lo, hi, unit, pay_text=pay_text,
+               desc=r.get("desc") or "")
 
 
 # ---------------------------------------------------------------------------
@@ -542,7 +595,9 @@ def fetch_lever(org: str, company: str) -> list[dict]:
         if r.get("createdAt"):
             posted = datetime.utcfromtimestamp(r["createdAt"] / 1000).strftime("%Y-%m-%d")
         out.append({"company": company, "title": title, "loc": (r.get("categories") or {}).get("location", ""),
-                    "posted": posted, "pay": pay, "url": r.get("hostedUrl", ""), "id": r.get("id"), "source": "lever"})
+                    "posted": posted, "pay": pay, "url": r.get("hostedUrl", ""), "id": r.get("id"), "source": "lever",
+                    "desc": (r.get("descriptionPlain") or "") + " " + " ".join(
+                        strip_html(l.get("text", "") + " " + l.get("content", "")) for l in (r.get("lists") or []))})
     return out
 
 
@@ -741,7 +796,8 @@ def fetch_mcdean() -> list[dict]:
                 pay = [m.group(1), m.group(2), "hour" if m.group(3).lower().startswith("h") else "year"] if m else None
                 out.append({"company": "M.C. Dean", "title": re.sub(r"\s*-\s*[A-Z][\w .]+,\s*[A-Z]{2}$", "", title),
                             "loc": f"{(d.get('city') or '').title()}, {d.get('state')}", "posted": (d.get("posted_date") or "")[:10],
-                            "pay": pay, "url": f"https://careers.mcdean.com/jobs/{d.get('slug')}", "id": f"mcdean-{rid}", "source": "mcdean"})
+                            "pay": pay, "url": f"https://careers.mcdean.com/jobs/{d.get('slug')}", "id": f"mcdean-{rid}", "source": "mcdean",
+                            "desc": strip_html(d.get("description") or "")[:6000]})
             if len(jobs) < 100:
                 break
             time.sleep(0.3)
@@ -849,7 +905,7 @@ def parse_linx_table(html_text: str) -> list[dict]:
 
 
 def parse_linx_job(html_text: str) -> tuple:
-    """Devuelve (pay, posted): pay = (min, max, 'hour') o None."""
+    """Devuelve (pay, posted, desc): pay = (min, max, 'hour') o None."""
     pay = None
     m = LINX_PAY.search(html_text)
     if m:
@@ -857,7 +913,8 @@ def parse_linx_job(html_text: str) -> tuple:
         if nums and min(nums) >= 10:
             pay = (min(nums), max(nums), "hour")
     d = re.search(r'datePublished"\s*:\s*"(\d{4}-\d\d-\d\d)', html_text)
-    return pay, (d.group(1) if d else "")
+    body = re.search(r"<article[\s\S]*?</article>|<main[\s\S]*?</main>", html_text)
+    return pay, (d.group(1) if d else ""), strip_html(re.sub(r"<script[\s\S]*?</script>", "", (body.group(0) if body else html_text)))[:6000]
 
 
 def linx_locations(locs: str) -> list[str]:
@@ -879,14 +936,14 @@ def fetch_linx() -> list[dict]:
     out = []
     for r in parse_linx_table(get("https://teamlinx.com/careers/", as_json=False)):
         try:
-            pay, posted = parse_linx_job(get(r["href"], as_json=False))
+            pay, posted, desc = parse_linx_job(get(r["href"], as_json=False))
         except Exception as e:
             print("aviso: linx", r["href"], e, file=sys.stderr)
-            pay, posted = None, ""
+            pay, posted, desc = None, "", ""
         posted = posted or r["posted"]
         slug = r["href"].rstrip("/").rsplit("/", 1)[-1]
         for loc in linx_locations(r["locs"]):
-            out.append({"company": "Team LINX", "title": r["title"], "loc": loc, "posted": posted, "pay": pay,
+            out.append({"company": "Team LINX", "title": r["title"], "loc": loc, "posted": posted, "pay": pay, "desc": desc,
                         "url": r["href"], "id": f"linx-{slug}-{re.sub(r'[^a-z]', '', loc.lower())}", "source": "linx"})
         time.sleep(0.3)
     return out
@@ -930,11 +987,18 @@ def parse_jazz_job(html_text: str):
     return (lo, hi, unit) if lo else None
 
 
+def jazz_desc(html_text: str) -> str:
+    body = re.search(r'id="job-description"[\s\S]*?(?=<form|<div class="apply|$)', html_text)
+    return strip_html(re.sub(r"<script[\s\S]*?</script>", "", body.group(0) if body else html_text))[:6000]
+
+
 def fetch_jazz(company: str, board: str, keep: "re.Pattern") -> list[dict]:
     rows = parse_jazz_list(get(board, as_json=False), company, keep)
     for r in rows:
         try:
-            r["pay"] = parse_jazz_job(get(r["url"], as_json=False))
+            page = get(r["url"], as_json=False)
+            r["pay"] = parse_jazz_job(page)
+            r["desc"] = jazz_desc(page)
         except Exception as e:
             print("aviso: jazz", r["url"], e, file=sys.stderr)
         time.sleep(0.2)
@@ -1026,14 +1090,14 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
 def write_outputs(jobs: list[Job], outdir: Path) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
     cols = ["company", "title", "role", "level", "city", "state", "openings", "posted", "days_posted",
-            "hourly_min", "hourly_max", "pay_min", "pay_max", "pay_unit", "url", "source", "job_id"]
+            "hourly_min", "hourly_max", "pay_min", "pay_max", "pay_unit", "perks", "per_diem", "url", "source", "job_id"]
     with open(outdir / "jobs.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         for j in jobs:
             w.writerow(asdict(j))
     with open(outdir / "jobs.json", "w", encoding="utf-8") as f:
-        json.dump([{k: v for k, v in asdict(j).items() if k != "pay_text"} for j in jobs], f,
+        json.dump([{k: v for k, v in asdict(j).items() if k not in ("pay_text", "desc")} for j in jobs], f,
                   ensure_ascii=False, indent=1)
 
 
