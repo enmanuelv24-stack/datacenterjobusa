@@ -617,44 +617,131 @@ ORACLE_US = "300000000149325"
 ORACLE_PAY = re.compile(r"from \$([\d,.]+) to \$([\d,.]+) per (hour|annum|year)", re.I)
 
 
-def fetch_oracle() -> list[dict]:
+def fetch_oracle_hcm(company: str, api: str, site: str, keywords: tuple, keep: "re.Pattern", job_url: str,
+                     location_id: str | None = None, source: str = "oracle") -> list[dict]:
+    """Sitios de empleo en Oracle Cloud HCM (Oracle, Black Box). Pide la lista por palabra clave y el detalle por puesto."""
     seen, out = set(), []
-    for kw in ("technician", "data center facilities", "critical facilities"):
+    for kw in keywords:
         offset = 0
         while True:
-            url = (f"{ORACLE_API}recruitingCEJobRequisitions?onlyData=true&expand=requisitionList.secondaryLocations"
-                   f"&finder=findReqs;siteNumber={ORACLE_SITE},"
-                   f"keyword=%22{urllib.parse.quote(kw)}%22,locationId={ORACLE_US},limit=200,offset={offset},"
+            loc = f",locationId={location_id}" if location_id else ""
+            url = (f"{api}recruitingCEJobRequisitions?onlyData=true&expand=requisitionList.secondaryLocations"
+                   f"&finder=findReqs;siteNumber={site},keyword=%22{urllib.parse.quote(kw)}%22{loc},limit=200,offset={offset},"
                    f"sortBy=POSTING_DATES_DESC")
             items = get(url).get("items") or [{}]
             rows = items[0].get("requisitionList") or []
             for r in rows:
                 title = (r.get("Title") or "").strip()
-                if r["Id"] in seen or not is_tech_title(title) or not DC_TITLE.search(title) and "facilit" not in title.lower():
+                if r["Id"] in seen or not is_tech_title(title) or not keep.search(title):
                     continue
                 seen.add(r["Id"])
-                out.append({"company": "Oracle", "title": title, "loc": (r.get("PrimaryLocation") or "").replace(", United States", ""),
+                place = r.get("PrimaryLocation") or ""
+                if place.strip() == "United States":  # sin ciudad: usar la primera ubicación secundaria de EE.UU.
+                    for s2 in r.get("secondaryLocations") or []:
+                        if (s2.get("CountryCode") == "US" or "United States" in (s2.get("Name") or "")) and "," in (s2.get("Name") or ""):
+                            place = s2["Name"]
+                            break
+                if "United States" not in place and not re.search(r", [A-Z]{2}$", place):
+                    continue
+                place = place.replace(", United States", "")
+                city, _, st = place.rpartition(", ")
+                if city.isupper():
+                    city = city.title()
+                out.append({"company": company, "title": title, "loc": f"{city}, {st}" if city else place,
                             "posted": (r.get("PostedDate") or "")[:10], "pay": None,
-                            "url": f"https://careers.oracle.com/jobs/#en/sites/jobsearch/job/{r['Id']}",
-                            "id": "oracle-" + str(r["Id"]), "source": "oracle"})
+                            "url": job_url.format(id=r["Id"]), "id": f"{source}-{r['Id']}", "source": source})
             if len(rows) < 200:
                 break
             offset += 200
 
     def add_pay(r):
         try:
-            d = get(f"{ORACLE_API}recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;"
-                    f"Id=%22{r['id'].split('-')[1]}%22,siteNumber={ORACLE_SITE}")
-            text = " ".join(str(v) for v in (d.get("items") or [{}])[0].values() if isinstance(v, str))
-            m = ORACLE_PAY.search(strip_html(text))
+            d = get(f"{api}recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;"
+                    f"Id=%22{r['id'].split('-', 1)[1]}%22,siteNumber={site}")
+            text = strip_html(" ".join(str(v) for v in (d.get("items") or [{}])[0].values() if isinstance(v, str)))
+            m = ORACLE_PAY.search(text)
             if m:
                 r["pay"] = [m.group(1), m.group(2), "hour" if m.group(3).lower() == "hour" else "year"]
+            else:
+                r["pay"] = text[-3000:]  # parse_pay busca "$X - $Y" en el texto
         except Exception:
             pass
         return r
 
     with ThreadPoolExecutor(max_workers=3) as ex:
         return list(ex.map(add_pay, out))
+
+
+def fetch_oracle() -> list[dict]:
+    keep = re.compile(r"data ?cent|\bISP\b|\bDC\b|facilit", re.I)
+    return fetch_oracle_hcm("Oracle", ORACLE_API, ORACLE_SITE, ("technician", "data center facilities", "critical facilities"),
+                            keep, "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/{id}", ORACLE_US, "oracle")
+
+
+def fetch_blackbox() -> list[dict]:
+    """Black Box: contratista de cableado y despliegue para hyperscalers."""
+    keep = re.compile(r"network tech|infrastructure tech|cabl|fiber|low voltage|data ?cent|structured", re.I)
+    return fetch_oracle_hcm("Black Box", "https://eoje.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/", "CX_1001",
+                            ("technician",), keep,
+                            "https://eoje.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/{id}",
+                            None, "blackbox")
+
+
+# ---------------------------------------------------------------------------
+# Vision Technologies (tablero Loxo, lista en el HTML)
+# ---------------------------------------------------------------------------
+VISION_URL = "https://vision-technologies.app.loxo.co/vision-technologies"
+VISION_CARD = re.compile(r'class="job-title"[^>]*href="([^"]+)"[^>]*>\s*(.*?)\s*</a>.*?location_on</i>\s*(.*?)\s*</div>', re.S)
+
+
+def parse_vision(html_text: str) -> list[dict]:
+    out = []
+    for href, title, loc in VISION_CARD.findall(html_text):
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).strip()
+        if not is_tech_title(title) or not DC_TITLE.search(title) and not re.search(r"structured cabl", title, re.I):
+            continue
+        loc = html.unescape(loc).replace(", United States", "").strip()
+        url = href if href.startswith("http") else "https://vision-technologies.app.loxo.co" + href
+        out.append({"company": "Vision Technologies", "title": title, "loc": loc, "posted": "", "pay": None,
+                    "url": url, "id": "vision-" + url.rsplit("/", 1)[-1][:40], "source": "vision"})
+    return out
+
+
+def fetch_vision() -> list[dict]:
+    return parse_vision(get(VISION_URL, as_json=False))
+
+
+# ---------------------------------------------------------------------------
+# M.C. Dean (iCIMS): eléctrico, cableado y operación de instalaciones críticas
+# ---------------------------------------------------------------------------
+MCDEAN_KEEP = re.compile(r"critical facilit|data ?cent|\bUPS\b|medium voltage|communications technician|electrician|cabl|generator", re.I)
+MCDEAN_PAY = re.compile(r"USD\s*\$([\d,.]+)\s*-\s*USD\s*\$([\d,.]+)\s*/\s*(Hr|Yr|Hour|Year)", re.I)
+
+
+def fetch_mcdean() -> list[dict]:
+    seen, out = set(), []
+    for kw in ("critical facility technician", "data center", "UPS technician", "medium voltage", "electrician", "communications technician"):
+        for page in range(1, 8):
+            data = get(f"https://careers.mcdean.com/api/jobs?keywords={urllib.parse.quote(kw)}&page={page}&limit=100")
+            jobs = data.get("jobs") or []
+            for x in jobs:
+                d = x.get("data") or x
+                rid = d.get("req_id") or d.get("slug")
+                title = (d.get("title") or "").strip()
+                if rid in seen or not is_tech_title(title) or not MCDEAN_KEEP.search(title):
+                    continue
+                if (d.get("country_code") or "US") not in ("US", "USA") or not d.get("state"):
+                    continue
+                seen.add(rid)
+                m = MCDEAN_PAY.search(strip_html(d.get("description") or ""))
+                pay = [m.group(1), m.group(2), "hour" if m.group(3).lower().startswith("h") else "year"] if m else None
+                out.append({"company": "M.C. Dean", "title": re.sub(r"\s*-\s*[A-Z][\w .]+,\s*[A-Z]{2}$", "", title),
+                            "loc": f"{(d.get('city') or '').title()}, {d.get('state')}", "posted": (d.get("posted_date") or "")[:10],
+                            "pay": pay, "url": f"https://careers.mcdean.com/jobs/{d.get('slug')}", "id": f"mcdean-{rid}", "source": "mcdean"})
+            if len(jobs) < 100:
+                break
+            time.sleep(0.3)
+    return out
 
 
 def collect_live() -> dict:
@@ -673,7 +760,8 @@ def collect_live() -> dict:
             raw["ashby"][o] = fetch_ashby(o)
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
-    for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin):
+    for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin,
+               fetch_blackbox, fetch_vision, fetch_mcdean):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo

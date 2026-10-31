@@ -53,9 +53,12 @@ DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, 
 | Rosendin | Contratista eléctrico | Su sitio (admin-ajax); solo electricistas de campo |
 | Holder Construction | Constructora de data centers | Greenhouse; solo técnicos de obra por hora |
 | QTS | Operador | Workday |
+| Black Box | Contratista de cableado y despliegue | Oracle HCM (API) |
+| Vision Technologies | Contratista de cableado | Loxo (lista en HTML) |
+| M.C. Dean | Eléctrico y operación de instalaciones críticas | iCIMS (API) |
 
 Pendientes: Salute Mission Critical (usa ADP, difícil de leer), Megawatt Construction (no tiene bolsa pública),
-Digital Realty (su Workday no responde desde fuera), Vantage, Meta, CBRE/JLL, DPR, Turner, Mortenson.
+Digital Realty (su Workday no responde desde fuera), WWT (ADP), Wachter (seguridad, no DC), Telaid (subcontrata), Vantage, Meta, CBRE/JLL, DPR, Turner, Mortenson.
 
 ## Agregar una empresa
 
