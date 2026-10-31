@@ -100,7 +100,7 @@ class Site:
     # -------------------------------------------------------------- pieces
     def job_row(self, j, depth: int, scale_max: float) -> str:
         title = clean_title(j["title"])
-        loc = f'{j["city"]}, {j["state"]}'
+        loc = f'{j["city"]}, {j["state"]}' if j["city"] else STATE_NAMES.get(j["state"], j["state"])
         href = (self.rel(f'jobs/{j["slug"]}.html', depth) if not self.preview else j["url"])
         ext = "" if not self.preview else ' rel="noopener" target="_blank"'
         chips = f'<span class="chip">{E(ROLE_EN.get(j["role"], j["role"]))}</span>'
@@ -194,7 +194,7 @@ class Site:
                 '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
                 + self.signup()
-                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LG={json.dumps({c: logo(c) for c in companies})};'
+                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LG={json.dumps({c: logo(c) for c in companies})};const ST={json.dumps({s: STATE_NAMES.get(s, s) for s in states})};'
                 + r"""
 const $=id=>document.getElementById(id);let N=40;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -202,7 +202,7 @@ const m=v=>'$'+v.toFixed(2);
 function row(j){let pay='<div class="pay nopay">Pay not posted</div>';
  if(j.lo){const l=j.lo/SC*100,w=Math.max(2,(j.hi-j.lo)/SC*100);pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour</small><div class="bar" aria-hidden="true"><span style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
- return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${esc(j.ci)}, ${j.s}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}</div></div>${pay}</li>`}
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}</div></div>${pay}</li>`}
 function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value;
  let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
@@ -262,7 +262,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
         city_counts = Counter()
         for j in js:
             city_counts[(j["city"], j["state"])] += j["openings"]
-        city_pages = {k for k, v in city_counts.items() if v >= MIN_CITY_OPENINGS}
+        city_pages = {k for k, v in city_counts.items() if v >= MIN_CITY_OPENINGS and k[0]}  # sin ciudad = sin página
         for s, n in states.items():
             name = STATE_NAMES.get(s, s)
             rows = [j for j in js if j["state"] == s]
@@ -271,7 +271,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 cities[j["city"]] += j["openings"]
             c_links = "".join(
                 (f'<li><a href="../cities/{slug(ci + "-" + s)}.html"><span>{E(ci)}</span><small>{k}</small></a></li>'
-                 if (ci, s) in city_pages else f'<li><a href="#jobs"><span>{E(ci)}</span><small>{k}</small></a></li>')
+                 if (ci, s) in city_pages else f'<li><a href="#jobs"><span>{E(ci or "Statewide / unspecified")}</span><small>{k}</small></a></li>')
                 for ci, k in cities.most_common())
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../states.html">States</a> / {E(name)}</p>'
                     f'<h1>Data center technician jobs in {E(name)}</h1>'
