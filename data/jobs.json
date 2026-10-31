@@ -2,6 +2,26 @@
  {
   "source": "amazon",
   "company": "Amazon",
+  "job_id": "10593926",
+  "title": "Data Center Technician",
+  "city": "",
+  "state": "TX",
+  "location_raw": "Texas, USA",
+  "posted": "2026-10-31",
+  "url": "https://www.amazon.jobs/en/jobs/10593926/data-center-technician",
+  "pay_min": 30.91,
+  "pay_max": 54.18,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 30.91,
+  "hourly_max": 54.18,
+  "days_posted": 0,
+  "openings": 1
+ },
+ {
+  "source": "amazon",
+  "company": "Amazon",
   "job_id": "10593873",
   "title": "Data Center Chief Engineer",
   "city": "Boardman",
@@ -16,7 +36,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 0,
+  "days_posted": 1,
   "openings": 2
  },
  {
@@ -36,7 +56,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 0,
+  "days_posted": 1,
   "openings": 2
  },
  {
@@ -56,7 +76,27 @@
   "role": "Controles / BMS",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 0,
+  "days_posted": 1,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557038928",
+  "title": "Data Center Technician (Nightshift)",
+  "city": "Boydton",
+  "state": "VA",
+  "location_raw": "Boydton, VA",
+  "posted": "2026-10-30",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557038928",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 1,
   "openings": 1
  },
  {
@@ -76,8 +116,8 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 1,
-  "openings": 40
+  "days_posted": 2,
+  "openings": 39
  },
  {
   "source": "amazon",
@@ -96,7 +136,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
@@ -116,7 +156,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
@@ -136,7 +176,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
@@ -156,13 +196,13 @@
   "role": "Instalaciones críticas",
   "hourly_min": 53.51,
   "hourly_max": 89.47,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
-  "source": "careers",
+  "source": "microsoft",
   "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557039010",
+  "job_id": "1970393557039010",
   "title": "Data Center Technician - Phoenix East",
   "city": "Phoenix",
   "state": "AZ",
@@ -176,13 +216,13 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 23.65,
   "hourly_max": 37.07,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
-  "source": "careers",
+  "source": "microsoft",
   "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557045389",
+  "job_id": "1970393557045389",
   "title": "Logistics Technician",
   "city": "Des Moines",
   "state": "IA",
@@ -196,7 +236,7 @@
   "role": "Otro técnico",
   "hourly_min": 23.22,
   "hourly_max": 32.36,
-  "days_posted": 1,
+  "days_posted": 2,
   "openings": 1
  },
  {
@@ -216,7 +256,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -236,7 +276,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 3
  },
  {
@@ -256,8 +296,8 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 2,
-  "openings": 53
+  "days_posted": 3,
+  "openings": 52
  },
  {
   "source": "amazon",
@@ -276,7 +316,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 10
  },
  {
@@ -296,7 +336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 3
  },
  {
@@ -316,7 +356,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 3
  },
  {
@@ -336,7 +376,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -356,7 +396,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 53.51,
   "hourly_max": 89.47,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -376,7 +416,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 31
  },
  {
@@ -396,7 +436,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 35
  },
  {
@@ -416,7 +456,107 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 2,
+  "days_posted": 3,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557044325",
+  "title": "Senior Data Center IT Support Technician (Night Shift)",
+  "city": "Mt Pleasant",
+  "state": "WI",
+  "location_raw": "Mt Pleasant, WI",
+  "posted": "2026-10-28",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044325",
+  "pay_min": 34.13,
+  "pay_max": 56.54,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Soporte TI",
+  "hourly_min": 34.13,
+  "hourly_max": 56.54,
+  "days_posted": 3,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557044354",
+  "title": "Senior Data Center IT Support Technician",
+  "city": "Manassas",
+  "state": "VA",
+  "location_raw": "Manassas, VA",
+  "posted": "2026-10-28",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044354",
+  "pay_min": 34.13,
+  "pay_max": 56.54,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Soporte TI",
+  "hourly_min": 34.13,
+  "hourly_max": 56.54,
+  "days_posted": 3,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557046312",
+  "title": "Critical Environment Support Assistant",
+  "city": "Des Moines",
+  "state": "IA",
+  "location_raw": "Des Moines, IA",
+  "posted": "2026-10-28",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557046312",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 3,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557044326",
+  "title": "Senior Logistics Technician",
+  "city": "Sterling",
+  "state": "VA",
+  "location_raw": "Sterling, VA",
+  "posted": "2026-10-28",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044326",
+  "pay_min": 27.16,
+  "pay_max": 43.27,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Otro técnico",
+  "hourly_min": 27.16,
+  "hourly_max": 43.27,
+  "days_posted": 3,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557048058",
+  "title": "Logistics Technician ATR-B",
+  "city": "San Antonio",
+  "state": "TX",
+  "location_raw": "San Antonio, TX",
+  "posted": "2026-10-28",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557048058",
+  "pay_min": 23.22,
+  "pay_max": 32.36,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Otro técnico",
+  "hourly_min": 23.22,
+  "hourly_max": 32.36,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -436,7 +576,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 35.0,
   "hourly_max": 39.0,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -456,7 +596,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 31.0,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -476,7 +616,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 22.0,
   "hourly_max": 24.0,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -496,127 +636,7 @@
   "role": "Energía / generación",
   "hourly_min": 42.0,
   "hourly_max": 52.0,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557044325",
-  "title": "Senior Data Center IT Support Technician (Night Shift)",
-  "city": "Mt Pleasant",
-  "state": "WI",
-  "location_raw": "Mt Pleasant, WI",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044325",
-  "pay_min": 34.13,
-  "pay_max": 56.54,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Soporte TI",
-  "hourly_min": 34.13,
-  "hourly_max": 56.54,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557044354",
-  "title": "Senior Data Center IT Support Technician",
-  "city": "Manassas",
-  "state": "VA",
-  "location_raw": "Manassas, VA",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044354",
-  "pay_min": 34.13,
-  "pay_max": 56.54,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Soporte TI",
-  "hourly_min": 34.13,
-  "hourly_max": 56.54,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557046312",
-  "title": "Critical Environment Support Assistant",
-  "city": "Des Moines",
-  "state": "IA",
-  "location_raw": "Des Moines, IA",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557046312",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557044326",
-  "title": "Senior Logistics Technician",
-  "city": "Sterling",
-  "state": "VA",
-  "location_raw": "Sterling, VA",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044326",
-  "pay_min": 27.16,
-  "pay_max": 43.27,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": 27.16,
-  "hourly_max": 43.27,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557027281",
-  "title": "Senior Logistics Technician",
-  "city": "Chicago",
-  "state": "IL",
-  "location_raw": "Chicago, IL",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557027281",
-  "pay_min": 27.16,
-  "pay_max": 43.27,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": 27.16,
-  "hourly_max": 43.27,
-  "days_posted": 2,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557048058",
-  "title": "Logistics Technician ATR-B",
-  "city": "San Antonio",
-  "state": "TX",
-  "location_raw": "San Antonio, TX",
-  "posted": "2026-10-28",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557048058",
-  "pay_min": 23.22,
-  "pay_max": 32.36,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Otro técnico",
-  "hourly_min": 23.22,
-  "hourly_max": 32.36,
-  "days_posted": 2,
+  "days_posted": 3,
   "openings": 1
  },
  {
@@ -636,7 +656,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 4
  },
  {
@@ -656,7 +676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -676,7 +696,47 @@
   "role": "Operador",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 3,
+  "days_posted": 4,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557046307",
+  "title": "Data Center Technician",
+  "city": "Cheyenne",
+  "state": "WY",
+  "location_raw": "Cheyenne, WY",
+  "posted": "2026-10-27",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557046307",
+  "pay_min": 27.45,
+  "pay_max": 48.03,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.45,
+  "hourly_max": 48.03,
+  "days_posted": 4,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557042084",
+  "title": "Senior Logistics Technician",
+  "city": "Des Moines",
+  "state": "IA",
+  "location_raw": "Des Moines, IA",
+  "posted": "2026-10-27",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557042084",
+  "pay_min": 27.16,
+  "pay_max": 43.27,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Otro técnico",
+  "hourly_min": 27.16,
+  "hourly_max": 43.27,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -696,7 +756,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -716,7 +776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -736,7 +796,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -756,67 +816,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 3,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557016497",
-  "title": "Critical Environment Technical Trainer",
-  "city": "Phoenix",
-  "state": "AZ",
-  "location_raw": "Phoenix, AZ",
-  "posted": "2026-10-27",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557016497",
-  "pay_min": 77800.0,
-  "pay_max": 153700.0,
-  "pay_unit": "year",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 37.4,
-  "hourly_max": 73.89,
-  "days_posted": 3,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557046307",
-  "title": "Data Center Technician",
-  "city": "Cheyenne",
-  "state": "WY",
-  "location_raw": "Cheyenne, WY",
-  "posted": "2026-10-27",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557046307",
-  "pay_min": 27.45,
-  "pay_max": 48.03,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.45,
-  "hourly_max": 48.03,
-  "days_posted": 3,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557042084",
-  "title": "Senior Logistics Technician",
-  "city": "Des Moines",
-  "state": "IA",
-  "location_raw": "Des Moines, IA",
-  "posted": "2026-10-27",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557042084",
-  "pay_min": 27.16,
-  "pay_max": 43.27,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": 27.16,
-  "hourly_max": 43.27,
-  "days_posted": 3,
+  "days_posted": 4,
   "openings": 1
  },
  {
@@ -836,7 +836,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -856,7 +856,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 2
  },
  {
@@ -876,7 +876,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -896,7 +896,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -916,7 +916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 7
  },
  {
@@ -936,7 +936,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -956,7 +956,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 3
  },
  {
@@ -976,7 +976,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 2
  },
  {
@@ -996,7 +996,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -1016,8 +1016,28 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 4
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393556986820",
+  "title": "Critical Environment Industrial Control Systems Engineer",
+  "city": "Charlotte",
+  "state": "NC",
+  "location_raw": "Charlotte, NC",
+  "posted": "2026-10-26",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393556986820",
+  "pay_min": 102100.0,
+  "pay_max": 202200.0,
+  "pay_unit": "year",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 49.09,
+  "hourly_max": 97.21,
+  "days_posted": 5,
+  "openings": 1
  },
  {
   "source": "oracle",
@@ -1036,27 +1056,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 4,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556986820",
-  "title": "Critical Environment Industrial Control Systems Engineer",
-  "city": "Charlotte",
-  "state": "NC",
-  "location_raw": "Charlotte, NC",
-  "posted": "2026-10-26",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556986820",
-  "pay_min": 102100.0,
-  "pay_max": 202200.0,
-  "pay_unit": "year",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 49.09,
-  "hourly_max": 97.21,
-  "days_posted": 4,
+  "days_posted": 5,
   "openings": 1
  },
  {
@@ -1076,7 +1076,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 6,
+  "days_posted": 7,
   "openings": 4
  },
  {
@@ -1096,7 +1096,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 39.08,
   "hourly_max": 68.41,
-  "days_posted": 7,
+  "days_posted": 8,
   "openings": 2
  },
  {
@@ -1116,7 +1116,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 7,
+  "days_posted": 8,
   "openings": 1
  },
  {
@@ -1136,7 +1136,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 7,
+  "days_posted": 8,
   "openings": 20
  },
  {
@@ -1156,7 +1156,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 7,
+  "days_posted": 8,
   "openings": 1
  },
  {
@@ -1176,7 +1176,67 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 7,
+  "days_posted": 8,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393556945459",
+  "title": "Sr. Data Center Technician",
+  "city": "San Antonio",
+  "state": "TX",
+  "location_raw": "San Antonio, TX",
+  "posted": "2026-10-23",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393556945459",
+  "pay_min": 34.13,
+  "pay_max": 56.54,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 34.13,
+  "hourly_max": 56.54,
+  "days_posted": 8,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557021674",
+  "title": "Senior Critical Environment Technician - Electrical SME",
+  "city": "Phoenix",
+  "state": "AZ",
+  "location_raw": "Phoenix, AZ",
+  "posted": "2026-10-23",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557021674",
+  "pay_min": 34.13,
+  "pay_max": 56.54,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Instalaciones críticas",
+  "hourly_min": 34.13,
+  "hourly_max": 56.54,
+  "days_posted": 8,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557044745",
+  "title": "Critical Environment Technician",
+  "city": "Charlotte",
+  "state": "NC",
+  "location_raw": "Charlotte, NC",
+  "posted": "2026-10-23",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044745",
+  "pay_min": 27.45,
+  "pay_max": 48.03,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 27.45,
+  "hourly_max": 48.03,
+  "days_posted": 8,
   "openings": 1
  },
  {
@@ -1196,87 +1256,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 7,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556945459",
-  "title": "Sr. Data Center Technician",
-  "city": "San Antonio",
-  "state": "TX",
-  "location_raw": "San Antonio, TX",
-  "posted": "2026-10-23",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556945459",
-  "pay_min": 34.13,
-  "pay_max": 56.54,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 34.13,
-  "hourly_max": 56.54,
-  "days_posted": 7,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557023167",
-  "title": "Critical Environment Technician",
-  "city": "Dulles",
-  "state": "VA",
-  "location_raw": "Dulles, VA",
-  "posted": "2026-10-23",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557023167",
-  "pay_min": 27.45,
-  "pay_max": 48.03,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 27.45,
-  "hourly_max": 48.03,
-  "days_posted": 7,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557021674",
-  "title": "Senior Critical Environment Technician - Electrical SME",
-  "city": "Phoenix",
-  "state": "AZ",
-  "location_raw": "Phoenix, AZ",
-  "posted": "2026-10-23",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557021674",
-  "pay_min": 34.13,
-  "pay_max": 56.54,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Instalaciones críticas",
-  "hourly_min": 34.13,
-  "hourly_max": 56.54,
-  "days_posted": 7,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557044745",
-  "title": "Critical Environment Technician",
-  "city": "Charlotte",
-  "state": "NC",
-  "location_raw": "Charlotte, NC",
-  "posted": "2026-10-23",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557044745",
-  "pay_min": 27.45,
-  "pay_max": 48.03,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 27.45,
-  "hourly_max": 48.03,
-  "days_posted": 7,
+  "days_posted": 8,
   "openings": 1
  },
  {
@@ -1296,7 +1276,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 66.97,
   "hourly_max": 100.0,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1316,7 +1296,7 @@
   "role": "Controles / BMS",
   "hourly_min": 29.66,
   "hourly_max": 51.92,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 3
  },
  {
@@ -1336,7 +1316,7 @@
   "role": "Controles / BMS",
   "hourly_min": 29.66,
   "hourly_max": 51.92,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1356,7 +1336,27 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 8,
+  "days_posted": 9,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393556958319",
+  "title": "Critical Environment Ops Tech",
+  "city": "Atlanta",
+  "state": "GA",
+  "location_raw": "Atlanta, GA",
+  "posted": "2026-10-22",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393556958319",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1376,7 +1376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 23.08,
   "hourly_max": 45.05,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1396,7 +1396,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1416,7 +1416,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1436,7 +1436,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1456,7 +1456,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1476,7 +1476,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 26.78,
   "hourly_max": 40.14,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1496,27 +1496,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 35.29,
   "hourly_max": 52.98,
-  "days_posted": 8,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556958319",
-  "title": "Critical Environment Ops Tech",
-  "city": "Atlanta",
-  "state": "GA",
-  "location_raw": "Atlanta, GA",
-  "posted": "2026-10-22",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556958319",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 8,
+  "days_posted": 9,
   "openings": 1
  },
  {
@@ -1536,7 +1516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 9,
+  "days_posted": 10,
   "openings": 1
  },
  {
@@ -1556,28 +1536,8 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 9,
+  "days_posted": 10,
   "openings": 47
- },
- {
-  "source": "amazon",
-  "company": "Amazon",
-  "job_id": "10584706",
-  "title": "DC Asset Doc Tech Coordinator, Field Engineering",
-  "city": "Austin",
-  "state": "TX",
-  "location_raw": "Austin, Texas, USA",
-  "posted": "2026-10-21",
-  "url": "https://www.amazon.jobs/en/jobs/10584706/dc-asset-doc-tech-coordinator-field-engineering",
-  "pay_min": 95300.0,
-  "pay_max": 160000.0,
-  "pay_unit": "year",
-  "level": "",
-  "role": "Instalación / red",
-  "hourly_min": 45.82,
-  "hourly_max": 76.92,
-  "days_posted": 9,
-  "openings": 1
  },
  {
   "source": "greenhouse",
@@ -1596,7 +1556,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 9,
+  "days_posted": 10,
   "openings": 1
  },
  {
@@ -1616,7 +1576,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 9,
+  "days_posted": 10,
   "openings": 1
  },
  {
@@ -1636,7 +1596,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 2
  },
  {
@@ -1656,7 +1616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1676,7 +1636,7 @@
   "role": "Energía / generación",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1696,7 +1656,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1716,7 +1676,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1736,7 +1696,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1756,7 +1716,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1776,7 +1736,67 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 10,
+  "days_posted": 11,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557027298",
+  "title": "Critical Environment Operations Specialist",
+  "city": "Goodyear",
+  "state": "AZ",
+  "location_raw": "Goodyear, AZ",
+  "posted": "2026-10-20",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557027298",
+  "pay_min": 102600.0,
+  "pay_max": 202800.0,
+  "pay_unit": "year",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 49.33,
+  "hourly_max": 97.5,
+  "days_posted": 11,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393556984731",
+  "title": "Data Center Technician",
+  "city": "Manassas",
+  "state": "VA",
+  "location_raw": "Manassas, VA",
+  "posted": "2026-10-20",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393556984731",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 11,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557041509",
+  "title": "Critical Environment Industrial Control Systems Engineer",
+  "city": "Quincy",
+  "state": "WA",
+  "location_raw": "Quincy, WA",
+  "posted": "2026-10-20",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557041509",
+  "pay_min": 102100.0,
+  "pay_max": 202200.0,
+  "pay_unit": "year",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 49.09,
+  "hourly_max": 97.21,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1796,7 +1816,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 23.08,
   "hourly_max": 45.05,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1816,7 +1836,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1836,7 +1856,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 25.0,
   "hourly_max": 30.0,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1856,67 +1876,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 21.44,
   "hourly_max": 32.21,
-  "days_posted": 10,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557027298",
-  "title": "Critical Environment Operations Specialist",
-  "city": "Goodyear",
-  "state": "AZ",
-  "location_raw": "Goodyear, AZ",
-  "posted": "2026-10-20",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557027298",
-  "pay_min": 102600.0,
-  "pay_max": 202800.0,
-  "pay_unit": "year",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 49.33,
-  "hourly_max": 97.5,
-  "days_posted": 10,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557041509",
-  "title": "Critical Environment Industrial Control Systems Engineer",
-  "city": "Quincy",
-  "state": "WA",
-  "location_raw": "Quincy, WA",
-  "posted": "2026-10-20",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557041509",
-  "pay_min": 102100.0,
-  "pay_max": 202200.0,
-  "pay_unit": "year",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 49.09,
-  "hourly_max": 97.21,
-  "days_posted": 10,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556984731",
-  "title": "Data Center Technician",
-  "city": "Manassas",
-  "state": "VA",
-  "location_raw": "Manassas, VA",
-  "posted": "2026-10-20",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556984731",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 10,
+  "days_posted": 11,
   "openings": 1
  },
  {
@@ -1936,7 +1896,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 39.08,
   "hourly_max": 68.41,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 2
  },
  {
@@ -1956,7 +1916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 2
  },
  {
@@ -1976,7 +1936,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 3
  },
  {
@@ -1996,7 +1956,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 5
  },
  {
@@ -2016,7 +1976,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 2
  },
  {
@@ -2036,7 +1996,27 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 11,
+  "days_posted": 12,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557041647",
+  "title": "Data Center Technician",
+  "city": "Richmond",
+  "state": "VA",
+  "location_raw": "Richmond, VA",
+  "posted": "2026-10-19",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557041647",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 12,
   "openings": 1
  },
  {
@@ -2056,7 +2036,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 1
  },
  {
@@ -2076,27 +2056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 36.06,
   "hourly_max": 54.33,
-  "days_posted": 11,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557041647",
-  "title": "Data Center Technician",
-  "city": "Richmond",
-  "state": "VA",
-  "location_raw": "Richmond, VA",
-  "posted": "2026-10-19",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557041647",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 11,
+  "days_posted": 12,
   "openings": 1
  },
  {
@@ -2116,7 +2076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 14,
+  "days_posted": 15,
   "openings": 1
  },
  {
@@ -2136,27 +2096,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 14,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557040907",
-  "title": "Senior Critical Environment Technician",
-  "city": "Quincy",
-  "state": "WA",
-  "location_raw": "Quincy, WA",
-  "posted": "2026-10-16",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557040907",
-  "pay_min": 34.13,
-  "pay_max": 56.54,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Instalaciones críticas",
-  "hourly_min": 34.13,
-  "hourly_max": 56.54,
-  "days_posted": 14,
+  "days_posted": 15,
   "openings": 1
  },
  {
@@ -2176,7 +2116,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
@@ -2196,7 +2136,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
@@ -2216,7 +2156,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 3
  },
  {
@@ -2236,7 +2176,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 2
  },
  {
@@ -2256,14 +2196,14 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5266499007",
-  "title": "Data Center Operations Technician",
+  "title": "Data Center Operations Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -2276,14 +2216,14 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5266497007",
-  "title": "Lead Data Center Technician",
+  "title": "Lead Data Center Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -2296,7 +2236,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
@@ -2316,14 +2256,14 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5266461007",
-  "title": "Senior Linux Data Center Technician - Memphis",
+  "title": "Sr. Linux Data Center Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -2336,7 +2276,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
@@ -2356,7 +2296,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 40.38,
   "hourly_max": 60.58,
-  "days_posted": 15,
+  "days_posted": 16,
   "openings": 1
  },
  {
@@ -2376,7 +2316,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 3
  },
  {
@@ -2396,7 +2336,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2416,7 +2356,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 39.08,
   "hourly_max": 68.41,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2436,7 +2376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 3
  },
  {
@@ -2456,7 +2396,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2476,7 +2416,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 2
  },
  {
@@ -2496,7 +2436,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 2
  },
  {
@@ -2516,7 +2456,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2536,7 +2476,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2556,7 +2496,7 @@
   "role": "Instalación / red",
   "hourly_min": 25.19,
   "hourly_max": 44.08,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 3
  },
  {
@@ -2576,7 +2516,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 13
  },
  {
@@ -2596,7 +2536,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2616,7 +2556,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2636,7 +2576,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 36.06,
   "hourly_max": 54.33,
-  "days_posted": 16,
+  "days_posted": 17,
   "openings": 1
  },
  {
@@ -2656,7 +2596,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 24
  },
  {
@@ -2676,7 +2616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 27
  },
  {
@@ -2696,7 +2636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 20
  },
  {
@@ -2716,7 +2656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
@@ -2736,7 +2676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
@@ -2756,7 +2696,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 2
  },
  {
@@ -2776,14 +2716,14 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5264616007",
-  "title": "Senior Facilities Operations Technician - Memphis",
+  "title": "Sr. Facilities Operations Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -2796,7 +2736,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
@@ -2816,7 +2756,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
@@ -2836,27 +2776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 17,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-347481",
-  "title": "Senior Data Center Support Services",
-  "city": "",
-  "state": "TX",
-  "location_raw": "TX",
-  "posted": "2026-10-13",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/347481",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 17,
+  "days_posted": 18,
   "openings": 1
  },
  {
@@ -2876,28 +2796,8 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 18,
+  "days_posted": 19,
   "openings": 4
- },
- {
-  "source": "amazon",
-  "company": "Amazon",
-  "job_id": "10576240",
-  "title": "Engineering Operation Technician II, AWS DC Operations Engineering (DCEO)",
-  "city": "Hilliard",
-  "state": "OH",
-  "location_raw": "Hilliard, Ohio, USA",
-  "posted": "2026-10-12",
-  "url": "https://www.amazon.jobs/en/jobs/10576240/engineering-operation-technician-ii-aws-dc-operations-engineering-dceo",
-  "pay_min": 37.64,
-  "pay_max": 65.91,
-  "pay_unit": "hour",
-  "level": "II",
-  "role": "Instalaciones críticas",
-  "hourly_min": 37.64,
-  "hourly_max": 65.91,
-  "days_posted": 18,
-  "openings": 1
  },
  {
   "source": "amazon",
@@ -2916,7 +2816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 18,
+  "days_posted": 19,
   "openings": 1
  },
  {
@@ -2936,7 +2836,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 18,
+  "days_posted": 19,
   "openings": 4
  },
  {
@@ -2956,7 +2856,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.02,
   "hourly_max": 55.58,
-  "days_posted": 18,
+  "days_posted": 19,
   "openings": 1
  },
  {
@@ -2976,7 +2876,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 21,
+  "days_posted": 22,
   "openings": 1
  },
  {
@@ -2996,7 +2896,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.54,
   "hourly_max": 47.31,
-  "days_posted": 21,
+  "days_posted": 22,
   "openings": 1
  },
  {
@@ -3016,7 +2916,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 22.31,
   "hourly_max": 33.46,
-  "days_posted": 21,
+  "days_posted": 22,
   "openings": 1
  },
  {
@@ -3036,53 +2936,13 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 22,
+  "days_posted": 23,
   "openings": 1
  },
  {
-  "source": "careers",
+  "source": "microsoft",
   "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556972143",
-  "title": "Critical Environment Ops",
-  "city": "Santa Clara",
-  "state": "CA",
-  "location_raw": "Santa Clara, CA",
-  "posted": "2026-10-08",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556972143",
-  "pay_min": 27.45,
-  "pay_max": 48.03,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 27.45,
-  "hourly_max": 48.03,
-  "days_posted": 22,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557026595",
-  "title": "Critical Environment Technician",
-  "city": "Boydton",
-  "state": "VA",
-  "location_raw": "Boydton, VA",
-  "posted": "2026-10-08",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557026595",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 22,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557021793",
+  "job_id": "1970393557021793",
   "title": "Senior Critical Environment Technician - CTJ - Poly",
   "city": "Manassas",
   "state": "VA",
@@ -3096,7 +2956,27 @@
   "role": "Instalaciones críticas",
   "hourly_min": 34.13,
   "hourly_max": 56.54,
-  "days_posted": 22,
+  "days_posted": 23,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393557026595",
+  "title": "Critical Environment Technician",
+  "city": "Boydton",
+  "state": "VA",
+  "location_raw": "Boydton, VA",
+  "posted": "2026-10-08",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393557026595",
+  "pay_min": 23.65,
+  "pay_max": 37.07,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Instalaciones críticas",
+  "hourly_min": 23.65,
+  "hourly_max": 37.07,
+  "days_posted": 23,
   "openings": 1
  },
  {
@@ -3116,7 +2996,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 35.52,
   "hourly_max": 62.3,
-  "days_posted": 23,
+  "days_posted": 24,
   "openings": 1
  },
  {
@@ -3136,7 +3016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 23,
+  "days_posted": 24,
   "openings": 10
  },
  {
@@ -3156,7 +3036,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 23,
+  "days_posted": 24,
   "openings": 3
  },
  {
@@ -3176,7 +3056,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 23,
+  "days_posted": 24,
   "openings": 1
  },
  {
@@ -3196,7 +3076,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 1
  },
  {
@@ -3216,7 +3096,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 9
  },
  {
@@ -3236,7 +3116,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 35.52,
   "hourly_max": 62.3,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 2
  },
  {
@@ -3256,7 +3136,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 32.16,
   "hourly_max": 56.29,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 4
  },
  {
@@ -3276,7 +3156,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 1
  },
  {
@@ -3296,7 +3176,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 1
  },
  {
@@ -3316,7 +3196,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 2
  },
  {
@@ -3336,7 +3216,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 1
  },
  {
@@ -3356,7 +3236,7 @@
   "role": "Instalación / red",
   "hourly_min": 25.19,
   "hourly_max": 44.08,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 1
  },
  {
@@ -3376,7 +3256,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 2
  },
  {
@@ -3396,28 +3276,8 @@
   "role": "Instalaciones críticas",
   "hourly_min": 41.25,
   "hourly_max": 45.25,
-  "days_posted": 24,
+  "days_posted": 25,
   "openings": 2
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-346757",
-  "title": "Instructional Designer – Data Center Critical Facilities Training",
-  "city": "Nashville",
-  "state": "TN",
-  "location_raw": "Nashville, TN",
-  "posted": "2026-10-06",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/346757",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 24,
-  "openings": 1
  },
  {
   "source": "amazon",
@@ -3436,7 +3296,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 2
  },
  {
@@ -3456,7 +3316,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3476,7 +3336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3496,7 +3356,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 3
  },
  {
@@ -3516,7 +3376,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3536,28 +3396,8 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 2
- },
- {
-  "source": "greenhouse",
-  "company": "xAI",
-  "job_id": "5257430007",
-  "title": "Critical Facilities Engineer - Memphis",
-  "city": "Southaven",
-  "state": "MS",
-  "location_raw": " Southaven, MS; Memphis, TN",
-  "posted": "2026-10-05",
-  "url": "https://job-boards.greenhouse.io/xai/jobs/5257430007",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 25,
-  "openings": 1
  },
  {
   "source": "greenhouse",
@@ -3576,7 +3416,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3596,14 +3436,34 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 25,
+  "days_posted": 26,
+  "openings": 1
+ },
+ {
+  "source": "greenhouse",
+  "company": "xAI",
+  "job_id": "5257430007",
+  "title": "Sr. Critical Facilities Engineer - Memphis",
+  "city": "Southaven",
+  "state": "MS",
+  "location_raw": " Southaven, MS; Memphis, TN",
+  "posted": "2026-10-05",
+  "url": "https://job-boards.greenhouse.io/xai/jobs/5257430007",
+  "pay_min": null,
+  "pay_max": null,
+  "pay_unit": "",
+  "level": "III",
+  "role": "Instalaciones críticas",
+  "hourly_min": null,
+  "hourly_max": null,
+  "days_posted": 26,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5257417007",
-  "title": "Senior Critical Facilities Technician - Memphis",
+  "title": "Sr. Critical Facilities Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -3616,7 +3476,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3636,7 +3496,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 45.0,
   "hourly_max": 57.0,
-  "days_posted": 25,
+  "days_posted": 26,
   "openings": 1
  },
  {
@@ -3656,7 +3516,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 1
  },
  {
@@ -3676,7 +3536,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 3
  },
  {
@@ -3696,14 +3556,14 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 10
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5255505007",
-  "title": "Power Generation Technician",
+  "title": "Power Generation Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -3716,7 +3576,7 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 1
  },
  {
@@ -3736,7 +3596,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 49.0,
   "hourly_max": 54.0,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 1
  },
  {
@@ -3756,7 +3616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 28,
+  "days_posted": 29,
   "openings": 1
  },
  {
@@ -3776,7 +3636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 29,
+  "days_posted": 30,
   "openings": 2
  },
  {
@@ -3796,7 +3656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 29,
+  "days_posted": 30,
   "openings": 1
  },
  {
@@ -3816,7 +3676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 66.97,
   "hourly_max": 100.0,
-  "days_posted": 29,
+  "days_posted": 30,
   "openings": 1
  },
  {
@@ -3836,7 +3696,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 29,
+  "days_posted": 30,
   "openings": 8
  },
  {
@@ -3856,27 +3716,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 13.03,
   "hourly_max": 24.81,
-  "days_posted": 29,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556958676",
-  "title": "Critical Environment Ops Tech \"Per Scholas\"",
-  "city": "Atlanta",
-  "state": "GA",
-  "location_raw": "Atlanta, GA",
-  "posted": "2026-10-01",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556958676",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 29,
+  "days_posted": 30,
   "openings": 1
  },
  {
@@ -3896,7 +3736,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 16
  },
  {
@@ -3916,7 +3756,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 32.16,
   "hourly_max": 56.29,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 1
  },
  {
@@ -3936,7 +3776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 2
  },
  {
@@ -3956,7 +3796,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 1
  },
  {
@@ -3976,7 +3816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 1
  },
  {
@@ -3996,7 +3836,7 @@
   "role": "Eléctrico",
   "hourly_min": 50.0,
   "hourly_max": 55.0,
-  "days_posted": 30,
+  "days_posted": 31,
   "openings": 1
  },
  {
@@ -4016,7 +3856,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 39.08,
   "hourly_max": 68.41,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 6
  },
  {
@@ -4036,7 +3876,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 3
  },
  {
@@ -4056,7 +3896,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 33.89,
   "hourly_max": 59.32,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4076,7 +3916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4096,7 +3936,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 2
  },
  {
@@ -4116,14 +3956,14 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5252402007",
-  "title": "Critical Facilities Technician",
+  "title": "Critical Facilities Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -4136,7 +3976,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4156,7 +3996,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4176,7 +4016,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4196,7 +4036,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4216,7 +4056,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 31,
+  "days_posted": 32,
   "openings": 1
  },
  {
@@ -4236,7 +4076,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 32.16,
   "hourly_max": 56.29,
-  "days_posted": 32,
+  "days_posted": 33,
   "openings": 1
  },
  {
@@ -4256,7 +4096,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 32,
+  "days_posted": 33,
   "openings": 1
  },
  {
@@ -4276,7 +4116,7 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 32,
+  "days_posted": 33,
   "openings": 1
  },
  {
@@ -4296,7 +4136,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 35,
+  "days_posted": 36,
   "openings": 1
  },
  {
@@ -4316,7 +4156,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 35,
+  "days_posted": 36,
   "openings": 2
  },
  {
@@ -4336,7 +4176,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 35,
+  "days_posted": 36,
   "openings": 10
  },
  {
@@ -4356,7 +4196,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 35,
+  "days_posted": 36,
   "openings": 6
  },
  {
@@ -4376,13 +4216,13 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 36,
+  "days_posted": 37,
   "openings": 1
  },
  {
-  "source": "careers",
+  "source": "microsoft",
   "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556995580",
+  "job_id": "1970393556995580",
   "title": "Critical Environment Technician - CTJ - Top Secret",
   "city": "Cheyenne",
   "state": "WY",
@@ -4396,7 +4236,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 34.13,
   "hourly_max": 56.54,
-  "days_posted": 36,
+  "days_posted": 37,
   "openings": 1
  },
  {
@@ -4416,7 +4256,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 4
  },
  {
@@ -4436,7 +4276,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 1
  },
  {
@@ -4456,7 +4296,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 2
  },
  {
@@ -4476,7 +4316,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 1
  },
  {
@@ -4496,7 +4336,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 1
  },
  {
@@ -4516,7 +4356,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 37,
+  "days_posted": 38,
   "openings": 1
  },
  {
@@ -4536,7 +4376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 14
  },
  {
@@ -4556,7 +4396,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 66.97,
   "hourly_max": 100.0,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
@@ -4576,7 +4416,7 @@
   "role": "Instalación / red",
   "hourly_min": 25.19,
   "hourly_max": 44.08,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 21
  },
  {
@@ -4596,14 +4436,14 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5245782007",
-  "title": "Medium Voltage Electrician (Service & Repair)",
+  "title": "Medium Voltage Electrician (Service & Repair) - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -4616,14 +4456,14 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5245777007",
-  "title": "Senior Medium-Voltage Electrician - Memphis",
+  "title": "Sr. Medium Voltage Electrician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -4636,7 +4476,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
@@ -4656,7 +4496,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
@@ -4676,27 +4516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 38,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393557004833",
-  "title": "Data Center Technician",
-  "city": "Phoenix",
-  "state": "AZ",
-  "location_raw": "Phoenix, AZ",
-  "posted": "2026-09-22",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393557004833",
-  "pay_min": 23.65,
-  "pay_max": 37.07,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 23.65,
-  "hourly_max": 37.07,
-  "days_posted": 38,
+  "days_posted": 39,
   "openings": 1
  },
  {
@@ -4716,7 +4536,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 39,
+  "days_posted": 40,
   "openings": 1
  },
  {
@@ -4736,7 +4556,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 39,
+  "days_posted": 40,
   "openings": 1
  },
  {
@@ -4756,7 +4576,7 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 39,
+  "days_posted": 40,
   "openings": 1
  },
  {
@@ -4776,7 +4596,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 39,
+  "days_posted": 40,
   "openings": 1
  },
  {
@@ -4796,7 +4616,7 @@
   "role": "Energía / generación",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 39,
+  "days_posted": 40,
   "openings": 1
  },
  {
@@ -4816,7 +4636,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4836,7 +4656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 44
  },
  {
@@ -4856,7 +4676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 3
  },
  {
@@ -4876,7 +4696,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4896,7 +4716,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4916,7 +4736,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4936,7 +4756,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4956,27 +4776,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 42,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-333911",
-  "title": "Data Center Facilities Operations Technician V – Electrical (IC5/OPX)",
-  "city": "",
-  "state": "MI",
-  "location_raw": "MI",
-  "posted": "2026-09-18",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/333911",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 42,
+  "days_posted": 43,
   "openings": 1
  },
  {
@@ -4996,7 +4796,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 2
  },
  {
@@ -5016,7 +4816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5036,7 +4836,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5056,7 +4856,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 3
  },
  {
@@ -5076,7 +4876,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5096,7 +4896,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.83,
   "hourly_max": 66.1,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5116,7 +4916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5136,7 +4936,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5156,7 +4956,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 42.0,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5176,7 +4976,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.4,
   "hourly_max": 48.56,
-  "days_posted": 43,
+  "days_posted": 44,
   "openings": 1
  },
  {
@@ -5196,7 +4996,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 3
  },
  {
@@ -5216,7 +5016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5236,7 +5036,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5256,7 +5056,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5276,87 +5076,7 @@
   "role": "Instalación / red",
   "hourly_min": 43.27,
   "hourly_max": 49.04,
-  "days_posted": 44,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-345502",
-  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
-  "city": "Phoenix",
-  "state": "AZ",
-  "location_raw": "Phoenix, AZ",
-  "posted": "2026-09-16",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345502",
-  "pay_min": 27.64,
-  "pay_max": 56.83,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.64,
-  "hourly_max": 56.83,
-  "days_posted": 44,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-345508",
-  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
-  "city": "Harwood",
-  "state": "ND",
-  "location_raw": "Harwood, ND",
-  "posted": "2026-09-16",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345508",
-  "pay_min": 27.64,
-  "pay_max": 56.83,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.64,
-  "hourly_max": 56.83,
-  "days_posted": 44,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-345578",
-  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
-  "city": "Ashburn",
-  "state": "VA",
-  "location_raw": "Ashburn, VA",
-  "posted": "2026-09-16",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345578",
-  "pay_min": 27.64,
-  "pay_max": 56.83,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.64,
-  "hourly_max": 56.83,
-  "days_posted": 44,
-  "openings": 1
- },
- {
-  "source": "oracle",
-  "company": "Oracle",
-  "job_id": "oracle-345581",
-  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
-  "city": "Anthony",
-  "state": "NM",
-  "location_raw": "Anthony, NM",
-  "posted": "2026-09-16",
-  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345581",
-  "pay_min": 27.64,
-  "pay_max": 56.83,
-  "pay_unit": "hour",
-  "level": "III",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.64,
-  "hourly_max": 56.83,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5376,7 +5096,87 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 44,
+  "days_posted": 45,
+  "openings": 1
+ },
+ {
+  "source": "oracle",
+  "company": "Oracle",
+  "job_id": "oracle-345502",
+  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
+  "city": "Phoenix",
+  "state": "AZ",
+  "location_raw": "Phoenix, AZ",
+  "posted": "2026-09-16",
+  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345502",
+  "pay_min": 27.64,
+  "pay_max": 56.83,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.64,
+  "hourly_max": 56.83,
+  "days_posted": 45,
+  "openings": 1
+ },
+ {
+  "source": "oracle",
+  "company": "Oracle",
+  "job_id": "oracle-345508",
+  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
+  "city": "Harwood",
+  "state": "ND",
+  "location_raw": "Harwood, ND",
+  "posted": "2026-09-16",
+  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345508",
+  "pay_min": 27.64,
+  "pay_max": 56.83,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.64,
+  "hourly_max": 56.83,
+  "days_posted": 45,
+  "openings": 1
+ },
+ {
+  "source": "oracle",
+  "company": "Oracle",
+  "job_id": "oracle-345578",
+  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
+  "city": "Ashburn",
+  "state": "VA",
+  "location_raw": "Ashburn, VA",
+  "posted": "2026-09-16",
+  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345578",
+  "pay_min": 27.64,
+  "pay_max": 56.83,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.64,
+  "hourly_max": 56.83,
+  "days_posted": 45,
+  "openings": 1
+ },
+ {
+  "source": "oracle",
+  "company": "Oracle",
+  "job_id": "oracle-345581",
+  "title": "Senior Data Center Support Services Technician - Washington Vets to Tech (WaV2T)",
+  "city": "Anthony",
+  "state": "NM",
+  "location_raw": "Anthony, NM",
+  "posted": "2026-09-16",
+  "url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/job/345581",
+  "pay_min": 27.64,
+  "pay_max": 56.83,
+  "pay_unit": "hour",
+  "level": "III",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.64,
+  "hourly_max": 56.83,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5396,7 +5196,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.41,
   "hourly_max": 56.83,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5416,7 +5216,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 44,
+  "days_posted": 45,
   "openings": 1
  },
  {
@@ -5436,7 +5236,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 45,
+  "days_posted": 46,
   "openings": 7
  },
  {
@@ -5456,7 +5256,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 45,
+  "days_posted": 46,
   "openings": 6
  },
  {
@@ -5476,7 +5276,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 45,
+  "days_posted": 46,
   "openings": 1
  },
  {
@@ -5496,7 +5296,7 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 45,
+  "days_posted": 46,
   "openings": 1
  },
  {
@@ -5516,7 +5316,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5536,7 +5336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 2
  },
  {
@@ -5556,7 +5356,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.83,
   "hourly_max": 66.1,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5576,7 +5376,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5596,7 +5396,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5616,7 +5416,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5636,27 +5436,7 @@
   "role": "Instalación / red",
   "hourly_min": 43.27,
   "hourly_max": 49.04,
-  "days_posted": 46,
-  "openings": 1
- },
- {
-  "source": "afl",
-  "company": "AFL",
-  "job_id": "afl-LOWVO009297",
-  "title": "Low Voltage Technician III",
-  "city": "Raleigh",
-  "state": "NC",
-  "location_raw": "Raleigh, NC",
-  "posted": "2026-09-14",
-  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=6d1826bc-e496-4628-befc-7271ecbbcaef",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5676,19 +5456,19 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
   "source": "afl",
   "company": "AFL",
-  "job_id": "afl-LOWVO009292",
+  "job_id": "afl-LOWVO009297",
   "title": "Low Voltage Technician III",
-  "city": "Jacksonville",
-  "state": "FL",
-  "location_raw": "Jacksonville, FL",
+  "city": "Raleigh",
+  "state": "NC",
+  "location_raw": "Raleigh, NC",
   "posted": "2026-09-14",
-  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=19e7df44-b62d-479f-a510-5ea141ba20d9",
+  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=6d1826bc-e496-4628-befc-7271ecbbcaef",
   "pay_min": null,
   "pay_max": null,
   "pay_unit": "",
@@ -5696,47 +5476,7 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 46,
-  "openings": 1
- },
- {
-  "source": "afl",
-  "company": "AFL",
-  "job_id": "afl-LOWVO009293",
-  "title": "Low Voltage Technician III",
-  "city": "Orlando",
-  "state": "FL",
-  "location_raw": "Orlando, FL",
-  "posted": "2026-09-14",
-  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=bee48c25-df4c-4860-bb97-cd52c55179ad",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 46,
-  "openings": 1
- },
- {
-  "source": "afl",
-  "company": "AFL",
-  "job_id": "afl-LOWVO009291",
-  "title": "Low Voltage Technician III",
-  "city": "Tampa",
-  "state": "FL",
-  "location_raw": "Tampa, FL",
-  "posted": "2026-09-14",
-  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=fd592616-4a70-4760-815c-2e885371c1e4",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "III",
-  "role": "Otro técnico",
-  "hourly_min": null,
-  "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5756,7 +5496,27 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
+  "openings": 1
+ },
+ {
+  "source": "afl",
+  "company": "AFL",
+  "job_id": "afl-LOWVO009292",
+  "title": "Low Voltage Technician III",
+  "city": "Jacksonville",
+  "state": "FL",
+  "location_raw": "Jacksonville, FL",
+  "posted": "2026-09-14",
+  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=19e7df44-b62d-479f-a510-5ea141ba20d9",
+  "pay_min": null,
+  "pay_max": null,
+  "pay_unit": "",
+  "level": "III",
+  "role": "Otro técnico",
+  "hourly_min": null,
+  "hourly_max": null,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5776,7 +5536,47 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
+  "openings": 1
+ },
+ {
+  "source": "afl",
+  "company": "AFL",
+  "job_id": "afl-LOWVO009293",
+  "title": "Low Voltage Technician III",
+  "city": "Orlando",
+  "state": "FL",
+  "location_raw": "Orlando, FL",
+  "posted": "2026-09-14",
+  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=bee48c25-df4c-4860-bb97-cd52c55179ad",
+  "pay_min": null,
+  "pay_max": null,
+  "pay_unit": "",
+  "level": "III",
+  "role": "Otro técnico",
+  "hourly_min": null,
+  "hourly_max": null,
+  "days_posted": 47,
+  "openings": 1
+ },
+ {
+  "source": "afl",
+  "company": "AFL",
+  "job_id": "afl-LOWVO009291",
+  "title": "Low Voltage Technician III",
+  "city": "Tampa",
+  "state": "FL",
+  "location_raw": "Tampa, FL",
+  "posted": "2026-09-14",
+  "url": "https://recruiting.ultipro.com/AFL1002/JobBoard/d535bad2-e3ea-c8c8-2fb2-63621892e293/OpportunityDetail?opportunityId=fd592616-4a70-4760-815c-2e885371c1e4",
+  "pay_min": null,
+  "pay_max": null,
+  "pay_unit": "",
+  "level": "III",
+  "role": "Otro técnico",
+  "hourly_min": null,
+  "hourly_max": null,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5796,7 +5596,7 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 46,
+  "days_posted": 47,
   "openings": 1
  },
  {
@@ -5816,7 +5616,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 39.08,
   "hourly_max": 68.41,
-  "days_posted": 49,
+  "days_posted": 50,
   "openings": 27
  },
  {
@@ -5836,7 +5636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 49,
+  "days_posted": 50,
   "openings": 1
  },
  {
@@ -5856,7 +5656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 49,
+  "days_posted": 50,
   "openings": 15
  },
  {
@@ -5876,7 +5676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 49,
+  "days_posted": 50,
   "openings": 1
  },
  {
@@ -5896,7 +5696,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 49,
+  "days_posted": 50,
   "openings": 1
  },
  {
@@ -5916,7 +5716,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 50,
+  "days_posted": 51,
   "openings": 24
  },
  {
@@ -5936,7 +5736,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 50,
+  "days_posted": 51,
   "openings": 1
  },
  {
@@ -5956,7 +5756,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 50,
+  "days_posted": 51,
   "openings": 2
  },
  {
@@ -5976,7 +5776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 39.9,
-  "days_posted": 50,
+  "days_posted": 51,
   "openings": 1
  },
  {
@@ -5996,7 +5796,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 32.16,
   "hourly_max": 56.29,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 1
  },
  {
@@ -6016,7 +5816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 1
  },
  {
@@ -6036,7 +5836,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 1
  },
  {
@@ -6056,7 +5856,7 @@
   "role": "Energía / generación",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 2
  },
  {
@@ -6076,7 +5876,7 @@
   "role": "Energía / generación",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 2
  },
  {
@@ -6096,7 +5896,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 1
  },
  {
@@ -6116,7 +5916,7 @@
   "role": "Otro técnico",
   "hourly_min": 25.77,
   "hourly_max": 38.65,
-  "days_posted": 51,
+  "days_posted": 52,
   "openings": 1
  },
  {
@@ -6136,7 +5936,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6156,7 +5956,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 53.51,
   "hourly_max": 89.47,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6176,7 +5976,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6196,7 +5996,7 @@
   "role": "Controles / BMS",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6216,7 +6016,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6236,7 +6036,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6256,7 +6056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 52,
+  "days_posted": 53,
   "openings": 1
  },
  {
@@ -6276,7 +6076,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 53,
+  "days_posted": 54,
   "openings": 1
  },
  {
@@ -6296,7 +6096,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 55,
+  "days_posted": 56,
   "openings": 2
  },
  {
@@ -6316,7 +6116,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 56,
+  "days_posted": 57,
   "openings": 2
  },
  {
@@ -6336,27 +6136,27 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 56,
+  "days_posted": 57,
   "openings": 3
  },
  {
   "source": "amazon",
   "company": "Amazon",
-  "job_id": "10530412",
+  "job_id": "10530402",
   "title": "Engineering Operations Technician",
   "city": "Canton",
   "state": "MS",
   "location_raw": "Canton, Mississippi, USA",
   "posted": "2026-09-04",
-  "url": "https://www.amazon.jobs/en/jobs/10530412/engineering-operations-technician",
-  "pay_min": 33.89,
-  "pay_max": 59.32,
+  "url": "https://www.amazon.jobs/en/jobs/10530402/engineering-operations-technician",
+  "pay_min": 29.61,
+  "pay_max": 51.73,
   "pay_unit": "hour",
   "level": "",
   "role": "Instalaciones críticas",
-  "hourly_min": 33.89,
-  "hourly_max": 59.32,
-  "days_posted": 56,
+  "hourly_min": 29.61,
+  "hourly_max": 51.73,
+  "days_posted": 57,
   "openings": 2
  },
  {
@@ -6376,7 +6176,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 56,
+  "days_posted": 57,
   "openings": 2
  },
  {
@@ -6396,7 +6196,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 36.06,
   "hourly_max": 48.08,
-  "days_posted": 56,
+  "days_posted": 57,
   "openings": 1
  },
  {
@@ -6416,7 +6216,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 56,
+  "days_posted": 57,
   "openings": 1
  },
  {
@@ -6436,7 +6236,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6456,7 +6256,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 3
  },
  {
@@ -6476,7 +6276,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6496,7 +6296,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6516,7 +6316,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 41.54,
   "hourly_max": 71.97,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6536,7 +6336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6556,7 +6356,7 @@
   "role": "Operador",
   "hourly_min": 31.25,
   "hourly_max": 45.67,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6576,7 +6376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 25.77,
   "hourly_max": 38.65,
-  "days_posted": 57,
+  "days_posted": 58,
   "openings": 1
  },
  {
@@ -6596,7 +6396,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 58,
+  "days_posted": 59,
   "openings": 23
  },
  {
@@ -6616,7 +6416,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 39.9,
-  "days_posted": 58,
+  "days_posted": 59,
   "openings": 1
  },
  {
@@ -6636,7 +6436,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6656,7 +6456,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6676,7 +6476,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6696,7 +6496,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6716,7 +6516,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6736,14 +6536,14 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
   "source": "greenhouse",
   "company": "xAI",
   "job_id": "5227699007",
-  "title": "Facilities Operations Technician",
+  "title": "Facilities Operations Technician - Memphis",
   "city": "Southaven",
   "state": "MS",
   "location_raw": " Southaven, MS; Memphis, TN",
@@ -6756,7 +6556,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6776,7 +6576,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 59,
+  "days_posted": 60,
   "openings": 1
  },
  {
@@ -6796,7 +6596,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 60,
+  "days_posted": 61,
   "openings": 1
  },
  {
@@ -6816,7 +6616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 60,
+  "days_posted": 61,
   "openings": 3
  },
  {
@@ -6836,7 +6636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 60,
+  "days_posted": 61,
   "openings": 3
  },
  {
@@ -6856,7 +6656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 60,
+  "days_posted": 61,
   "openings": 1
  },
  {
@@ -6876,7 +6676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 60,
+  "days_posted": 61,
   "openings": 2
  },
  {
@@ -6896,7 +6696,7 @@
   "role": "Controles / BMS",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 63,
+  "days_posted": 64,
   "openings": 1
  },
  {
@@ -6916,7 +6716,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 63,
+  "days_posted": 64,
   "openings": 1
  },
  {
@@ -6936,7 +6736,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 64,
+  "days_posted": 65,
   "openings": 9
  },
  {
@@ -6956,7 +6756,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 64,
+  "days_posted": 65,
   "openings": 1
  },
  {
@@ -6976,7 +6776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 64,
+  "days_posted": 65,
   "openings": 1
  },
  {
@@ -6996,7 +6796,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 65,
+  "days_posted": 66,
   "openings": 1
  },
  {
@@ -7016,7 +6816,7 @@
   "role": "Soporte TI",
   "hourly_min": 30.24,
   "hourly_max": 41.68,
-  "days_posted": 65,
+  "days_posted": 66,
   "openings": 1
  },
  {
@@ -7036,7 +6836,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 66,
+  "days_posted": 67,
   "openings": 7
  },
  {
@@ -7056,7 +6856,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 67,
+  "days_posted": 68,
   "openings": 5
  },
  {
@@ -7076,7 +6876,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 67,
+  "days_posted": 68,
   "openings": 2
  },
  {
@@ -7096,7 +6896,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 67,
+  "days_posted": 68,
   "openings": 1
  },
  {
@@ -7116,7 +6916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 68,
+  "days_posted": 69,
   "openings": 1
  },
  {
@@ -7136,7 +6936,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 68,
+  "days_posted": 69,
   "openings": 1
  },
  {
@@ -7156,7 +6956,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 68,
+  "days_posted": 69,
   "openings": 1
  },
  {
@@ -7176,7 +6976,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 70,
+  "days_posted": 71,
   "openings": 1
  },
  {
@@ -7196,7 +6996,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 70,
+  "days_posted": 71,
   "openings": 1
  },
  {
@@ -7216,7 +7016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 70,
+  "days_posted": 71,
   "openings": 25
  },
  {
@@ -7236,7 +7036,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 70,
+  "days_posted": 71,
   "openings": 1
  },
  {
@@ -7256,7 +7056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 43.26,
   "hourly_max": 75.81,
-  "days_posted": 72,
+  "days_posted": 73,
   "openings": 1
  },
  {
@@ -7276,7 +7076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 72,
+  "days_posted": 73,
   "openings": 1
  },
  {
@@ -7296,7 +7096,7 @@
   "role": "Energía / generación",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 72,
+  "days_posted": 73,
   "openings": 1
  },
  {
@@ -7316,7 +7116,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.37,
   "hourly_max": 42.5,
-  "days_posted": 72,
+  "days_posted": 73,
   "openings": 1
  },
  {
@@ -7336,7 +7136,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 72,
+  "days_posted": 73,
   "openings": 1
  },
  {
@@ -7356,7 +7156,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 73,
+  "days_posted": 74,
   "openings": 2
  },
  {
@@ -7376,7 +7176,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 73,
+  "days_posted": 74,
   "openings": 1
  },
  {
@@ -7396,7 +7196,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 73,
+  "days_posted": 74,
   "openings": 1
  },
  {
@@ -7416,7 +7216,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 73,
+  "days_posted": 74,
   "openings": 1
  },
  {
@@ -7436,7 +7236,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 74,
+  "days_posted": 75,
   "openings": 1
  },
  {
@@ -7456,7 +7256,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 74,
+  "days_posted": 75,
   "openings": 1
  },
  {
@@ -7476,7 +7276,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 74,
+  "days_posted": 75,
   "openings": 1
  },
  {
@@ -7496,7 +7296,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 74,
+  "days_posted": 75,
   "openings": 1
  },
  {
@@ -7516,7 +7316,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 74,
+  "days_posted": 75,
   "openings": 1
  },
  {
@@ -7536,7 +7336,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 76,
+  "days_posted": 77,
   "openings": 1
  },
  {
@@ -7556,7 +7356,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 77,
+  "days_posted": 78,
   "openings": 1
  },
  {
@@ -7576,7 +7376,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 77,
+  "days_posted": 78,
   "openings": 1
  },
  {
@@ -7596,7 +7396,7 @@
   "role": "Energía / generación",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 77,
+  "days_posted": 78,
   "openings": 1
  },
  {
@@ -7616,7 +7416,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 77,
+  "days_posted": 78,
   "openings": 1
  },
  {
@@ -7636,7 +7436,7 @@
   "role": "Controles / BMS",
   "hourly_min": 41.44,
   "hourly_max": 72.5,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7656,7 +7456,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 35.52,
   "hourly_max": 62.3,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 2
  },
  {
@@ -7676,7 +7476,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7696,7 +7496,7 @@
   "role": "Instalación / red",
   "hourly_min": 40.0,
   "hourly_max": 48.0,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7716,7 +7516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7736,7 +7536,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7756,7 +7556,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 23.0,
   "hourly_max": 34.0,
-  "days_posted": 78,
+  "days_posted": 79,
   "openings": 1
  },
  {
@@ -7776,7 +7576,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 80,
+  "days_posted": 81,
   "openings": 1
  },
  {
@@ -7796,7 +7596,27 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 80,
+  "days_posted": 81,
+  "openings": 1
+ },
+ {
+  "source": "microsoft",
+  "company": "Microsoft",
+  "job_id": "1970393556957479",
+  "title": "Data Center Technician - CTJ - Top Secret",
+  "city": "Cheyenne",
+  "state": "WY",
+  "location_raw": "Cheyenne, WY",
+  "posted": "2026-08-11",
+  "url": "https://apply.careers.microsoft.com/careers/job/1970393556957479",
+  "pay_min": 27.45,
+  "pay_max": 48.03,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 27.45,
+  "hourly_max": 48.03,
+  "days_posted": 81,
   "openings": 1
  },
  {
@@ -7816,7 +7636,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 80,
+  "days_posted": 81,
   "openings": 1
  },
  {
@@ -7836,27 +7656,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 80,
-  "openings": 1
- },
- {
-  "source": "careers",
-  "company": "Microsoft",
-  "job_id": "https://apply.careers.microsoft.com/careers/job/1970393556957479",
-  "title": "Data Center Technician - CTJ - Top Secret",
-  "city": "Cheyenne",
-  "state": "WY",
-  "location_raw": "Cheyenne, WY",
-  "posted": "2026-08-11",
-  "url": "https://apply.careers.microsoft.com/careers/job/1970393556957479",
-  "pay_min": 27.45,
-  "pay_max": 48.03,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 27.45,
-  "hourly_max": 48.03,
-  "days_posted": 80,
+  "days_posted": 81,
   "openings": 1
  },
  {
@@ -7876,7 +7676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 81,
+  "days_posted": 82,
   "openings": 4
  },
  {
@@ -7896,7 +7696,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 81,
+  "days_posted": 82,
   "openings": 3
  },
  {
@@ -7916,7 +7716,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 81,
+  "days_posted": 82,
   "openings": 2
  },
  {
@@ -7936,7 +7736,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 81,
+  "days_posted": 82,
   "openings": 3
  },
  {
@@ -7956,7 +7756,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.4,
   "hourly_max": 48.56,
-  "days_posted": 81,
+  "days_posted": 82,
   "openings": 1
  },
  {
@@ -7976,7 +7776,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 84,
+  "days_posted": 85,
   "openings": 3
  },
  {
@@ -7996,7 +7796,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 84,
+  "days_posted": 85,
   "openings": 1
  },
  {
@@ -8016,7 +7816,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 84,
+  "days_posted": 85,
   "openings": 1
  },
  {
@@ -8036,7 +7836,7 @@
   "role": "Eléctrico",
   "hourly_min": 30.0,
   "hourly_max": 55.0,
-  "days_posted": 84,
+  "days_posted": 85,
   "openings": 1
  },
  {
@@ -8056,7 +7856,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 85,
+  "days_posted": 86,
   "openings": 1
  },
  {
@@ -8076,7 +7876,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 85,
+  "days_posted": 86,
   "openings": 1
  },
  {
@@ -8096,7 +7896,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 86,
+  "days_posted": 87,
   "openings": 5
  },
  {
@@ -8116,7 +7916,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 86,
+  "days_posted": 87,
   "openings": 1
  },
  {
@@ -8136,7 +7936,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 86,
+  "days_posted": 87,
   "openings": 1
  },
  {
@@ -8156,7 +7956,7 @@
   "role": "Soporte TI",
   "hourly_min": 32.88,
   "hourly_max": 49.33,
-  "days_posted": 86,
+  "days_posted": 87,
   "openings": 1
  },
  {
@@ -8176,7 +7976,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 86,
+  "days_posted": 87,
   "openings": 1
  },
  {
@@ -8196,7 +7996,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 87,
+  "days_posted": 88,
   "openings": 1
  },
  {
@@ -8216,7 +8016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 87,
+  "days_posted": 88,
   "openings": 1
  },
  {
@@ -8236,7 +8036,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 87,
+  "days_posted": 88,
   "openings": 1
  },
  {
@@ -8256,7 +8056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 87,
+  "days_posted": 88,
   "openings": 1
  },
  {
@@ -8276,7 +8076,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 88,
+  "days_posted": 89,
   "openings": 1
  },
  {
@@ -8296,7 +8096,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 88,
+  "days_posted": 89,
   "openings": 1
  },
  {
@@ -8316,7 +8116,7 @@
   "role": "Instalación / red",
   "hourly_min": 43.27,
   "hourly_max": 49.04,
-  "days_posted": 88,
+  "days_posted": 89,
   "openings": 1
  },
  {
@@ -8336,7 +8136,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 91,
+  "days_posted": 92,
   "openings": 1
  },
  {
@@ -8356,7 +8156,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 91,
+  "days_posted": 92,
   "openings": 1
  },
  {
@@ -8376,7 +8176,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 92,
+  "days_posted": 93,
   "openings": 4
  },
  {
@@ -8396,7 +8196,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 93,
+  "days_posted": 94,
   "openings": 1
  },
  {
@@ -8416,7 +8216,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 94,
+  "days_posted": 95,
   "openings": 5
  },
  {
@@ -8429,14 +8229,14 @@
   "location_raw": "Umatilla, Oregon, USA",
   "posted": "2026-07-28",
   "url": "https://www.amazon.jobs/en/jobs/10485619/data-center-controls-tech-data-center-capacity-delivery-controls",
-  "pay_min": 32.93,
-  "pay_max": 57.64,
+  "pay_min": 29.66,
+  "pay_max": 51.92,
   "pay_unit": "hour",
   "level": "",
   "role": "Controles / BMS",
-  "hourly_min": 32.93,
-  "hourly_max": 57.64,
-  "days_posted": 94,
+  "hourly_min": 29.66,
+  "hourly_max": 51.92,
+  "days_posted": 95,
   "openings": 1
  },
  {
@@ -8456,7 +8256,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 94,
+  "days_posted": 95,
   "openings": 1
  },
  {
@@ -8476,7 +8276,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 94,
+  "days_posted": 95,
   "openings": 1
  },
  {
@@ -8496,7 +8296,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 94,
+  "days_posted": 95,
   "openings": 1
  },
  {
@@ -8516,7 +8316,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 94,
+  "days_posted": 95,
   "openings": 1
  },
  {
@@ -8536,7 +8336,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 95,
+  "days_posted": 96,
   "openings": 1
  },
  {
@@ -8556,7 +8356,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 98,
+  "days_posted": 99,
   "openings": 2
  },
  {
@@ -8576,7 +8376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 98,
+  "days_posted": 99,
   "openings": 1
  },
  {
@@ -8596,7 +8396,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 98,
+  "days_posted": 99,
   "openings": 1
  },
  {
@@ -8616,7 +8416,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 39.9,
-  "days_posted": 98,
+  "days_posted": 99,
   "openings": 1
  },
  {
@@ -8636,7 +8436,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 2
  },
  {
@@ -8656,7 +8456,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8676,7 +8476,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 6
  },
  {
@@ -8696,7 +8496,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8716,7 +8516,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8736,7 +8536,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 2
  },
  {
@@ -8756,7 +8556,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8776,7 +8576,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 2
  },
  {
@@ -8796,7 +8596,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 2
  },
  {
@@ -8816,7 +8616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 2
  },
  {
@@ -8836,7 +8636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8856,7 +8656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8876,7 +8676,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8896,7 +8696,7 @@
   "role": "Soporte TI",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 99,
+  "days_posted": 100,
   "openings": 1
  },
  {
@@ -8916,7 +8716,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 100,
+  "days_posted": 101,
   "openings": 1
  },
  {
@@ -8936,7 +8736,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 101,
+  "days_posted": 102,
   "openings": 1
  },
  {
@@ -8956,7 +8756,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 102,
+  "days_posted": 103,
   "openings": 2
  },
  {
@@ -8976,7 +8776,7 @@
   "role": "Eléctrico",
   "hourly_min": 20.0,
   "hourly_max": 30.0,
-  "days_posted": 102,
+  "days_posted": 103,
   "openings": 1
  },
  {
@@ -8996,7 +8796,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 105,
+  "days_posted": 106,
   "openings": 1
  },
  {
@@ -9016,7 +8816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 43.0,
   "hourly_max": 75.0,
-  "days_posted": 106,
+  "days_posted": 107,
   "openings": 1
  },
  {
@@ -9036,7 +8836,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 107,
+  "days_posted": 108,
   "openings": 1
  },
  {
@@ -9056,7 +8856,7 @@
   "role": "Soporte TI",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 107,
+  "days_posted": 108,
   "openings": 1
  },
  {
@@ -9076,7 +8876,7 @@
   "role": "Otro técnico",
   "hourly_min": 20.0,
   "hourly_max": 25.0,
-  "days_posted": 107,
+  "days_posted": 108,
   "openings": 1
  },
  {
@@ -9096,7 +8896,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 108,
+  "days_posted": 109,
   "openings": 1
  },
  {
@@ -9116,7 +8916,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 108,
+  "days_posted": 109,
   "openings": 9
  },
  {
@@ -9136,7 +8936,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 108,
+  "days_posted": 109,
   "openings": 2
  },
  {
@@ -9156,7 +8956,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.4,
   "hourly_max": 48.56,
-  "days_posted": 108,
+  "days_posted": 109,
   "openings": 1
  },
  {
@@ -9176,7 +8976,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 109,
+  "days_posted": 110,
   "openings": 1
  },
  {
@@ -9196,7 +8996,7 @@
   "role": "Soporte TI",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 109,
+  "days_posted": 110,
   "openings": 1
  },
  {
@@ -9216,7 +9016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.0,
   "hourly_max": 57.0,
-  "days_posted": 109,
+  "days_posted": 110,
   "openings": 1
  },
  {
@@ -9236,7 +9036,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 111,
+  "days_posted": 112,
   "openings": 1
  },
  {
@@ -9256,7 +9056,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 111,
+  "days_posted": 112,
   "openings": 4
  },
  {
@@ -9276,7 +9076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 112,
+  "days_posted": 113,
   "openings": 1
  },
  {
@@ -9296,7 +9096,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 112,
+  "days_posted": 113,
   "openings": 1
  },
  {
@@ -9316,7 +9116,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 112,
+  "days_posted": 113,
   "openings": 1
  },
  {
@@ -9336,7 +9136,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 113,
+  "days_posted": 114,
   "openings": 1
  },
  {
@@ -9356,7 +9156,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 114,
+  "days_posted": 115,
   "openings": 4
  },
  {
@@ -9376,7 +9176,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 114,
+  "days_posted": 115,
   "openings": 46
  },
  {
@@ -9396,7 +9196,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 114,
+  "days_posted": 115,
   "openings": 1
  },
  {
@@ -9416,7 +9216,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 114,
+  "days_posted": 115,
   "openings": 1
  },
  {
@@ -9436,7 +9236,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 115,
+  "days_posted": 116,
   "openings": 2
  },
  {
@@ -9456,7 +9256,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 117,
+  "days_posted": 118,
   "openings": 1
  },
  {
@@ -9476,7 +9276,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 120,
+  "days_posted": 121,
   "openings": 1
  },
  {
@@ -9496,7 +9296,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 120,
+  "days_posted": 121,
   "openings": 2
  },
  {
@@ -9516,7 +9316,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 121,
+  "days_posted": 122,
   "openings": 1
  },
  {
@@ -9536,7 +9336,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 122,
+  "days_posted": 123,
   "openings": 3
  },
  {
@@ -9556,7 +9356,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 122,
+  "days_posted": 123,
   "openings": 1
  },
  {
@@ -9576,7 +9376,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 123,
+  "days_posted": 124,
   "openings": 1
  },
  {
@@ -9596,7 +9396,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 123,
+  "days_posted": 124,
   "openings": 1
  },
  {
@@ -9616,7 +9416,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 123,
+  "days_posted": 124,
   "openings": 1
  },
  {
@@ -9636,7 +9436,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 126,
+  "days_posted": 127,
   "openings": 1
  },
  {
@@ -9656,7 +9456,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.36,
   "hourly_max": 58.41,
-  "days_posted": 127,
+  "days_posted": 128,
   "openings": 2
  },
  {
@@ -9676,8 +9476,28 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 127,
+  "days_posted": 128,
   "openings": 14
+ },
+ {
+  "source": "amazon",
+  "company": "Amazon",
+  "job_id": "10458878",
+  "title": "InfraDelivery Technician",
+  "city": "Arizona City",
+  "state": "AZ",
+  "location_raw": "Arizona City, Arizona, USA",
+  "posted": "2026-06-25",
+  "url": "https://www.amazon.jobs/en/jobs/10458878/infradelivery-technician",
+  "pay_min": 27.98,
+  "pay_max": 48.99,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Instalación / red",
+  "hourly_min": 27.98,
+  "hourly_max": 48.99,
+  "days_posted": 128,
+  "openings": 1
  },
  {
   "source": "oracle",
@@ -9696,7 +9516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 127,
+  "days_posted": 128,
   "openings": 1
  },
  {
@@ -9716,7 +9536,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 128,
+  "days_posted": 129,
   "openings": 1
  },
  {
@@ -9736,7 +9556,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 128,
+  "days_posted": 129,
   "openings": 1
  },
  {
@@ -9756,7 +9576,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 130,
+  "days_posted": 131,
   "openings": 1
  },
  {
@@ -9776,7 +9596,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 130,
+  "days_posted": 131,
   "openings": 1
  },
  {
@@ -9796,7 +9616,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 131,
+  "days_posted": 132,
   "openings": 1
  },
  {
@@ -9816,7 +9636,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 132,
+  "days_posted": 133,
   "openings": 1
  },
  {
@@ -9836,7 +9656,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 133,
+  "days_posted": 134,
   "openings": 1
  },
  {
@@ -9856,7 +9676,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 133,
+  "days_posted": 134,
   "openings": 1
  },
  {
@@ -9876,7 +9696,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 53.51,
   "hourly_max": 89.47,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9896,7 +9716,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9916,7 +9736,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9936,7 +9756,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.64,
   "hourly_max": 56.83,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9956,7 +9776,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9976,7 +9796,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.83,
   "hourly_max": 63.65,
-  "days_posted": 135,
+  "days_posted": 136,
   "openings": 1
  },
  {
@@ -9996,7 +9816,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 137,
+  "days_posted": 138,
   "openings": 24
  },
  {
@@ -10016,7 +9836,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 141,
+  "days_posted": 142,
   "openings": 3
  },
  {
@@ -10036,7 +9856,7 @@
   "role": "Instalación / red",
   "hourly_min": 25.19,
   "hourly_max": 44.08,
-  "days_posted": 141,
+  "days_posted": 142,
   "openings": 2
  },
  {
@@ -10056,7 +9876,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 42.31,
   "hourly_max": 63.46,
-  "days_posted": 141,
+  "days_posted": 142,
   "openings": 1
  },
  {
@@ -10076,7 +9896,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 142,
+  "days_posted": 143,
   "openings": 3
  },
  {
@@ -10096,7 +9916,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 39.9,
-  "days_posted": 144,
+  "days_posted": 145,
   "openings": 1
  },
  {
@@ -10116,7 +9936,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 148,
+  "days_posted": 149,
   "openings": 1
  },
  {
@@ -10136,7 +9956,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 148,
+  "days_posted": 149,
   "openings": 11
  },
  {
@@ -10156,7 +9976,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 148,
+  "days_posted": 149,
   "openings": 1
  },
  {
@@ -10176,7 +9996,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 149,
+  "days_posted": 150,
   "openings": 2
  },
  {
@@ -10196,7 +10016,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 150,
+  "days_posted": 151,
   "openings": 2
  },
  {
@@ -10216,7 +10036,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 33.0,
   "hourly_max": 58.0,
-  "days_posted": 150,
+  "days_posted": 151,
   "openings": 2
  },
  {
@@ -10236,7 +10056,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 150,
+  "days_posted": 151,
   "openings": 2
  },
  {
@@ -10256,7 +10076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 43.26,
   "hourly_max": 75.81,
-  "days_posted": 155,
+  "days_posted": 156,
   "openings": 1
  },
  {
@@ -10276,7 +10096,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 155,
+  "days_posted": 156,
   "openings": 1
  },
  {
@@ -10296,7 +10116,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 42.0,
-  "days_posted": 155,
+  "days_posted": 156,
   "openings": 1
  },
  {
@@ -10316,7 +10136,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 156,
+  "days_posted": 157,
   "openings": 1
  },
  {
@@ -10336,7 +10156,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 157,
+  "days_posted": 158,
   "openings": 3
  },
  {
@@ -10356,7 +10176,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 157,
+  "days_posted": 158,
   "openings": 4
  },
  {
@@ -10376,7 +10196,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 158,
+  "days_posted": 159,
   "openings": 1
  },
  {
@@ -10396,7 +10216,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 161,
+  "days_posted": 162,
   "openings": 2
  },
  {
@@ -10416,7 +10236,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 161,
+  "days_posted": 162,
   "openings": 1
  },
  {
@@ -10436,7 +10256,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 161,
+  "days_posted": 162,
   "openings": 1
  },
  {
@@ -10456,7 +10276,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 162,
+  "days_posted": 163,
   "openings": 15
  },
  {
@@ -10476,7 +10296,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 163,
+  "days_posted": 164,
   "openings": 1
  },
  {
@@ -10496,7 +10316,7 @@
   "role": "Eléctrico",
   "hourly_min": 33.0,
   "hourly_max": 62.0,
-  "days_posted": 168,
+  "days_posted": 169,
   "openings": 1
  },
  {
@@ -10516,7 +10336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 168,
+  "days_posted": 169,
   "openings": 1
  },
  {
@@ -10536,7 +10356,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 169,
+  "days_posted": 170,
   "openings": 1
  },
  {
@@ -10556,7 +10376,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 170,
+  "days_posted": 171,
   "openings": 1
  },
  {
@@ -10576,7 +10396,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 170,
+  "days_posted": 171,
   "openings": 1
  },
  {
@@ -10596,7 +10416,27 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 171,
+  "days_posted": 172,
+  "openings": 1
+ },
+ {
+  "source": "amazon",
+  "company": "Amazon",
+  "job_id": "10416045",
+  "title": "DCO Tech",
+  "city": "Sterling",
+  "state": "VA",
+  "location_raw": "Sterling, Virginia, USA",
+  "posted": "2026-05-11",
+  "url": "https://www.amazon.jobs/en/jobs/10416045/dco-tech",
+  "pay_min": 30.0,
+  "pay_max": 54.0,
+  "pay_unit": "hour",
+  "level": "",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 30.0,
+  "hourly_max": 54.0,
+  "days_posted": 173,
   "openings": 1
  },
  {
@@ -10616,28 +10456,8 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 172,
+  "days_posted": 173,
   "openings": 6
- },
- {
-  "source": "amazon",
-  "company": "Amazon",
-  "job_id": "10416045",
-  "title": "DCO Tech",
-  "city": "Sterling",
-  "state": "VA",
-  "location_raw": "Sterling, Virginia, USA",
-  "posted": "2026-05-11",
-  "url": "https://www.amazon.jobs/en/jobs/10416045/dco-tech",
-  "pay_min": 30.0,
-  "pay_max": 54.0,
-  "pay_unit": "hour",
-  "level": "",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 30.0,
-  "hourly_max": 54.0,
-  "days_posted": 172,
-  "openings": 1
  },
  {
   "source": "greenhouse",
@@ -10656,7 +10476,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 172,
+  "days_posted": 173,
   "openings": 1
  },
  {
@@ -10676,7 +10496,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 175,
+  "days_posted": 176,
   "openings": 1
  },
  {
@@ -10696,7 +10516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 35.63,
   "hourly_max": 71.3,
-  "days_posted": 175,
+  "days_posted": 176,
   "openings": 1
  },
  {
@@ -10716,7 +10536,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 177,
+  "days_posted": 178,
   "openings": 1
  },
  {
@@ -10736,7 +10556,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 43.26,
   "hourly_max": 75.81,
-  "days_posted": 178,
+  "days_posted": 179,
   "openings": 1
  },
  {
@@ -10756,7 +10576,7 @@
   "role": "Mecánico / HVAC",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 179,
+  "days_posted": 180,
   "openings": 1
  },
  {
@@ -10776,7 +10596,7 @@
   "role": "Eléctrico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 179,
+  "days_posted": 180,
   "openings": 1
  },
  {
@@ -10796,7 +10616,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 183,
+  "days_posted": 184,
   "openings": 1
  },
  {
@@ -10816,7 +10636,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 183,
+  "days_posted": 184,
   "openings": 1
  },
  {
@@ -10836,7 +10656,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.0,
   "hourly_max": 57.0,
-  "days_posted": 183,
+  "days_posted": 184,
   "openings": 2
  },
  {
@@ -10856,7 +10676,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 184,
+  "days_posted": 185,
   "openings": 1
  },
  {
@@ -10876,7 +10696,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.0,
   "hourly_max": 35.0,
-  "days_posted": 185,
+  "days_posted": 186,
   "openings": 1
  },
  {
@@ -10896,7 +10716,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.0,
   "hourly_max": 35.0,
-  "days_posted": 185,
+  "days_posted": 186,
   "openings": 1
  },
  {
@@ -10916,7 +10736,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.0,
   "hourly_max": 35.0,
-  "days_posted": 185,
+  "days_posted": 186,
   "openings": 1
  },
  {
@@ -10936,7 +10756,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.0,
   "hourly_max": 57.0,
-  "days_posted": 186,
+  "days_posted": 187,
   "openings": 7
  },
  {
@@ -10956,7 +10776,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 189,
+  "days_posted": 190,
   "openings": 2
  },
  {
@@ -10976,7 +10796,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 28.0,
   "hourly_max": 35.0,
-  "days_posted": 192,
+  "days_posted": 193,
   "openings": 1
  },
  {
@@ -10996,7 +10816,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 193,
+  "days_posted": 194,
   "openings": 1
  },
  {
@@ -11016,7 +10836,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 46.15,
   "hourly_max": 79.95,
-  "days_posted": 197,
+  "days_posted": 198,
   "openings": 1
  },
  {
@@ -11036,7 +10856,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.0,
   "hourly_max": 57.0,
-  "days_posted": 199,
+  "days_posted": 200,
   "openings": 2
  },
  {
@@ -11056,7 +10876,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 199,
+  "days_posted": 200,
   "openings": 3
  },
  {
@@ -11076,7 +10896,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 199,
+  "days_posted": 200,
   "openings": 1
  },
  {
@@ -11096,7 +10916,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 200,
+  "days_posted": 201,
   "openings": 3
  },
  {
@@ -11116,7 +10936,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 25.19,
   "hourly_max": 44.08,
-  "days_posted": 200,
+  "days_posted": 201,
   "openings": 3
  },
  {
@@ -11136,7 +10956,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 201,
+  "days_posted": 202,
   "openings": 2
  },
  {
@@ -11156,7 +10976,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 205,
+  "days_posted": 206,
   "openings": 2
  },
  {
@@ -11176,7 +10996,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 205,
+  "days_posted": 206,
   "openings": 1
  },
  {
@@ -11196,7 +11016,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.83,
   "hourly_max": 48.75,
-  "days_posted": 206,
+  "days_posted": 207,
   "openings": 1
  },
  {
@@ -11216,7 +11036,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 206,
+  "days_posted": 207,
   "openings": 1
  },
  {
@@ -11236,7 +11056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 211,
+  "days_posted": 212,
   "openings": 2
  },
  {
@@ -11256,7 +11076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 212,
+  "days_posted": 213,
   "openings": 1
  },
  {
@@ -11276,7 +11096,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 217,
+  "days_posted": 218,
   "openings": 1
  },
  {
@@ -11296,7 +11116,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 218,
+  "days_posted": 219,
   "openings": 2
  },
  {
@@ -11316,7 +11136,7 @@
   "role": "Otro técnico",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 218,
+  "days_posted": 219,
   "openings": 1
  },
  {
@@ -11336,7 +11156,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 218,
+  "days_posted": 219,
   "openings": 1
  },
  {
@@ -11356,7 +11176,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 221,
+  "days_posted": 222,
   "openings": 1
  },
  {
@@ -11376,7 +11196,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.0,
   "hourly_max": 47.0,
-  "days_posted": 221,
+  "days_posted": 222,
   "openings": 1
  },
  {
@@ -11396,7 +11216,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.0,
   "hourly_max": 54.0,
-  "days_posted": 221,
+  "days_posted": 222,
   "openings": 1
  },
  {
@@ -11416,7 +11236,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 224,
+  "days_posted": 225,
   "openings": 1
  },
  {
@@ -11436,7 +11256,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.0,
   "hourly_max": 57.0,
-  "days_posted": 225,
+  "days_posted": 226,
   "openings": 9
  },
  {
@@ -11456,7 +11276,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 225,
+  "days_posted": 226,
   "openings": 1
  },
  {
@@ -11476,7 +11296,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 226,
+  "days_posted": 227,
   "openings": 1
  },
  {
@@ -11496,7 +11316,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 227,
+  "days_posted": 228,
   "openings": 1
  },
  {
@@ -11516,7 +11336,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 228,
+  "days_posted": 229,
   "openings": 9
  },
  {
@@ -11536,7 +11356,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 228,
+  "days_posted": 229,
   "openings": 3
  },
  {
@@ -11556,7 +11376,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 238,
+  "days_posted": 239,
   "openings": 5
  },
  {
@@ -11576,7 +11396,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 239,
+  "days_posted": 240,
   "openings": 1
  },
  {
@@ -11596,7 +11416,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.0,
   "hourly_max": 65.0,
-  "days_posted": 240,
+  "days_posted": 241,
   "openings": 1
  },
  {
@@ -11616,7 +11436,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 26.0,
   "hourly_max": 38.0,
-  "days_posted": 242,
+  "days_posted": 243,
   "openings": 1
  },
  {
@@ -11636,26 +11456,6 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 245,
-  "openings": 1
- },
- {
-  "source": "greenhouse",
-  "company": "xAI",
-  "job_id": "5064636007",
-  "title": "Critical Facilities Engineer - Memphis",
-  "city": "Memphis",
-  "state": "TN",
-  "location_raw": "Memphis, TN",
-  "posted": "2026-02-26",
-  "url": "https://job-boards.greenhouse.io/xai/jobs/5064636007",
-  "pay_min": null,
-  "pay_max": null,
-  "pay_unit": "",
-  "level": "",
-  "role": "Instalaciones críticas",
-  "hourly_min": null,
-  "hourly_max": null,
   "days_posted": 246,
   "openings": 1
  },
@@ -11676,7 +11476,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 252,
+  "days_posted": 253,
   "openings": 4
  },
  {
@@ -11696,7 +11496,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.0,
   "hourly_max": 45.0,
-  "days_posted": 252,
+  "days_posted": 253,
   "openings": 1
  },
  {
@@ -11716,7 +11516,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 254,
+  "days_posted": 255,
   "openings": 1
  },
  {
@@ -11736,7 +11536,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 274,
+  "days_posted": 275,
   "openings": 3
  },
  {
@@ -11756,7 +11556,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.0,
   "hourly_max": 48.0,
-  "days_posted": 274,
+  "days_posted": 275,
   "openings": 1
  },
  {
@@ -11776,7 +11576,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11796,7 +11596,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11816,7 +11616,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11836,7 +11636,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11856,7 +11656,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 29.0,
   "hourly_max": 52.0,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11876,7 +11676,7 @@
   "role": "Instalación / red",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 276,
+  "days_posted": 277,
   "openings": 1
  },
  {
@@ -11896,7 +11696,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 30.91,
   "hourly_max": 54.18,
-  "days_posted": 277,
+  "days_posted": 278,
   "openings": 1
  },
  {
@@ -11916,7 +11716,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 280,
+  "days_posted": 281,
   "openings": 1
  },
  {
@@ -11936,7 +11736,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 282,
+  "days_posted": 283,
   "openings": 1
  },
  {
@@ -11956,7 +11756,7 @@
   "role": "Controles / BMS",
   "hourly_min": 32.93,
   "hourly_max": 57.64,
-  "days_posted": 290,
+  "days_posted": 291,
   "openings": 1
  },
  {
@@ -11976,7 +11776,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -11996,7 +11796,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12016,7 +11816,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12036,7 +11836,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12056,7 +11856,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12076,7 +11876,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12096,7 +11896,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12116,7 +11916,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12136,7 +11936,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12156,7 +11956,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12176,7 +11976,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 291,
+  "days_posted": 292,
   "openings": 1
  },
  {
@@ -12196,7 +11996,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 303,
+  "days_posted": 304,
   "openings": 2
  },
  {
@@ -12216,7 +12016,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 303,
+  "days_posted": 304,
   "openings": 1
  },
  {
@@ -12236,7 +12036,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 32.88,
   "hourly_max": 57.5,
-  "days_posted": 303,
+  "days_posted": 304,
   "openings": 1
  },
  {
@@ -12256,7 +12056,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 37.64,
   "hourly_max": 65.91,
-  "days_posted": 304,
+  "days_posted": 305,
   "openings": 2
  },
  {
@@ -12276,7 +12076,7 @@
   "role": "Instalaciones críticas",
   "hourly_min": 29.0,
   "hourly_max": 51.0,
-  "days_posted": 304,
+  "days_posted": 305,
   "openings": 1
  },
  {
@@ -12296,7 +12096,7 @@
   "role": "Instalación / red",
   "hourly_min": 27.98,
   "hourly_max": 48.99,
-  "days_posted": 316,
+  "days_posted": 317,
   "openings": 1
  },
  {
@@ -12316,7 +12116,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 318,
+  "days_posted": 319,
   "openings": 1
  },
  {
@@ -12336,7 +12136,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 318,
+  "days_posted": 319,
   "openings": 1
  },
  {
@@ -12356,7 +12156,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 318,
+  "days_posted": 319,
   "openings": 1
  },
  {
@@ -12376,7 +12176,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 392,
+  "days_posted": 393,
   "openings": 1
  },
  {
@@ -12396,7 +12196,7 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 31.25,
   "hourly_max": 40.87,
-  "days_posted": 491,
+  "days_posted": 492,
   "openings": 1
  },
  {
@@ -12416,7 +12216,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 540,
+  "days_posted": 541,
   "openings": 1
  },
  {
@@ -12436,7 +12236,7 @@
   "role": "Instalación / red",
   "hourly_min": null,
   "hourly_max": null,
-  "days_posted": 540,
+  "days_posted": 541,
   "openings": 1
  },
  {
@@ -12456,7 +12256,7 @@
   "role": "Eléctrico",
   "hourly_min": 50.0,
   "hourly_max": 85.0,
-  "days_posted": 913,
+  "days_posted": 914,
   "openings": 1
  },
  {
@@ -13162,26 +12962,6 @@
  {
   "source": "google",
   "company": "Google",
-  "job_id": "129792090136552134",
-  "title": "Data Center Technician II",
-  "city": "Lincoln",
-  "state": "NE",
-  "location_raw": "Lincoln, NE",
-  "posted": "",
-  "url": "https://www.google.com/about/careers/applications/jobs/results/129792090136552134-data-center-technician-ii",
-  "pay_min": 86000.0,
-  "pay_max": 118000.0,
-  "pay_unit": "year",
-  "level": "II",
-  "role": "Técnico de data center (DCT)",
-  "hourly_min": 41.35,
-  "hourly_max": 56.73,
-  "days_posted": null,
-  "openings": 1
- },
- {
-  "source": "google",
-  "company": "Google",
   "job_id": "89618868720280262",
   "title": "Data Center Technician III (Night Shift)",
   "city": "Red Oak",
@@ -13196,6 +12976,26 @@
   "role": "Técnico de data center (DCT)",
   "hourly_min": 50.48,
   "hourly_max": 69.71,
+  "days_posted": null,
+  "openings": 1
+ },
+ {
+  "source": "google",
+  "company": "Google",
+  "job_id": "129792090136552134",
+  "title": "Data Center Technician II",
+  "city": "Lincoln",
+  "state": "NE",
+  "location_raw": "Lincoln, NE",
+  "posted": "",
+  "url": "https://www.google.com/about/careers/applications/jobs/results/129792090136552134-data-center-technician-ii",
+  "pay_min": 86000.0,
+  "pay_max": 118000.0,
+  "pay_unit": "year",
+  "level": "II",
+  "role": "Técnico de data center (DCT)",
+  "hourly_min": 41.35,
+  "hourly_max": 56.73,
   "days_posted": null,
   "openings": 1
  },
