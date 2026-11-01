@@ -191,7 +191,7 @@ class Site:
              + f'<div><b>Find jobs</b><a href="{r("index.html")}">All technician jobs</a><a href="{r("entry-level-jobs.html")}">Entry-level jobs</a>'
                f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
              + f'<div><b>Pay &amp; career</b><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
-               f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
+               f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
              + '</div></div></footer>'
@@ -287,7 +287,7 @@ class Site:
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
-        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="how-to-become-a-data-center-technician.html">How to get in</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
         fresh_n = sum(j["openings"] for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7)
         entry_n = sum(j["openings"] for j in js if j.get("entry"))
         perk_n = sum(j["openings"] for j in js if j.get("perks") and re.search(r"per_diem|housing", j["perks"]))
@@ -604,6 +604,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 'Hyperscalers (Amazon, Google, Microsoft) and operators (QTS, Equinix) post Level I technician roles with better benefits but more competition. Staffing firms place techs on 6–12 month projects quickly.</p>'
                 '<p><b>What makes you stand out.</b> Any hands-on experience: electrical helper, cable installer, IT help desk, military, warehouse with forklift. '
                 'A $40 OSHA 10 card and a CompTIA A+ or BICSI Installer 1 cert put you ahead of most applicants. Say in your application that you can travel and work 12s if you can — it matters more than a degree.</p>'
+                '<p>Step by step, with a 90-day plan: <a href="how-to-become-a-data-center-technician.html">how to become a data center technician</a>.</p>'
                 '<p><b>What to ask before you accept.</b> Hourly rate, overtime after 40 or after 8, per diem and whether housing is paid, the rotation (weeks on/off), '
                 'and whether the position is W-2 or 1099. See <a href="travel-jobs.html">jobs with per diem and housing</a> and the <a href="shift-schedules.html">shift schedule guide</a>.</p>'
                 '</div></section>'
