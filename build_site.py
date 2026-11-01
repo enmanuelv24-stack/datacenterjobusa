@@ -261,18 +261,27 @@ class Site:
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
-        quick = ("".join(f'<a href="{E(u)}">{E(n)}</a>' for n, u in top_states)
-                 + '<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
-        body = ('<section class="hero"><div class="wrap">'
+        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+        fresh_n = sum(j["openings"] for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7)
+        entry_n = sum(j["openings"] for j in js if j.get("entry"))
+        perk_n = sum(j["openings"] for j in js if j.get("perks") and re.search(r"per_diem|housing", j["perks"]))
+        top_states_snap = "".join(f'<a href="{E(u)}">{E(n)}</a>' for n, u in top_states)
+        body = ('<section class="hero"><div class="wrap"><div class="grid"><div>'
                 '<p class="kicker">Built by a working data center tech · Updated every morning</p>'
                 '<h1>Data center technician jobs with the <mark>pay up front</mark>.</h1>'
-                f'<p class="lede">{total:,} open data center technician jobs at {len(companies)} operators and contractors, pulled straight from their own career pages every morning. '
-                f'{paid / total:.0%} show the pay range, and you can sort by it. No agencies, no call centers, no résumé harvesting.</p>'
-                f'<div class="quick">{quick}</div>'
-                f'<ul class="trust"><li><b>{len(companies)}</b> employers, read directly</li><li><b>{self.today:%b %-d}</b> last refresh</li>'
-                f'<li><b>0</b> recruiter reposts</li><li><b>Free</b>no sign-up to browse</li></ul>'
-                '</div></section><div class="wrap">'
-                f'<div class="stats"><div class="stat"><b>{total:,}</b><span>open technician jobs</span></div>'
+                f'<p class="lede">{total:,} open jobs at {len(companies)} operators and contractors, read straight from their own career pages. '
+                f'{paid / total:.0%} show the pay range. No agencies, no résumé harvesting.</p>'
+                '<form class="search" onsubmit="event.preventDefault();document.getElementById(\'q\').value=this.s.value;document.getElementById(\'q\').dispatchEvent(new Event(\'input\'));document.getElementById(\'f\').scrollIntoView({behavior:\'smooth\'})">'
+                '<input name="s" type="search" placeholder="Search title or city — fiber, Abilene, electrician…" aria-label="Search jobs"><button type="submit">Search jobs</button></form>'
+                f'<div class="quick">{quick}</div></div>'
+                '<aside class="snap"><h2>Today on the site</h2><ul>'
+                f'<li><a href="index.html"><b>{total:,}</b><span>open technician jobs</span></a></li>'
+                f'<li><a href="new-jobs.html"><b>{fresh_n:,}</b><span>posted this week</span></a></li>'
+                f'<li><a href="entry-level-jobs.html"><b>{entry_n:,}</b><span>entry level / no experience</span></a></li>'
+                f'<li><a href="travel-jobs.html"><b>{perk_n:,}</b><span>mention per diem or housing</span></a></li></ul>'
+                f'<p class="top">Most jobs: {top_states_snap}</p></aside>'
+                '</div></div></section><div class="wrap">'
+                f'<div class="stats"><div class="stat"><b>{self.today:%b %-d}</b><span>last updated · daily</span></div>'
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
                 f'<div class="stat"><b>{len(states)}</b><span>states</span></div>'
                 f'<div class="stat"><b>{paid / total:.0%}</b><span>with pay posted</span></div></div>'
