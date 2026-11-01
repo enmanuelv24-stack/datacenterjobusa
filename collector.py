@@ -115,6 +115,8 @@ class Job:
     desc: str = ""      # descripción completa (no se guarda; sirve para detectar per diem, hospedaje, etc.)
     perks: str = ""     # beneficios detectados, separados por "|": per_diem, housing, travel, rotation:3/1, overtime, ...
     per_diem: float | None = None  # monto diario del per diem si lo dicen
+    entry: bool = False  # apto para principiantes (nivel I / sin experiencia, según título o descripción)
+    last_seen: str = ""  # última fecha en que la fuente la mostró; las conservadas de ayer caducan a los 5 días
 
 
 # ---------------------------------------------------------------------------
@@ -300,7 +302,24 @@ def extract_perks(text: str) -> tuple[str, float | None]:
     return "|".join(tags), per_diem
 
 
+ENTRY_TITLE = re.compile(r"entry[- ]level|\bentry\b|associate|apprentice|junior|trainee|helper|cable puller|\btech(nician)? (1|i)\b|"
+                         r"\blevel (1|i)\b|\bl1\b|\btier (1|i)\b|\b(1|i)\s*[-–]|no experience", re.I)
+ENTRY_DESC = re.compile(r"no (prior |previous )?experience (is )?(required|necessary|needed)|entry[- ]level|will train|paid training|"
+                        r"on[- ]the[- ]job training|\b0\s*[-–]\s*[12]\+? years|zero experience|new to the (industry|trade|field)|"
+                        r"high school diploma or (equivalent|ged)", re.I)
+NOT_ENTRY = re.compile(r"senior|\bsr\b|lead|foreman|supervisor|manager|superintendent|\biii\b|\biv\b|\b[3-5]\b|specialist|engineer\b|journeyman|master", re.I)
+
+
+def is_entry(title: str, level: str, text: str) -> bool:
+    if NOT_ENTRY.search(title) or level in ("III", "IV"):
+        return False
+    if level == "I" or ENTRY_TITLE.search(title):
+        return True
+    return bool(ENTRY_DESC.search(text or "")) and level != "II"
+
+
 def finalize(job: Job) -> Job:
+    job.entry = is_entry(job.title, classify_level(job.title), job.desc or job.pay_text)
     if job.pay_min is None and job.pay_text:
         job.pay_min, job.pay_max, job.pay_unit = parse_pay(job.pay_text)
     if not job.perks:
@@ -1111,7 +1130,7 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
 def write_outputs(jobs: list[Job], outdir: Path) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
     cols = ["company", "title", "role", "level", "city", "state", "openings", "posted", "days_posted",
-            "hourly_min", "hourly_max", "pay_min", "pay_max", "pay_unit", "perks", "per_diem", "url", "source", "job_id"]
+            "hourly_min", "hourly_max", "pay_min", "pay_max", "pay_unit", "perks", "per_diem", "entry", "url", "source", "job_id"]
     with open(outdir / "jobs.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
@@ -1120,6 +1139,9 @@ def write_outputs(jobs: list[Job], outdir: Path) -> None:
     with open(outdir / "jobs.json", "w", encoding="utf-8") as f:
         json.dump([{k: v for k, v in asdict(j).items() if k not in ("pay_text", "desc")} for j in jobs], f,
                   ensure_ascii=False, indent=1)
+
+
+MAX_KEEP_DAYS = 5
 
 
 def keep_previous_if_source_failed(jobs: list[Job], prev_path: Path, today: date) -> list[Job]:
@@ -1132,15 +1154,23 @@ def keep_previous_if_source_failed(jobs: list[Job], prev_path: Path, today: date
     except Exception:
         return jobs
     live = {j.company for j in jobs}
+    for j in jobs:
+        j.last_seen = today.isoformat()
     names = set(Job.__dataclass_fields__)
-    kept = []
+    kept, expired = [], 0
     for d in prev:
         if d.get("company") in live:
             continue
         j = Job(**{k: v for k, v in d.items() if k in names})
+        seen = date.fromisoformat(j.last_seen) if j.last_seen else today
+        if (today - seen).days > MAX_KEEP_DAYS:  # la fuente lleva días sin responder: la vacante ya no es confiable
+            expired += 1
+            continue
         if j.posted:
             j.days_posted = (today - date.fromisoformat(j.posted)).days
         kept.append(j)
+    if expired:
+        print(f"aviso: {expired} vacantes conservadas caducaron (fuente sin responder más de {MAX_KEEP_DAYS} días)", file=sys.stderr)
     if kept:
         print(f"aviso: se conservan {len(kept)} vacantes de ayer de: "
               + ", ".join(sorted({j.company for j in kept})), file=sys.stderr)

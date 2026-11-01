@@ -108,6 +108,13 @@ def test_keep_previous_if_source_failed():
     # Amazon respondió hoy: no se conserva la vacante vieja de Amazon. Google falló: se conserva la de ayer.
     assert sorted((j.company, j.job_id) for j in out) == [("Amazon", "new"), ("Google", "g1")]
     assert [j for j in out if j.company == "Google"][0].days_posted == 10
+    # una vacante conservada cuya fuente lleva más de 5 días sin responder se descarta
+    prev[0]["last_seen"] = "2026-10-20"
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "jobs.json"
+        p.write_text(json.dumps(prev))
+        out = c.keep_previous_if_source_failed(live, p, date(2026, 10, 30))
+    assert [j.company for j in out] == ["Amazon"]
 
 
 def test_linx():

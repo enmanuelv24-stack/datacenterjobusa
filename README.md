@@ -80,3 +80,10 @@ Nunca agregues Indeed, LinkedIn ni otros agregadores: sus términos lo prohíben
 1. Da de alta el sitio en Google Search Console y envía `sitemap.xml`.
 2. Conecta el formulario de suscripción a un servicio de newsletter (beehiiv, Buttondown o Kit). El formulario de hoy es de muestra y no guarda correos.
 3. Pon el enlace de tu encuesta de turnos en `SURVEY_URL` dentro de `site_config.py`.
+
+## Páginas y SEO
+- `index.html` (filtros: estado, empresa, tipo, pago mínimo, experiencia, beneficios), `new-jobs.html` (últimos 7 días) + `feed.xml` (RSS),
+  `entry-level-jobs.html` (principiantes, guía y FAQ), `travel-jobs.html` (per diem/hospedaje/rotación), `salaries.html`, `states/`, `cities/`, `companies/`, `jobs/`.
+- Datos estructurados: JobPosting (con validThrough, identifier, pago del empleador) en cada vacante, BreadcrumbList en empresa/estado/ciudad/vacante, WebSite/Organization en inicio y About, FAQ en principiantes.
+- `sitemap.xml` es un índice → `sitemap-pages.xml` (lastmod = hoy) y `sitemap-jobs.xml` (lastmod = fecha de publicación). `404.html` para vacantes retiradas.
+- Las vacantes que el empleador retira desaparecen al día siguiente; si una fuente falla, sus vacantes de ayer se conservan máximo 5 días (`MAX_KEEP_DAYS`).

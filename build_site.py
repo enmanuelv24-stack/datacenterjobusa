@@ -14,7 +14,7 @@ import json
 import re
 import statistics
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
@@ -96,10 +96,26 @@ class Site:
     def rel(self, path: str, depth: int) -> str:
         return "../" * depth + path
 
+    @staticmethod
+    def breadcrumbs(items) -> str:
+        ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
+              "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, "item": f"{SITE_URL}/{p}".replace("/index.html", "/")}
+                                  for i, (n, p) in enumerate(items)]}
+        return f'<script type="application/ld+json">{json.dumps(ld)}</script>'
+
+    @staticmethod
+    def org_ld() -> str:
+        ld = {"@context": "https://schema.org", "@type": "WebSite", "name": SITE_NAME, "url": SITE_URL,
+              "description": SITE_TAGLINE,
+              "publisher": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL,
+                            "founder": {"@type": "Person", "name": "Enmanuel V.", "jobTitle": "Inside plant / data center technician"}}}
+        return f'<script type="application/ld+json">{json.dumps(ld)}</script>'
+
     def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = ""):
         depth = path.count("/")
         r = lambda p: self.rel(p, depth)  # noqa: E731
         nav = (f'<nav class="main" aria-label="Main"><a href="{r("index.html")}">Jobs</a>'
+               f'<a href="{r("new-jobs.html")}">New</a><a href="{r("entry-level-jobs.html")}">Entry level</a>'
                f'<a href="{r("salaries.html")}">Salaries</a><a href="{r("companies.html")}">Companies</a>'
                f'<a href="{r("states.html")}">States</a><a href="{r("certifications.html")}">Certifications</a>'
                f'<a href="{r("travel-jobs.html")}">Per diem</a>'
@@ -114,12 +130,22 @@ class Site:
              f'<meta name="description" content="{E(desc)}">'
              + (f'<link rel="canonical" href="{E(url)}">' if canonical and not self.preview else "")
              + f'<meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
+             + f'<link rel="alternate" type="application/rss+xml" title="New data center jobs" href="{r("feed.xml")}">'
              + FONTS + f"<style>{CSS}</style>{head_extra}"
              + ("" if bare else "</head><body>")
              + f'<header class="site"><div class="wrap"><a class="brand" href="{r("index.html")}"><i aria-hidden="true"></i>Data Center <em>Job USA</em></a>{nav}</div></header>'
              + (f'<main>{body}</main>' if body.startswith('<section class="hero">') else f'<main><div class="wrap">{body}</div></main>')
-             + f'<footer class="site"><div class="wrap"><span>{E(SITE_NAME)} · {E(SITE_TAGLINE)}</span>'
-             + f'<span>Pay ranges come from each employer\'s own posting · Updated {self.today:%B %-d, %Y} · <a href="{r("about.html")}">About</a> · <a href="{r("shift-survey.html")}">Shift survey</a></span></div></footer>'
+             + f'<footer class="site"><div class="wrap"><div class="cols">'
+             + f'<div><b>{E(SITE_NAME)}</b><p>{E(SITE_TAGLINE)}. Built and run by a working data center technician in Texas. '
+               f'Every listing links to the employer\'s own career page; we never collect applications.</p>'
+               f'<p class="upd">Last updated {self.today:%B %-d, %Y} · refreshed every morning</p></div>'
+             + f'<div><b>Find jobs</b><a href="{r("index.html")}">All technician jobs</a><a href="{r("entry-level-jobs.html")}">Entry-level jobs</a>'
+               f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
+             + f'<div><b>Pay &amp; career</b><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
+               f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
+             + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
+               f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
+             + '</div></div></footer>'
              + ("" if bare else "</body></html>"))
         f = self.out / path
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -141,6 +167,8 @@ class Site:
             chips += f' <span class="chip">{j["openings"]} openings</span>'
         if j.get("days_posted") is not None and j["days_posted"] <= 7:
             chips += ' <span class="chip new">New</span>'
+        if j.get("entry"):
+            chips += ' <span class="chip entry">Entry level</span>'
         chips += self.perk_chips(j)
         if j["hourly_min"]:
             lo, hi = j["hourly_min"], j["hourly_max"] or j["hourly_min"]
@@ -201,19 +229,22 @@ class Site:
         # ---- index with client-side filters
         data = [{"t": clean_title(j["title"]), "c": j["company"], "ci": j["city"], "s": j["state"],
                  "r": ROLE_EN.get(j["role"], j["role"]), "n": j["openings"], "lo": j["hourly_min"],
-                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j),
+                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j), "e": 1 if j.get("entry") else 0,
                  "u": (f'jobs/{j["slug"]}.html' if not self.preview else j["url"])} for j in js]
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
         quick = ("".join(f'<a href="{E(u)}">{E(n)}</a>' for n, u in top_states)
-                 + '<a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+                 + '<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
         body = ('<section class="hero"><div class="wrap">'
-                '<p class="kicker">Built by a working data center tech</p>'
-                '<h1>Data center tech jobs with the <mark>pay up front</mark>.</h1>'
-                f'<p class="lede">{total:,} open technician jobs at {len(companies)} data center operators and contractors, pulled straight from their own career pages every morning. '
-                f'{paid / total:.0%} show the pay range, and you can sort by it. No agencies, no call centers.</p>'
-                f'<div class="quick">{quick}</div></div></section><div class="wrap">'
+                '<p class="kicker">Built by a working data center tech · Updated every morning</p>'
+                '<h1>Data center technician jobs with the <mark>pay up front</mark>.</h1>'
+                f'<p class="lede">{total:,} open data center technician jobs at {len(companies)} operators and contractors, pulled straight from their own career pages every morning. '
+                f'{paid / total:.0%} show the pay range, and you can sort by it. No agencies, no call centers, no résumé harvesting.</p>'
+                f'<div class="quick">{quick}</div>'
+                f'<ul class="trust"><li><b>{len(companies)}</b> employers, read directly</li><li><b>{self.today:%b %-d}</b> last refresh</li>'
+                f'<li><b>0</b> recruiter reposts</li><li><b>Free</b>no sign-up to browse</li></ul>'
+                '</div></section><div class="wrap">'
                 f'<div class="stats"><div class="stat"><b>{total:,}</b><span>open technician jobs</span></div>'
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
                 f'<div class="stat"><b>{len(states)}</b><span>states</span></div>'
@@ -224,11 +255,17 @@ class Site:
                 f'<label for="co">Company<select id="co"><option value="">All companies</option>{opts(sorted(companies))}</select></label>'
                 f'<label for="ro">Type<select id="ro"><option value="">All types</option>{opts(sorted({d["r"] for d in data}))}</select></label>'
                 '<label for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
+                '<label for="ex">Experience<select id="ex"><option value="">Any</option><option value="1">Entry level / no experience</option></select></label>'
                 '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
                 '<option value="Travel">Travel job</option><option value="Schedule">Schedule stated (12s, 6 days…)</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
                 '<label for="so">Sort<select id="so"><option value="pay">Highest pay</option><option value="new">Newest</option></select></label>'
                 '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
+                '<section class="how"><h2>How this site works</h2><ol>'
+                '<li><b>We read the source.</b> Every morning the site reads the career pages of data center operators (Amazon, Google, Microsoft, QTS…) and the contractors who build and cable them (NTI, AFL, LINX, E2 Optics, ADB…).</li>'
+                '<li><b>We keep only technician work.</b> Data center techs, critical facilities, electricians, fiber and structured cabling, deployment. No sales, no managers, no fake "data entry" listings.</li>'
+                '<li><b>We put the pay first.</b> Hourly and salaried ranges are converted to $/hr so you can compare, and we flag per diem, housing and schedules when the employer states them.</li>'
+                '<li><b>You apply with the employer.</b> Every button goes to the company\'s own site. We never see your application.</li></ol></section>'
                 + self.signup()
                 + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LG={json.dumps({c: logo(c) for c in companies})};const ST={json.dumps({s: STATE_NAMES.get(s, s) for s in states})};'
                 + r"""
@@ -238,17 +275,18 @@ const m=v=>'$'+v.toFixed(2);
 function row(j){let pay='<div class="pay nopay">Pay not posted</div>';
  if(j.lo){const l=j.lo/SC*100,w=Math.max(2,(j.hi-j.lo)/SC*100);pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour</small><div class="bar" aria-hidden="true"><span style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
- return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
-function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value;
- let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk))));
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${j.e?'<span class="chip entry">Entry level</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
+function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value,ex=$('ex').value;
+ let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk)))&&(!ex||j.e));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
  const n=r.reduce((s,j)=>s+j.n,0);$('cnt').textContent=`${n.toLocaleString()} openings in ${r.length.toLocaleString()} listings`;
  $('list').innerHTML=r.slice(0,N).map(row).join('');$('more').hidden=r.length<=N}
-['q','st','co','ro','pay','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
+['q','st','co','ro','pay','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 </script></div>""")
-        self.page("index.html", SITE_NAME if self.preview else f"{SITE_NAME}: {SITE_TAGLINE}",
-                  f"{total:,} data center technician jobs with pay ranges, from {len(companies)} employers.", body)
+        self.page("index.html", SITE_NAME if self.preview else f"Data Center Technician Jobs with Pay, Updated Daily | {SITE_NAME}",
+                  f"{total:,} data center jobs for technicians, electricians and fiber techs at {len(companies)} employers, with posted pay ranges. "
+                  f"Filter by state, company, entry level and per diem. Updated {self.today:%B %-d, %Y}.", body, head_extra=self.org_ld())
 
         # ---- salaries
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Salaries</p>'
@@ -262,8 +300,9 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 + '<p class="note">Salaried ranges are divided by 2,080 hours. Pay ranges are the employer\'s posted range for the role, not what any one person earns. '
                   'Amazon, Google and Microsoft post pay in every state; some employers only post it where state law requires.</p>'
                 + self.signup())
-        self.page("salaries.html", f"Data Center Technician Salary by Company and State | {SITE_NAME}",
-                  "Posted pay ranges for data center technicians at Amazon, Google, Microsoft and more, by company, job type and state.", body)
+        self.page("salaries.html", f"Data Center Technician Salary {self.today.year}: Pay by Company and State | {SITE_NAME}",
+                  f"How much data center technicians make in {self.today.year}: posted pay ranges from {len(companies)} employers including Amazon, Google and Microsoft, "
+                  "by company, job type and state, converted to $/hr.", body)
 
         # ---- companies
         links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n:,}</small></a></li>'
@@ -285,8 +324,9 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     '<h2>Pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1)
                     + '<h2>Where they are hiring</h2>' + f'<ul class="grid-links">{st_links}</ul>'
                     + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
-            self.page(f"companies/{slug(c)}.html", f"{c} Data Center Technician Jobs and Pay | {SITE_NAME}",
-                      f"{n:,} open {c} data center technician jobs with posted pay ranges.", body)
+            self.page(f"companies/{slug(c)}.html", f"{c} Data Center Jobs: {n:,} Open Technician Roles and Pay | {SITE_NAME}",
+                      f"{n:,} open {c} data center technician jobs in {len(cs)} states, with posted pay ranges by job type. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Companies", "companies.html"), (c, f"companies/{slug(c)}.html")]))
 
         # ---- states and cities
         links = "".join(f'<li><a href="states/{slug(STATE_NAMES.get(s, s))}.html"><span>{E(STATE_NAMES.get(s, s))}</span><small>{n:,}</small></a></li>'
@@ -315,8 +355,9 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Cities</h2>' + f'<ul class="grid-links">{c_links}</ul>'
                     + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
-            self.page(f"states/{slug(name)}.html", f"Data Center Technician Jobs in {name} | {SITE_NAME}",
-                      f"{n:,} data center technician jobs in {name} with posted pay ranges.", body)
+            self.page(f"states/{slug(name)}.html", f"Data Center Jobs in {name}: {n:,} Technician Openings with Pay | {SITE_NAME}",
+                      f"{n:,} data center technician jobs in {name} across {len(cities)} cities, with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), ("States", "states.html"), (name, f"states/{slug(name)}.html")]))
         for (ci, s) in city_pages:
             rows = [j for j in js if j["city"] == ci and j["state"] == s]
             n = city_counts[(ci, s)]
@@ -326,20 +367,30 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     f'<p class="lede">{n:,} open technician jobs in {E(ci)}.</p>'
                     '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
-            self.page(f"cities/{slug(ci + '-' + s)}.html", f"Data Center Jobs in {ci}, {s} | {SITE_NAME}",
-                      f"{n:,} data center technician jobs in {ci}, {s} with pay.", body)
+            self.page(f"cities/{slug(ci + '-' + s)}.html", f"{ci} Data Center Jobs: {n:,} Technician Openings with Pay | {SITE_NAME}",
+                      f"{n:,} data center technician jobs in {ci}, {s} with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (name, f"states/{slug(name)}.html"), (ci, f"cities/{slug(ci + '-' + s)}.html")]))
 
         # ---- job pages (full build only), with JobPosting structured data for Google
         if not self.preview:
             for j in js:
+                posted_d = date.fromisoformat(j["posted"]) if j["posted"] else self.today
+                valid = max(posted_d, self.today - timedelta(days=1)) + timedelta(days=45)
+                perks_txt = ", ".join(perk_labels(j))
                 ld = {"@context": "https://schema.org/", "@type": "JobPosting", "title": clean_title(j["title"]),
                       "description": f"<p>{E(clean_title(j['title']))} at {E(j['company'])} in {E(j['city'])}, {j['state']}. "
-                                     f"Apply on the employer's career site.</p>",
-                      "datePosted": j["posted"] or str(self.today), "employmentType": "FULL_TIME",
+                                     + (f"Posted pay: {E(money(j['pay_min'], j['pay_unit']))}–{E(money(j['pay_max'], j['pay_unit']))} per {j['pay_unit']}. " if j["pay_min"] else "")
+                                     + (f"Employer mentions: {E(perks_txt)}. " if perks_txt else "")
+                                     + f"Job type: {E(ROLE_EN.get(j['role'], j['role']))}. Apply on the employer's career site.</p>",
+                      "datePosted": str(posted_d), "validThrough": f"{valid}T23:59:59",
+                      "employmentType": "FULL_TIME",
+                      "identifier": {"@type": "PropertyValue", "name": j["company"], "value": str(j["job_id"])},
                       "hiringOrganization": {"@type": "Organization", "name": j["company"]},
                       "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": j["city"],
                                                                      "addressRegion": j["state"], "addressCountry": "US"}},
                       "directApply": False}
+                crumbs_ld = self.breadcrumbs([("Jobs", "index.html"), (j["company"], f"companies/{slug(j['company'])}.html"),
+                                              (clean_title(j["title"]), f"jobs/{j['slug']}.html")])
                 if j["pay_min"]:
                     ld["baseSalary"] = {"@type": "MonetaryAmount", "currency": "USD",
                                         "value": {"@type": "QuantitativeValue", "minValue": j["pay_min"], "maxValue": j["pay_max"],
@@ -361,7 +412,96 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         + self.signup())
                 self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"]} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {j["city"]}, {j["state"]}. Pay: {pay}.', body,
-                          head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>')
+                          head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}')
+
+        # ---- entry-level jobs: no experience / level I
+        entry = [j for j in js if j.get("entry")]
+        e_paid = [j for j in entry if j["hourly_min"]]
+        e_lo = statistics.median([j["hourly_min"] for j in e_paid]) if e_paid else None
+        e_hi = statistics.median([j["hourly_max"] for j in e_paid]) if e_paid else None
+        e_states = Counter()
+        e_cos = Counter()
+        for j in entry:
+            e_states[j["state"]] += j["openings"]
+            e_cos[j["company"]] += j["openings"]
+        e_state_links = "".join(f'<li><a href="states/{slug(STATE_NAMES.get(st, st))}.html"><span>{E(STATE_NAMES.get(st, st))}</span><small>{n}</small></a></li>'
+                                for st, n in e_states.most_common(12))
+        e_co_links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n}</small></a></li>'
+                             for c, n in e_cos.most_common(12))
+        faq = [
+            ("Can I get a data center job with no experience?",
+             "Yes. Level I technician, cable puller, deployment technician and fiber technician 1 roles are hired without data center experience. "
+             "Employers usually ask for a high school diploma or GED, a clean drug test and background check, the ability to lift 50 lb and work 10–12 hour shifts, and a driver's license. "
+             "Contractors that build and cable data centers hire entry-level techs fastest; hyperscalers like Amazon hire Data Center Technician I roles directly."),
+            ("How much do entry-level data center technicians make?",
+             (f"Employers on this site currently post a typical range of {money(e_lo)}–{money(e_hi)} per hour for entry-level technician roles, " if e_lo else "Entry-level technician roles on this site typically post $20–$30 per hour, ")
+             + "with overtime common on construction sites. Traveling contractor jobs often add per diem ($100–$200 a day) and housing on top of the hourly rate."),
+            ("What certifications help you get hired?",
+             "None are required for most Level I jobs, but OSHA 10 (construction) and a forklift or scissor-lift card get you on site faster. "
+             "For a long-term edge: CompTIA A+ or Network+ for operations roles, BICSI Installer 1 or FOA CFOT for structured cabling and fiber."),
+            ("What does an entry-level data center technician actually do?",
+             "Racking and stacking servers, running and labeling copper and fiber cable, terminating and testing, moving equipment, following checklists and documenting work. "
+             "On construction projects it is physical work in 12-hour shifts; in live data centers it is more operations: tickets, swaps, inventory."),
+            ("Is it a good career path?",
+             "Level I techs commonly move to Level II–III in 1–3 years ($30–$45/hr), then lead, foreman or critical facilities roles. "
+             "Data center construction is one of the fastest-growing trades in the US, with new campuses in Texas, Ohio, Arizona, Virginia, Wisconsin and Louisiana."),
+        ]
+        faq_html = "".join(f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in faq)
+        faq_ld = {"@context": "https://schema.org", "@type": "FAQPage",
+                  "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
+        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Entry level</p>'
+                '<h1>Entry-level data center jobs: no experience required</h1>'
+                f'<p class="lede">{sum(j["openings"] for j in entry):,} open entry-level data center jobs — Level I technicians, cable pullers, deployment and fiber techs — at {len(e_cos)} employers. '
+                + (f'Typical posted pay: <b>{money(e_lo)}–{money(e_hi)}/hr</b>. ' if e_lo else '')
+                + 'Tagged automatically when the employer\'s posting says Level I, entry level, no experience required or paid training.</p>'
+                '<section class="guide"><h2>How to get your first data center job</h2><div class="prose">'
+                '<p><b>What they ask for.</b> High school diploma or GED, pass a drug test and background check, lift 50 lb, stand and climb ladders all shift, '
+                'a valid driver\'s license, and willingness to work nights, weekends or 10–12 hour shifts. Many contractor jobs also want OSHA 10.</p>'
+                '<p><b>Where the doors are open.</b> Contractors that build and cable data centers (deployment, structured cabling, fiber) hire the most entry-level techs and train on the job. '
+                'Hyperscalers (Amazon, Google, Microsoft) and operators (QTS, Equinix) post Level I technician roles with better benefits but more competition. Staffing firms place techs on 6–12 month projects quickly.</p>'
+                '<p><b>What makes you stand out.</b> Any hands-on experience: electrical helper, cable installer, IT help desk, military, warehouse with forklift. '
+                'A $40 OSHA 10 card and a CompTIA A+ or BICSI Installer 1 cert put you ahead of most applicants. Say in your application that you can travel and work 12s if you can — it matters more than a degree.</p>'
+                '<p><b>What to ask before you accept.</b> Hourly rate, overtime after 40 or after 8, per diem and whether housing is paid, the rotation (weeks on/off), '
+                'and whether the position is W-2 or 1099. See <a href="travel-jobs.html">jobs with per diem and housing</a> and the <a href="shift-schedules.html">shift schedule guide</a>.</p>'
+                '</div></section>'
+                '<h2>Where entry-level jobs are</h2>' + f'<ul class="grid-links">{e_state_links}</ul>'
+                '<h2>Employers hiring entry-level techs</h2>' + f'<ul class="grid-links">{e_co_links}</ul>'
+                '<h2>Open entry-level jobs</h2>' + self.job_list(entry, 0)
+                + '<h2>Questions people ask</h2><div class="faq">' + faq_html + '</div>'
+                + self.signup())
+        self.page("entry-level-jobs.html", f"Entry-Level Data Center Jobs (No Experience) {self.today.year}: Pay &amp; How to Start | {SITE_NAME}".replace("&amp;", "&"),
+                  f"{sum(j['openings'] for j in entry):,} entry-level data center technician jobs with no experience required, posted pay ranges, "
+                  "requirements, certifications that help and how to get hired.", body,
+                  head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
+
+        # ---- new this week: recién publicados + RSS
+        fresh = sorted([j for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7],
+                       key=lambda j: (j["days_posted"], -(j["hourly_max"] or 0)))
+        by_day = defaultdict(list)
+        for j in fresh:
+            by_day[j["days_posted"]].append(j)
+        day_label = lambda d: "Today" if d == 0 else ("Yesterday" if d == 1 else f"{d} days ago")  # noqa: E731
+        sections = "".join(f'<h2>{day_label(d)} <small>({sum(j["openings"] for j in by_day[d])} openings)</small></h2>' + self.job_list(by_day[d], 0)
+                           for d in sorted(by_day))
+        new_cos = sorted({j["company"] for j in fresh})
+        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / New this week</p>'
+                '<h1>New data center jobs this week</h1>'
+                f'<p class="lede">{sum(j["openings"] for j in fresh):,} technician openings posted in the last 7 days by {len(new_cos)} employers, newest first. '
+                f'Listings that employers take down disappear from this site the next morning, so everything here is live as of {self.today:%B %-d}.</p>'
+                f'<p class="note">Get these by email every Monday, or subscribe to the <a href="feed.xml">RSS feed</a>.</p>'
+                + sections + self.signup())
+        self.page("new-jobs.html", f"New Data Center Technician Jobs Posted This Week | {SITE_NAME}",
+                  f"Data center technician, fiber and electrician jobs posted in the last 7 days, with pay. Updated {self.today:%B %-d, %Y}.", body)
+        if not self.preview:
+            items = "".join(
+                f"<item><title>{E(clean_title(j['title']))} – {E(j['company'])}, {E(j['city'])}, {j['state']}</title>"
+                f"<link>{E(SITE_URL + '/jobs/' + j['slug'] + '.html')}</link><guid>{E(SITE_URL + '/jobs/' + j['slug'] + '.html')}</guid>"
+                f"<pubDate>{E(j['posted'] or str(self.today))}</pubDate>"
+                f"<description>{E((money(j['hourly_min']) + '–' + money(j['hourly_max']) + '/hr. ') if j['hourly_min'] else 'Pay not posted. ')}{E(', '.join(perk_labels(j)))}</description></item>"
+                for j in fresh[:100])
+            (self.out / "feed.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
+                                               f'<title>{E(SITE_NAME)}: new technician jobs</title><link>{E(SITE_URL)}/new-jobs.html</link>'
+                                               f'<description>Data center technician jobs posted this week, with pay.</description>{items}</channel></rss>', encoding="utf-8")
 
         # ---- travel jobs: per diem, housing, rotations
         travel = [j for j in js if j.get("perks")]
@@ -387,15 +527,25 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   "Data center technician and fiber jobs that pay per diem, provide housing or run on a travel rotation, with pay ranges.", body)
 
         # ---- about + survey
-        self.page("about.html", f"About | {SITE_NAME}", f"Why {SITE_NAME} exists and where the data comes from.",
+        self.page("about.html", f"About: Who Runs {SITE_NAME} and Where the Data Comes From", f"Why {SITE_NAME} exists, who built it, how listings are collected and how pay is calculated.",
                   '<p class="crumbs"><a href="index.html">Jobs</a> / About</p><h1>Made by a tech, for techs</h1>'
                   f'<div class="prose"><p>{E(OWNER_BLURB)}</p>'
-                  '<p>Every job here comes straight from the employer\'s own career page: Amazon, Google, Microsoft, CoreWeave, xAI and more. '
-                  'No staffing-agency reposts, no call-center jobs, no fake "data entry" listings.</p>'
-                  '<p>We show the pay range whenever the employer posts one, and convert it to an hourly rate so you can compare a salaried '
-                  'Google role with an hourly Amazon role. When a job stays on the employer\'s site, it is still open, so we keep it and show how long it has been posted.</p>'
+                  '<h2 id="who">Who runs this</h2>'
+                  '<p>Enmanuel V., an inside-plant (ISP) technician who has worked structured cabling and fiber on hyperscale data center builds in Texas, '
+                  'including the Abilene campus, on 12-hour shifts six days a week. This site started as the list he wished he had: every technician job, the pay, '
+                  'and whether the contractor pays per diem — without a recruiter in the middle.</p>'
+                  '<h2 id="data">Where the data comes from</h2>'
+                  f'<p>Every morning a script reads the career pages of {len(companies)} data center operators and contractors (Amazon, Google, Microsoft, QTS, Equinix, '
+                  'NTI, AFL, Team LINX, E2 Optics, ADB, Black Box and more) and keeps only technician, electrician, fiber and cabling roles. '
+                  'No staffing-agency reposts, no call-center jobs, no fake "data entry" listings. When an employer takes a listing down, it disappears here the next morning.</p>'
+                  '<h2 id="pay">How pay is calculated</h2>'
+                  '<p>We show the pay range only when the employer posts one — never estimates. Salaried ranges are divided by 2,080 hours so a salaried '
+                  'Google role and an hourly Amazon role line up. Per diem, housing, rotations and schedules are tagged only when the posting states them.</p>'
+                  '<h2 id="corrections">Corrections</h2>'
+                  '<p>If a listing, pay figure or company description is wrong, say so through the <a href="shift-survey.html">survey form</a> and it gets fixed in the next build. '
+                  'We never publish site names, badge or access details, or anything a technician tells us in confidence.</p>'
                   '<p>Next up: real shift schedules and site conditions reported by technicians. If you work in a data center, '
-                  '<a href="shift-survey.html">add yours in two minutes</a>.</p></div>' + self.signup())
+                  '<a href="shift-survey.html">add yours in two minutes</a>.</p></div>' + self.signup(), head_extra=self.org_ld())
         self.page("shift-survey.html", f"Data Center Shift Survey | {SITE_NAME}",
                   "Tell other technicians what your shift, rotation and pay really look like. Anonymous.",
                   '<p class="crumbs"><a href="index.html">Jobs</a> / Shift survey</p><h1>What does your shift really look like?</h1>'
@@ -415,11 +565,26 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 
         # ---- sitemap/robots (full build)
         if not self.preview:
-            urls = "".join(f"<url><loc>{E(SITE_URL + '/' + p.replace('index.html', ''))}</loc><lastmod>{self.today}</lastmod></url>"
-                           for p in self.pages)
-            (self.out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>'
-                                                  f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>')
+            posted_by_slug = {j["slug"]: (j["posted"] or str(self.today)) for j in js}
+            def urlset(paths, lastmod):
+                body = "".join(f"<url><loc>{E(SITE_URL + '/' + p.replace('index.html', ''))}</loc><lastmod>{lastmod(p)}</lastmod></url>" for p in paths)
+                return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
+            job_pages = [p for p in self.pages if p.startswith("jobs/")]
+            hub_pages = [p for p in self.pages if not p.startswith("jobs/")]
+            (self.out / "sitemap-pages.xml").write_text(urlset(hub_pages, lambda p: str(self.today)), encoding="utf-8")
+            (self.out / "sitemap-jobs.xml").write_text(urlset(job_pages, lambda p: posted_by_slug.get(p[5:-5], str(self.today))), encoding="utf-8")
+            (self.out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                                                  f'<sitemap><loc>{SITE_URL}/sitemap-pages.xml</loc><lastmod>{self.today}</lastmod></sitemap>'
+                                                  f'<sitemap><loc>{SITE_URL}/sitemap-jobs.xml</loc><lastmod>{self.today}</lastmod></sitemap></sitemapindex>', encoding="utf-8")
             (self.out / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
+            self.page("404.html", f"Job closed or page not found | {SITE_NAME}", "This job was taken down by the employer or the page moved.",
+                      '<h1>That job is closed or the page moved</h1>'
+                      '<p class="lede">Employers take listings down when they fill them, and this site removes them the next morning. The ones below are live today.</p>'
+                      '<div class="quick"><a href="/index.html">All technician jobs</a><a href="/new-jobs.html">New this week</a><a href="/entry-level-jobs.html">Entry level</a>'
+                      '<a href="/travel-jobs.html">Per diem &amp; housing</a><a href="/states.html">By state</a><a href="/companies.html">By company</a></div>'
+                      + '<h2>Newest openings</h2>' + self.job_list(sorted(js, key=lambda j: j["days_posted"] if j["days_posted"] is not None else 999)[:10], 0),
+                      canonical=False)
+            self.pages.remove("404.html")
 
 
 def main():

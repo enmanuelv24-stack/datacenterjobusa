@@ -116,6 +116,26 @@ td a{color:var(--ink);font-weight:600;text-decoration:none} td a:hover{color:var
 .signup button:hover{background:#ff6a3d}
 .signup .ok{color:#8fe3b4;font-weight:600;flex-basis:100%;margin:0}
 footer.site{border-top:1px solid var(--line);color:var(--muted);font-size:14px;margin-top:20px;background:var(--panel)}
-footer.site .wrap{padding-block:26px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+footer.site .wrap{padding-block:30px;display:block}
 footer.site a{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* --- confianza, guía, FAQ, footer --- */
+.chip.entry{background:#e3f1ff;color:#1a4e8a;border:1px solid #b9d7f5}
+@media (prefers-color-scheme:dark){.chip.entry{background:#17304d;color:#bcdcff;border-color:#2b5a8a}}
+.trust{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px;opacity:.9}
+.trust li b{font:600 15px/1 var(--mono);margin-right:6px}
+.how{margin:40px 0 8px;padding:26px 26px 10px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.how h2{margin-top:0}.how ol{margin:0;padding-left:22px}.how li{margin:0 0 12px;line-height:1.55}
+.guide{margin:26px 0 10px;padding:22px 26px 6px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.guide h2{margin-top:0}
+.faq details{border:1px solid var(--line);border-radius:10px;background:var(--card);margin:0 0 10px;padding:10px 16px}
+.faq summary{cursor:pointer;font-weight:600;font-size:17px}
+.faq p{margin:10px 0 4px;line-height:1.55}
+footer.site .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:28px;align-items:start}
+footer.site .cols b{display:block;margin-bottom:8px;font-size:15px;color:inherit}
+footer.site .cols a{display:block;margin:4px 0;color:inherit;opacity:.85;text-decoration:none}
+footer.site .cols a:hover{opacity:1;text-decoration:underline}
+footer.site .cols p{margin:0 0 8px;opacity:.85;line-height:1.5}
+footer.site .upd{font:500 12px/1.4 var(--mono);opacity:.7}
+@media (max-width:760px){footer.site .cols{grid-template-columns:1fr 1fr}.how,.guide{padding:18px 16px 4px}}
