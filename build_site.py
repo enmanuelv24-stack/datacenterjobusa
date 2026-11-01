@@ -109,6 +109,32 @@ def perk_labels(j) -> list[str]:
     return out
 
 
+
+# Guías locales para ciudades con mucha búsqueda (solo información pública; nunca detalles internos de sitios)
+CITY_GUIDES = {
+    ("Abilene", "TX"): {
+        "intro": ("Abilene is the center of one of the largest AI data center builds in the country: the Stargate campus developed by Crusoe for Oracle and OpenAI, "
+                  "with Vantage's Frontier campus rising next door in Shackelford County. That means thousands of construction and technician jobs for several years — "
+                  "and most of the cabling, fiber and deployment work is done by contractors who hire fast, pay hourly plus per diem, and run 10–12 hour shifts."),
+        "who": [("Who builds here", "General contractors and electrical primes publicly tied to the Abilene campus include DPR, Rosendin, Southland, MMR and Cupertino Electric. "
+                                     "Inside-plant cabling and fiber primes posting Abilene jobs include AFL, NTI (Network Connex), Team LINX, Total Deployment Solutions, "
+                                     "Black Box and E2 Optics, plus subcontractors and staffing firms such as The Archetype Strategy, Telvero, TEKsystems, Insight Global and Equiliem."),
+                ("What the jobs look like", "Structured cabling and fiber technicians (pulling, terminating, ribbon splicing, testing), deployment techs (racks, servers, labeling), "
+                                            "cable pullers, foremen and QA/QC. Typical posted pay for techs is $20–$35/hr; foremen and leads $30–$45/hr; splicers up to $40–$44/hr. "
+                                            "Contractors that travel crews in often add $100–$180/day per diem and sometimes housing."),
+                ("Living and working there", "Abilene is a 2-hour drive west of Fort Worth. Hotels and short-term rentals fill up fast on big project rotations, so ask about housing or per diem before you accept. "
+                                            "Shifts of 6×10 or 6×12 are common on the construction side; live-facility technician roles follow 12-hour rotations.")],
+        "faq": [("How do I get a job at the Abilene data center?",
+                 "Apply directly to the contractors doing the work, not to the owner. Entry-level cabling and deployment techs are hired by contractors and staffing firms listed on this page; "
+                 "electricians and HVAC through the electrical and mechanical primes. OSHA 10, a driver's license and the ability to pass a drug test and background check are the usual requirements."),
+                ("Do Abilene data center jobs pay per diem?",
+                 "Many traveling contractor roles do (typically $100–$180 per day), but most employers don't put it in the posting. Ask the recruiter, and check the jobs tagged with per diem on this site."),
+                ("Is there housing?",
+                 "Some contractors provide hotel rooms or shared housing for traveling crews; others pay a per diem and leave lodging to you. Local supply is tight during peak construction.")],
+    },
+}
+
+
 class Site:
     def __init__(self, jobs, out: Path, preview: bool, today: date):
         self.jobs, self.out, self.preview, self.today = jobs, out, preview, today
@@ -412,14 +438,29 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
             rows = [j for j in js if j["city"] == ci and j["state"] == s]
             n = city_counts[(ci, s)]
             name = STATE_NAMES.get(s, s)
+            g = CITY_GUIDES.get((ci, s))
+            guide_html = ""
+            faq_ld = ""
+            if g:
+                guide_html = ('<section class="guide"><h2>Working in ' + E(ci) + '</h2><div class="prose"><p>' + E(g["intro"]) + '</p>'
+                              + "".join(f'<p><b>{E(h)}.</b> {E(t)}</p>' for h, t in g["who"]) + '</div></section>')
+                faq_html = '<h2>Questions people ask</h2><div class="faq">' + "".join(f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in g["faq"]) + '</div>'
+                faq_ld = '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@type": "FAQPage",
+                         "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in g["faq"]]}) + '</script>'
+            else:
+                faq_html = ""
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../states/{slug(name)}.html">{E(name)}</a> / {E(ci)}</p>'
                     f'<h1>Data center jobs in {E(ci)}, {s}</h1>'
-                    f'<p class="lede">{n:,} open technician jobs in {E(ci)}.</p>'
-                    '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
-                    + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
+                    f'<p class="lede">{n:,} open technician jobs in {E(ci)} from {len({j["company"] for j in rows})} employers, read daily from their career pages. '
+                    + (f'Typical posted pay: <b>{money(statistics.median([j["hourly_min"] for j in rows if j["hourly_min"]]))}–{money(statistics.median([j["hourly_max"] for j in rows if j["hourly_min"]]))}/hr</b>.' if any(j["hourly_min"] for j in rows) else '')
+                    + '</p>' + guide_html
+                    + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
+                    + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + faq_html
+                    + f'<p class="note">See also: <a href="../states/{slug(name)}.html">all {E(name)} data center jobs</a>, <a href="../travel-jobs.html">jobs with per diem and housing</a>, <a href="../entry-level-jobs.html">entry-level jobs</a>.</p>'
+                    + self.signup())
             self.page(f"cities/{slug(ci + '-' + s)}.html", f"{ci} Data Center Jobs: {n:,} Technician Openings with Pay | {SITE_NAME}",
                       f"{n:,} data center technician jobs in {ci}, {s} with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
-                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (name, f"states/{slug(name)}.html"), (ci, f"cities/{slug(ci + '-' + s)}.html")]))
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (name, f"states/{slug(name)}.html"), (ci, f"cities/{slug(ci + '-' + s)}.html")]) + faq_ld)
 
         # ---- job pages (full build only), with JobPosting structured data for Google
         if not self.preview:
