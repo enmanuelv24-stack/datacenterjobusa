@@ -139,3 +139,24 @@ footer.site .cols a:hover{opacity:1;text-decoration:underline}
 footer.site .cols p{margin:0 0 8px;opacity:.85;line-height:1.5}
 footer.site .upd{font:500 12px/1.4 var(--mono);opacity:.7}
 @media (max-width:760px){footer.site .cols{grid-template-columns:1fr 1fr}.how,.guide{padding:18px 16px 4px}}
+
+/* --- tarjetas v2: logo real, nivel, antigüedad --- */
+.logo{position:relative;overflow:hidden;background:#fff}
+.logo b{position:absolute;inset:0;display:grid;place-items:center;font:700 17px/1 var(--display);color:#fff;letter-spacing:.02em;background:inherit}
+.logo img{position:relative;width:30px;height:30px;object-fit:contain;background:#fff;border-radius:6px;padding:2px}
+.logo:has(img){background:#fff!important;border:1px solid var(--line)}
+.logo:has(img) b{display:none}
+.job .tags{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:7px}
+.job .meta .age{color:var(--muted);font:500 12px var(--mono)}
+.chip.lvl{background:#eef2f7;color:#2d3e55;border:1px solid #d5dde8}
+@media (prefers-color-scheme:dark){.chip.lvl{background:#243348;color:#cbd8ea;border-color:#36506f}}
+.pay.nopay small{display:block;font:400 12px var(--body);color:var(--muted)}
+.browse{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:26px 0 8px}
+.browse h2{font-size:17px;margin:0 0 10px;border:0;padding:0}
+.browse .quick a small,.quick a small{font:600 11px/1 var(--mono);opacity:.7;margin-left:6px}
+@media (max-width:760px){.browse{grid-template-columns:1fr}}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+main .quick a{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;background:var(--panel)}
+main .quick a:hover{border-color:var(--accent);color:var(--accent-ink)}
+.hero .quick a{color:#fff;border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}
+.hero .quick a:hover{background:rgba(255,255,255,.16);color:#fff}

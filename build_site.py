@@ -36,12 +36,27 @@ def money(v, unit="hour"):
 LOGO_COLORS = ["#2b6cb0", "#1f7a4d", "#6b46c1", "#b7791f", "#c53030", "#2c7a7b", "#4a5568", "#d53f8c", "#3182ce", "#805ad5"]
 
 
+COMPANY_DOMAINS = {
+    "Amazon": "amazon.com", "M.C. Dean": "mcdean.com", "Oracle": "oracle.com", "xAI": "x.ai", "Google": "google.com",
+    "Introl": "introl.com", "Black Box": "blackbox.com", "QTS": "qtsdatacenters.com", "E2 Optics": "e2optics.com",
+    "TDS (Total Deployment Solutions)": "totaldeployment.com", "Microsoft": "microsoft.com", "Equinix": "equinix.com",
+    "Vision Technologies": "visiontechnologies.com", "CoreWeave": "coreweave.com", "Holder Construction": "holderconstruction.com",
+    "Rosendin": "rosendin.com", "Network Connex": "networkconnex.com", "AFL": "aflglobal.com", "Cologix": "cologix.com",
+    "Nebius": "nebius.com", "Crusoe": "crusoe.ai", "ADB Companies": "adbcompanies.com", "Compu Dynamics": "compu-dynamics.com",
+    "Lambda": "lambda.ai", "Team LINX": "teamlinx.com", "The Archetype Strategy": "archetypestrategy.com",
+    "MidPoint Technology Group": "midpointtechnologygroup.com",
+}
+
+
 def logo(company: str) -> str:
-    """Avatar de letras para la empresa (sin usar logotipos ajenos)."""
+    """Ícono del empleador (su propio favicon, servido por Google) sobre un avatar de letras de respaldo."""
     words = [w for w in re.split(r"[\s(]+", company) if w and w[0].isalpha()]
     txt = (words[0][:2] if len(words) == 1 else "".join(w[0] for w in words[:2])).upper()
     col = LOGO_COLORS[sum(map(ord, company)) % len(LOGO_COLORS)]
-    return f'<span class="logo" style="background:{col}" aria-hidden="true">{E(txt)}</span>'
+    dom = COMPANY_DOMAINS.get(company)
+    img = (f'<img src="https://www.google.com/s2/favicons?domain={E(dom)}&amp;sz=64" alt="" width="44" height="44" loading="lazy" '
+           f'onerror="this.remove()">' if dom else "")
+    return f'<span class="logo" style="background:{col}" aria-hidden="true"><b>{E(txt)}</b>{img}</span>'
 
 
 def clean_title(t: str) -> str:
@@ -62,6 +77,12 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 
 PERK_EN = {"per_diem": "Per diem", "housing": "Housing", "travel": "Travel", "overtime": "Overtime", "signon": "Sign-on bonus",
            "relocation": "Relocation", "shift_diff": "Shift differential", "vehicle": "Company vehicle", "retention": "Completion bonus"}
+
+
+def ago(d) -> str:
+    if d is None:
+        return ""
+    return "Today" if d == 0 else ("Yesterday" if d == 1 else (f"{d}d ago" if d < 30 else f"{d // 30}mo ago"))
 
 
 def perk_labels(j) -> list[str]:
@@ -130,6 +151,8 @@ class Site:
              f'<meta name="description" content="{E(desc)}">'
              + (f'<link rel="canonical" href="{E(url)}">' if canonical and not self.preview else "")
              + f'<meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
+             + f'<link rel="icon" href="{r("favicon.svg")}" type="image/svg+xml"><link rel="apple-touch-icon" href="{r("apple-touch-icon.png")}">'
+             + f'<meta property="og:image" content="{SITE_URL}/og.png"><meta name="twitter:card" content="summary_large_image">'
              + f'<link rel="alternate" type="application/rss+xml" title="New data center jobs" href="{r("feed.xml")}">'
              + FONTS + f"<style>{CSS}</style>{head_extra}"
              + ("" if bare else "</head><body>")
@@ -163,6 +186,8 @@ class Site:
         href = (self.rel(f'jobs/{j["slug"]}.html', depth) if not self.preview else j["url"])
         ext = "" if not self.preview else ' rel="noopener" target="_blank"'
         chips = f'<span class="chip">{E(ROLE_EN.get(j["role"], j["role"]))}</span>'
+        if j.get("level"):
+            chips += f' <span class="chip lvl">Level {E(j["level"])}</span>'
         if j["openings"] > 1:
             chips += f' <span class="chip">{j["openings"]} openings</span>'
         if j.get("days_posted") is not None and j["days_posted"] <= 7:
@@ -170,16 +195,17 @@ class Site:
         if j.get("entry"):
             chips += ' <span class="chip entry">Entry level</span>'
         chips += self.perk_chips(j)
+        age = ago(j.get("days_posted"))
         if j["hourly_min"]:
             lo, hi = j["hourly_min"], j["hourly_max"] or j["hourly_min"]
-            left, width = lo / scale_max * 100, max(2, (hi - lo) / scale_max * 100)
             pay = (f'<div class="pay">{money(lo)}–{money(hi)}<small>per hour'
                    + (f' · {money(j["pay_min"], "year")}–{money(j["pay_max"], "year")}/yr' if j["pay_unit"] == "year" else "")
-                   + f'</small><div class="bar" aria-hidden="true"><span style="left:{left:.1f}%;width:{width:.1f}%"></span></div></div>')
+                   + '</small></div>')
         else:
-            pay = '<div class="pay nopay">Pay not posted</div>'
+            pay = '<div class="pay nopay">Pay not posted<small>ask the recruiter</small></div>'
         return (f'<li class="job">{logo(j["company"])}<div><a class="t" href="{E(href)}"{ext}>{E(title)}</a>'
-                f'<div class="meta"><span class="co">{E(j["company"])}</span><span>{E(loc)}</span>{chips}</div></div>{pay}</li>')
+                f'<div class="meta"><span class="co">{E(j["company"])}</span><span>{E(loc)}</span>{f"<span class=age>{age}</span>" if age else ""}</div>'
+                f'<div class="tags">{chips}</div></div>{pay}</li>')
 
     def job_list(self, rows, depth: int, limit: int | None = None) -> str:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
@@ -229,7 +255,8 @@ class Site:
         # ---- index with client-side filters
         data = [{"t": clean_title(j["title"]), "c": j["company"], "ci": j["city"], "s": j["state"],
                  "r": ROLE_EN.get(j["role"], j["role"]), "n": j["openings"], "lo": j["hourly_min"],
-                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j), "e": 1 if j.get("entry") else 0,
+                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j), "e": 1 if j.get("entry") else 0, "l": j.get("level") or "",
+                 "yr": [j["pay_min"], j["pay_max"]] if j["pay_unit"] == "year" and j["pay_min"] else None,
                  "u": (f'jobs/{j["slug"]}.html' if not self.preview else j["url"])} for j in js]
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
@@ -249,12 +276,19 @@ class Site:
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
                 f'<div class="stat"><b>{len(states)}</b><span>states</span></div>'
                 f'<div class="stat"><b>{paid / total:.0%}</b><span>with pay posted</span></div></div>'
+                '<section class="browse" id="browse"><div><h2>By type of work</h2><div class="quick">'
+                + "".join(f'<a href="roles/{slug(r)}.html">{E(r)} <small>{n:,}</small></a>' for r, n in Counter({ROLE_EN.get(j["role"], j["role"]): 0 for j in js}).items() for n in [sum(x["openings"] for x in js if ROLE_EN.get(x["role"], x["role"]) == r)])
+                + '</div></div><div><h2>By level</h2><div class="quick">'
+                + "".join(f'<a href="levels/{slug(l)}.html">{E(n)} <small>{sum(x["openings"] for x in js if x.get("level") == l):,}</small></a>'
+                          for l, n in [("I", "Level I / entry"), ("II", "Level II"), ("III", "Level III / senior"), ("IV", "Level IV")] if any(x.get("level") == l for x in js))
+                + '<a href="entry-level-jobs.html">No experience <small>guide</small></a></div></div></section>'
                 '<form class="filters" id="f" onsubmit="event.preventDefault()">'
                 '<label for="q">Search<input id="q" type="search" placeholder="Title or city"></label>'
                 f'<label for="st">State<select id="st"><option value="">All states</option>{opts(sorted(states))}</select></label>'
                 f'<label for="co">Company<select id="co"><option value="">All companies</option>{opts(sorted(companies))}</select></label>'
                 f'<label for="ro">Type<select id="ro"><option value="">All types</option>{opts(sorted({d["r"] for d in data}))}</select></label>'
                 '<label for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
+                '<label for="lv">Level<select id="lv"><option value="">Any level</option><option value="I">Level I</option><option value="II">Level II</option><option value="III">Level III / senior</option><option value="IV">Level IV</option></select></label>'
                 '<label for="ex">Experience<select id="ex"><option value="">Any</option><option value="1">Entry level / no experience</option></select></label>'
                 '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
                 '<option value="Travel">Travel job</option><option value="Schedule">Schedule stated (12s, 6 days…)</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
@@ -272,16 +306,19 @@ class Site:
 const $=id=>document.getElementById(id);let N=40;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const m=v=>'$'+v.toFixed(2);
-function row(j){let pay='<div class="pay nopay">Pay not posted</div>';
- if(j.lo){const l=j.lo/SC*100,w=Math.max(2,(j.hi-j.lo)/SC*100);pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour</small><div class="bar" aria-hidden="true"><span style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%"></span></div></div>`}
+const ago=d=>d==null?'':(d===0?'Today':d===1?'Yesterday':d<30?d+'d ago':Math.floor(d/30)+'mo ago');
+const yr=v=>'$'+Math.round(v).toLocaleString();
+function row(j){let pay='<div class="pay nopay">Pay not posted<small>ask the recruiter</small></div>';
+ if(j.lo){pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour${j.yr?' · '+yr(j.yr[0])+'–'+yr(j.yr[1])+'/yr':''}</small></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
- return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span><span class="chip">${esc(j.r)}</span>${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${j.e?'<span class="chip entry">Entry level</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
-function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value,ex=$('ex').value;
- let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk)))&&(!ex||j.e));
+ const a=ago(j.d);
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span>${a?`<span class="age">${a}</span>`:''}</div><div class="tags"><span class="chip">${esc(j.r)}</span>${j.l?`<span class="chip lvl">Level ${j.l}</span>`:''}${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${j.e?'<span class="chip entry">Entry level</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
+function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value,ex=$('ex').value,lv=$('lv').value;
+ let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk)))&&(!ex||j.e)&&(!lv||j.l===lv));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
  const n=r.reduce((s,j)=>s+j.n,0);$('cnt').textContent=`${n.toLocaleString()} openings in ${r.length.toLocaleString()} listings`;
  $('list').innerHTML=r.slice(0,N).map(row).join('');$('more').hidden=r.length<=N}
-['q','st','co','ro','pay','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
+['q','st','co','ro','pay','lv','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 </script></div>""")
         self.page("index.html", SITE_NAME if self.preview else f"Data Center Technician Jobs with Pay, Updated Daily | {SITE_NAME}",
@@ -413,6 +450,58 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"]} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {j["city"]}, {j["state"]}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}')
+
+        # ---- categorías: por tipo de trabajo y por nivel
+        role_counts = Counter()
+        for j in js:
+            role_counts[ROLE_EN.get(j["role"], j["role"])] += j["openings"]
+        ROLE_BLURB = {
+            "Data center technician": "Rack and stack, cabling, hardware swaps, tickets and documentation inside live data halls. The core technician job at hyperscalers, operators and contractors.",
+            "Critical facilities": "Keeping power and cooling alive: UPS, generators, switchgear, chillers, rounds and emergency response. Usually shift work on a rotation.",
+            "Install & network": "Structured cabling, fiber splicing and testing, network hardware installs and deployment on new builds and expansions. Where contractors hire most.",
+            "Electrical": "Journeyman and apprentice electricians, medium-voltage and low-voltage work on data center construction and maintenance.",
+            "Mechanical & HVAC": "Chillers, CRAH/CRAC units, pumps, controls and the mechanical side of cooling.",
+            "Controls & BMS": "Building management systems, PLCs, controls commissioning and tuning.",
+            "Power & generators": "Generator, turbine and power-plant technicians supporting campus power.",
+            "Operations center": "Control-room and NOC/SOC operators monitoring alarms, access and systems.",
+            "Construction site": "Field engineers and site technicians on active data center construction projects.",
+            "IT support": "Hands-on IT support roles based inside data centers.",
+            "Other technician": "Technician roles that don't fit the other categories.",
+        }
+        LEVEL_BLURB = {
+            "I": ("Level I / entry", "First-rung technician roles: no data center experience required, training on the job. Often 12-hour shifts on construction sites or nights in live facilities."),
+            "II": ("Level II", "1–3 years of experience: works independently on installs, troubleshooting and documentation; often trains Level I techs."),
+            "III": ("Level III / senior", "Senior techs, leads and foremen: own a scope or a crew, handle escalations, quality and commissioning support."),
+            "IV": ("Level IV", "Principal and chief-engineer level technician roles."),
+        }
+        for role_en, n in role_counts.most_common():
+            rows = [j for j in js if ROLE_EN.get(j["role"], j["role"]) == role_en]
+            lv = Counter(j["level"] or "—" for j in rows)
+            body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../index.html#browse">Categories</a> / {E(role_en)}</p>'
+                    f'<h1>{E(role_en)} jobs in data centers</h1>'
+                    f'<p class="lede">{n:,} open {E(role_en.lower())} jobs. {E(ROLE_BLURB.get(role_en, ""))}</p>'
+                    '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
+                    + '<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{c}</small></a>' for l, c in sorted(lv.items()) if l != "—") + '</div>'
+                    + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
+            self.page(f"roles/{slug(role_en)}.html", f"{role_en} Jobs in Data Centers: {n:,} Open with Pay | {SITE_NAME}",
+                      f"{n:,} {role_en.lower()} jobs in US data centers with posted pay by employer and level. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (role_en, f"roles/{slug(role_en)}.html")]))
+        for lvl, (lname, blurb) in LEVEL_BLURB.items():
+            rows = [j for j in js if j.get("level") == lvl]
+            if not rows:
+                continue
+            n = sum(j["openings"] for j in rows)
+            paid = [j for j in rows if j["hourly_min"]]
+            lo = statistics.median([j["hourly_min"] for j in paid]) if paid else None
+            hi = statistics.median([j["hourly_max"] for j in paid]) if paid else None
+            body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../index.html#browse">Categories</a> / {E(lname)}</p>'
+                    f'<h1>{E(lname)} data center technician jobs</h1>'
+                    f'<p class="lede">{n:,} open jobs. {E(blurb)}' + (f' Typical posted pay: <b>{money(lo)}–{money(hi)}/hr</b>.' if lo else '') + '</p>'
+                    '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
+                    + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
+            self.page(f"levels/{slug(lvl)}.html", f"{lname} Data Center Technician Jobs and Pay | {SITE_NAME}",
+                      f"{n:,} {lname.lower()} data center technician jobs with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (lname, f"levels/{slug(lvl)}.html")]))
 
         # ---- entry-level jobs: no experience / level I
         entry = [j for j in js if j.get("entry")]
@@ -562,6 +651,13 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
             t = re.search(r"<!--title: (.*?)-->", raw).group(1)
             dsc = re.search(r"<!--desc: (.*?)-->", raw).group(1)
             self.page(f.name, t, dsc, re.sub(r"<!--.*?-->", "", raw) + self.signup())
+
+        # ---- recursos estáticos (ícono, imagen para compartir)
+        import shutil
+        for name in ("favicon.svg", "apple-touch-icon.png", "og.png"):
+            src = Path(__file__).with_name(name)
+            if src.exists():
+                shutil.copy(src, self.out / name)
 
         # ---- sitemap/robots (full build)
         if not self.preview:
