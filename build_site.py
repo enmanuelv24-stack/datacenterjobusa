@@ -365,20 +365,66 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   f"Filter by state, company, entry level and per diem. Updated {self.today:%B %-d, %Y}.", body, head_extra=self.org_ld())
 
         # ---- salaries
+        paid_js = [j for j in js if j["hourly_min"]]
+        med = lambda rows, k: statistics.median([j[k] for j in rows]) if rows else None  # noqa: E731
+        all_lo, all_hi = med(paid_js, "hourly_min"), med(paid_js, "hourly_max")
+        dct = [j for j in paid_js if ROLE_EN.get(j["role"], j["role"]) == "Data center technician"]
+        lvl_rows = []
+        for lv, name in [("I", "Level I / entry"), ("II", "Level II"), ("III", "Level III / senior"), ("IV", "Level IV")]:
+            r = [j for j in paid_js if j.get("level") == lv]
+            if len(r) >= 3:
+                lvl_rows.append(f'<tr><td><a href="levels/{slug(lv)}.html">{E(name)}</a></td><td class=num>{sum(j["openings"] for j in r)}</td>'
+                                f'<td class=num>{money(med(r, "hourly_min"))}</td><td class=num>{money(med(r, "hourly_max"))}</td><td class=num>{len(r)}</td></tr>')
+        # ranking de empleadores para el puesto de técnico de data center
+        by_co = defaultdict(list)
+        for j in dct:
+            by_co[j["company"]].append(j)
+        rank = sorted(((c, med(r, "hourly_max"), med(r, "hourly_min"), len(r)) for c, r in by_co.items() if len(r) >= 2), key=lambda t: -t[1])
+        rank_rows = "".join(f'<tr><td>{i + 1}</td><td><a href="companies/{slug(c)}.html">{E(c)}</a></td><td class=num>{money(lo)}</td><td class=num>{money(hi)}</td><td class=num>{n}</td></tr>'
+                            for i, (c, hi, lo, n) in enumerate(rank[:15]))
+        perk_pd = [j for j in js if j.get("per_diem")]
+        faq = [
+            ("How much does a data center technician make?",
+             f"Across {len(paid_js):,} technician postings with pay on this site, the typical employer-posted range is {money(all_lo)}–{money(all_hi)} per hour "
+             f"(about {money(all_lo * 2080, 'year')}–{money(all_hi * 2080, 'year')} a year at 40 hours). Entry-level roles post around the low end; Level III, leads and critical-facilities roles post the high end. "
+             "These are the ranges employers publish, not self-reported salaries."),
+            ("Which companies pay data center technicians the most?",
+             ("The highest posted ranges for data center technician roles right now come from " + ", ".join(c for c, *_ in rank[:3]) + ". " if len(rank) >= 3 else "")
+             + "Hyperscalers and operators tend to post higher base ranges; contractors post lower hourly rates but add overtime and per diem, which often make the weekly check bigger."),
+            ("Do data center technicians get overtime and per diem?",
+             "On construction and deployment projects, yes: 50–72 hour weeks are common and overtime is paid after 40 hours. Traveling contractors usually add per diem of $100–$180 a day, "
+             "though most postings don't state it. Operations roles at hyperscalers are usually salaried or hourly with shift differentials."),
+            ("How is pay converted to hourly on this site?",
+             "Salaried ranges are divided by 2,080 hours (40 hours × 52 weeks). We use only the range the employer wrote in the posting; we never estimate. 'Typical' is the median of the posted minimums and maximums."),
+        ]
+        faq_html = "".join(f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in faq)
+        faq_ld = {"@context": "https://schema.org", "@type": "FAQPage",
+                  "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Salaries</p>'
-                '<h1>Data center technician pay, compared</h1>'
-                '<p class="lede">What employers actually post for technician jobs, converted to an hourly rate so salaried and hourly jobs line up. '
-                '"Typical" is the median of the posted ranges.</p>'
-                '<h2>By employer</h2>' + self.pay_table(js, lambda j: j["company"], "Employer", 0, lambda k: f"companies/{slug(k)}.html")
-                + '<h2>By job type</h2>' + self.pay_table(js, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 0)
+                f'<h1>Data center technician salary in {self.today.year}: what employers actually post</h1>'
+                f'<p class="lede">Typical posted range across {len(paid_js):,} technician jobs with pay: <b>{money(all_lo)}–{money(all_hi)} per hour</b> '
+                f'({money(all_lo * 2080, "year")}–{money(all_hi * 2080, "year")} a year at 40 hours). Every number here comes from the employer\'s own posting, converted to $/hr so salaried and hourly jobs line up. '
+                'No self-reported guesses, no estimates.</p>'
+                f'<div class="stats"><div class="stat"><b>{money(all_lo)}</b><span>typical low $/hr</span></div><div class="stat"><b>{money(all_hi)}</b><span>typical high $/hr</span></div>'
+                f'<div class="stat"><b>{len(paid_js):,}</b><span>postings with pay</span></div><div class="stat"><b>{len(perk_pd)}</b><span>state a per diem amount</span></div></div>'
+                '<h2>By level</h2><div class="tablebox"><table><thead><tr><th>Level</th><th>Openings</th><th>Typical low $/hr</th><th>Typical high $/hr</th><th>Postings with pay</th></tr></thead>'
+                f'<tbody>{"".join(lvl_rows)}</tbody></table></div>'
+                '<h2>Highest-paying employers for "Data center technician" roles</h2>'
+                '<p class="note">Employers with at least two data center technician postings that include pay, ranked by the typical high end of their range.</p>'
+                '<div class="tablebox"><table><thead><tr><th>#</th><th>Employer</th><th>Typical low $/hr</th><th>Typical high $/hr</th><th>Postings</th></tr></thead>'
+                f'<tbody>{rank_rows}</tbody></table></div>'
+                '<h2>By employer (all technician roles)</h2>' + self.pay_table(js, lambda j: j["company"], "Employer", 0, lambda k: f"companies/{slug(k)}.html")
+                + '<h2>By job type</h2>' + self.pay_table(js, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 0, lambda k: f"roles/{slug(k)}.html")
                 + '<h2>By state</h2>' + self.pay_table(js, lambda j: STATE_NAMES.get(j["state"], j["state"]), "State", 0,
                                                       lambda k: f"states/{slug(k)}.html")
+                + '<h2>Questions people ask</h2><div class="faq">' + faq_html + '</div>'
                 + '<p class="note">Salaried ranges are divided by 2,080 hours. Pay ranges are the employer\'s posted range for the role, not what any one person earns. '
-                  'Amazon, Google and Microsoft post pay in every state; some employers only post it where state law requires.</p>'
+                  'Amazon, Google and Microsoft post pay in every state; some employers only post it where state law requires. Per diem, housing and overtime are tagged on the '
+                  '<a href="travel-jobs.html">per diem &amp; housing</a> page.</p>'
                 + self.signup())
-        self.page("salaries.html", f"Data Center Technician Salary {self.today.year}: Pay by Company and State | {SITE_NAME}",
-                  f"How much data center technicians make in {self.today.year}: posted pay ranges from {len(companies)} employers including Amazon, Google and Microsoft, "
-                  "by company, job type and state, converted to $/hr.", body)
+        self.page("salaries.html", f"Data Center Technician Salary {self.today.year}: Pay by Level, Company and State | {SITE_NAME}",
+                  f"How much data center technicians make in {self.today.year}: {money(all_lo)}–{money(all_hi)}/hr typical, from {len(paid_js):,} employer-posted ranges at {len(companies)} employers, "
+                  "by level, company, job type and state. No estimates.", body, head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
 
         # ---- companies
         links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n:,}</small></a></li>'
