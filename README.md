@@ -60,6 +60,9 @@ DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, 
 | ADB Companies | Fibra ISP/OSP y empalme en data center | UKG/UltiPro (API) |
 | The Archetype Strategy | Proveedor de técnicos ISP/fibra para data centers (Tye/Abilene TX y todo EE. UU.; nivel subcontratista) | JazzHR (lista HTML + página por puesto con "Pay:") |
 | MidPoint Technology Group | Contratista de cableado/data center (Columbia MD; Oracle Abilene); hoy sin vacantes abiertas | Lever (API) |
+| Align | Contratista de cableado de data center (foremen y técnicos; Sterling, Plano, Phoenix, Detroit…) | Greenhouse (API) |
+| Telvero | Sub de fibra/ISP hyperscale (Abilene, Columbus, Bridgeport AL); publica pago y per diem | CareerPlug (HTML + página por puesto) |
+| SRI Telecom | Sub ISP/fibra (300+ técnicos; Memphis, Fairfax IA, Atlanta, San Antonio) | ApplicantPro (API JSON) |
 | Team LINX | Contratista de bajo voltaje / ISP en construcción de data centers (Abilene, Dallas, El Paso, SLC, Cheyenne) | WordPress (tabla HTML + página por puesto con "Pay:") |
 
 Pendientes: Total Team Communications (Houston; contratista ISP/fibra de Oracle, no tiene bolsa pública en su sitio),

@@ -44,7 +44,7 @@ COMPANY_DOMAINS = {
     "Rosendin": "rosendin.com", "Network Connex": "networkconnex.com", "AFL": "aflglobal.com", "Cologix": "cologix.com",
     "Nebius": "nebius.com", "Crusoe": "crusoe.ai", "ADB Companies": "adbcompanies.com", "Compu Dynamics": "compu-dynamics.com",
     "Lambda": "lambda.ai", "Team LINX": "teamlinx.com", "The Archetype Strategy": "archetypestrategy.com",
-    "MidPoint Technology Group": "midpointtechnologygroup.com",
+    "MidPoint Technology Group": "midpointtechnologygroup.com", "Align": "align.com", "Telvero": "telvero.com", "SRI Telecom": "sritelecom.net",
 }
 
 

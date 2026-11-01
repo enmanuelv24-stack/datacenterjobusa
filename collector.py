@@ -32,11 +32,11 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Configuración de fuentes. Para agregar una empresa, agrégala aquí.
 # ---------------------------------------------------------------------------
-GREENHOUSE_BOARDS = {"xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius", "holderconstruction": "Holder Construction",
+GREENHOUSE_BOARDS = {"align46": "Align", "xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius", "holderconstruction": "Holder Construction",
                      "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics"}
 # Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
 LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix", "midtechgroup": "MidPoint Technology Group"}
-DC_ONLY = {"Network Connex", "AFL"}
+DC_ONLY = {"Network Connex", "AFL", "Align"}
 DC_TITLE = re.compile(r"data ?cent|\bISP\b|\bDC\b|low voltage|structured cabl|white space", re.I)
 ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda"}
 AMAZON_QUERIES = [
@@ -276,14 +276,16 @@ def extract_perks(text: str) -> tuple[str, float | None]:
             per_diem = amt
             if "per_diem" not in tags:
                 tags.insert(0, "per_diem")
-    sh = SHIFT_HOURS.search(text)
-    hours = next((g for g in sh.groups() if g), None) if sh else None
-    if sh and sh.group(3):  # "5x12"
-        hours = sh.group(4)
-    dw = DAYS_WEEK.search(text)
-    days = (dw.group(1) or {"saturday": "6", "sunday": "7"}[dw.group(2).lower()]) if dw else None
-    if sh and sh.group(3) and not days:
-        days = sh.group(3)
+    hours = days = None
+    nxm = [(int(a), int(b)) for a, b in re.findall(r"\b([56])\s?x\s?(1[02])s?\b", text, re.I)]  # "6x12": días x horas
+    if nxm:  # si ofrecen varias ("6x10 or 6x12"), se muestra la más larga
+        days, hours = max(nxm, key=lambda t: t[0] * t[1])
+        days, hours = str(days), str(hours)
+    else:
+        sh = SHIFT_HOURS.search(text)
+        hours = next((g for g in sh.groups() if g), None) if sh else None
+        dw = DAYS_WEEK.search(text)
+        days = (dw.group(1) or {"saturday": "6", "sunday": "7"}[dw.group(2).lower()]) if dw else None
     hw = HOURS_WEEK.search(text)
     sched = []
     if hours:
@@ -338,7 +340,7 @@ def finalize(job: Job) -> Job:
 
 def parse_date(s: str) -> str:
     s = (s or "").strip()
-    for fmt in ("%B %d, %Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"):
+    for fmt in ("%B %d, %Y", "%b %d, %Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"):
         try:
             return datetime.strptime(re.sub(r"\s+", " ", s), fmt).date().isoformat()
         except ValueError:
@@ -1045,6 +1047,79 @@ def fetch_jazz(company: str, board: str, keep: "re.Pattern") -> list[dict]:
     return rows
 
 
+# ---------------------------------------------------------------------------
+# CareerPlug (Telvero): lista HTML + página por puesto con "Pay:" y per diem
+# ---------------------------------------------------------------------------
+CAREERPLUG_SITES = [("Telvero", "https://telvero.careerplug.com")]
+CP_ROW = re.compile(r'<a[^>]+href="(/jobs/(\d+))"[^>]*>.*?<span class="name">(.*?)</span>.*?Location:</span>\s*([^<]+?)\s*</div>', re.S)
+CP_PAY = re.compile(r"Pay(?: Rate)?:\s*(\$\s?\d[\d,.]*\s*(?:to|-|–)\s*\$?\s?\d[\d,.]*\s*(?:per hour|/\s?hour|/hr|an hour|hourly)?)", re.I)
+
+
+def parse_careerplug(html_text: str, company: str, base: str) -> list[dict]:
+    out = []
+    for href, jid, title, loc in CP_ROW.findall(html_text):
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).strip()
+        if not is_tech_title(title) and not re.search(r"splic|installer", title, re.I):
+            continue
+        m = re.match(r"([A-Z]{2})-([^-]+?)\s*-\s*\d{5}", html.unescape(loc).strip())  # "TX-Abilene-79601"
+        if not m:
+            continue
+        out.append({"company": company, "title": title, "loc": f"{m.group(2).strip()}, {m.group(1)}", "posted": "", "pay": None,
+                    "url": base + href, "id": f"careerplug-{jid}", "source": "careerplug"})
+    return out
+
+
+def fetch_careerplug(company: str, base: str) -> list[dict]:
+    rows = parse_careerplug(get(base + "/jobs", as_json=False), company, base)
+    for r in rows:
+        try:
+            page = get(r["url"], as_json=False)
+            text = strip_html(re.sub(r"<script[\s\S]*?</script>", "", page))
+            m = CP_PAY.search(text)
+            if m:
+                lo, hi, unit = parse_pay(m.group(1))
+                if lo:
+                    r["pay"] = (lo, hi, unit)
+            d = re.search(r'datePosted"\s*:\s*"(\d{4}-\d\d-\d\d)', page)
+            r["posted"] = d.group(1) if d else ""
+            r["desc"] = text[:6000]
+        except Exception as e:
+            print("aviso: careerplug", r["url"], e, file=sys.stderr)
+        time.sleep(0.3)
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# ApplicantPro (SRI Telecom): API JSON /core/jobs/{siteId}?getParams={}
+# ---------------------------------------------------------------------------
+APPLICANTPRO_SITES = [("SRI Telecom", "sritelecom", 10497, re.compile(r"data center|\bISP\b|fiber|splic|cabl", re.I))]
+
+
+def fetch_applicantpro(company: str, sub: str, site_id: int, keep: "re.Pattern") -> list[dict]:
+    data = get(f"https://{sub}.applicantpro.com/core/jobs/{site_id}?getParams=%7B%7D")
+    out = []
+    for j in (data.get("data") or {}).get("jobs") or []:
+        title = html.unescape(j.get("title") or "").strip()
+        if not keep.search(title) or not is_tech_title(title):
+            continue
+        city, st = (j.get("city") or "").strip(), (j.get("abbreviation") or "").strip()
+        if not st:
+            continue
+        pay = None
+        if j.get("minSalary") and j.get("maxSalary"):
+            pay = (float(j["minSalary"]), float(j["maxSalary"]), "hour" if (j.get("payType") or "").lower().startswith("hour") else "year")
+        url = j.get("jobUrl") or f"https://{sub}.applicantpro.com/jobs/{j.get('id')}"
+        row = {"company": company, "title": title, "loc": f"{city}, {st}" if city else STATE_BY_NAME_UPPER.get(st.upper(), st),
+               "posted": parse_date(j.get("startDateRef") or ""), "pay": pay, "url": url, "id": f"applicantpro-{j.get('id')}", "source": "applicantpro"}
+        try:
+            row["desc"] = strip_html(re.sub(r"<script[\s\S]*?</script>", "", get(url, as_json=False)))[:6000]
+        except Exception as e:
+            print("aviso: applicantpro", url, e, file=sys.stderr)
+        time.sleep(0.3)
+        out.append(row)
+    return out
+
+
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
     try:
@@ -1072,6 +1147,16 @@ def collect_live() -> dict:
             raw["other"] += fetch_ultipro(company, board, keep)
         except Exception as e:
             print("aviso: ultipro", company, e, file=sys.stderr)
+    for company, base in CAREERPLUG_SITES:
+        try:
+            raw["other"] += fetch_careerplug(company, base)
+        except Exception as e:
+            print("aviso: careerplug", company, e, file=sys.stderr)
+    for company, sub, site_id, keep in APPLICANTPRO_SITES:
+        try:
+            raw["other"] += fetch_applicantpro(company, sub, site_id, keep)
+        except Exception as e:
+            print("aviso: applicantpro", company, e, file=sys.stderr)
     for company, board, keep in JAZZ_SITES:
         try:
             raw["other"] += fetch_jazz(company, board, keep)
