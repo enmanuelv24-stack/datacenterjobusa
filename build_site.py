@@ -135,6 +135,41 @@ CITY_GUIDES = {
 }
 
 
+
+# Descripciones cortas y neutrales de cada empleador (hechos públicos; sin afirmaciones de pago no publicadas)
+COMPANY_BLURBS = {
+    "Amazon": "Amazon Web Services runs the largest fleet of data centers in the US and hires Data Center Technicians (DCT L1–L4), Engineering Operations Technicians and Critical Facilities roles directly, with pay posted in every state. Most roles are 12-hour rotating shifts in live facilities.",
+    "Google": "Google hires Data Center Technicians and Facilities Technicians directly at its US campuses (Ohio, Texas, Oklahoma, Iowa, Nebraska, Virginia and more). Postings include salary ranges; roles are shift-based with strong benefits.",
+    "Microsoft": "Microsoft hires Data Center Technicians and Critical Environment roles for Azure campuses (Texas, Arizona, Virginia, Wisconsin, Iowa…). Much of the build-out cabling is done by contractors; Microsoft's own roles are operations-side.",
+    "Oracle": "Oracle Cloud Infrastructure is building fast — Abilene (Stargate), Salt Lake City, Port Washington and Saline among others — and hires data center technicians, low-voltage leads and operations managers directly, while contractors handle most inside-plant cabling.",
+    "QTS": "QTS is a hyperscale data center operator (Dallas, Atlanta, Phoenix, Virginia, Texas) hiring Critical Facilities and Data Center Operations technicians for live facilities.",
+    "Equinix": "Equinix is the largest colocation operator in the world and hires Data Center Technicians and Critical Facilities Engineers in major US metros; roles are operations-side with structured levels.",
+    "xAI": "xAI builds and runs the Colossus AI supercomputer campuses in Memphis/Southaven and hires data center technicians, electricians and construction roles directly, several with per diem and housing noted in the posting.",
+    "CoreWeave": "CoreWeave is an AI cloud operator growing data halls across Texas, Virginia, Pennsylvania and more, hiring Data Center Technicians with posted salary ranges.",
+    "Network Connex": "National Technologies (NTI), a Network Connex company, is one of the main inside-plant fiber and structured cabling contractors on hyperscale builds (Abilene, Cedar Rapids, Atlanta…), hiring fiber technicians, splicers and data center technicians, many traveling.",
+    "AFL": "AFL is a fiber manufacturer and installer that acts as a prime structured-cabling contractor on hyperscale data centers, hiring structured cable technicians, foremen and splicers for projects such as Abilene.",
+    "Team LINX": "LINX is a low-voltage contractor (Denver, Salt Lake City, Dallas, El Paso, Cheyenne) hiring low-voltage technicians, leads and foremen for data center construction, with pay by level posted on each role.",
+    "E2 Optics": "E2 Optics is a national low-voltage and structured cabling contractor on hyperscale builds, hiring installers, technicians and network specialists in Texas, Utah, Arizona, Virginia and more.",
+    "ADB Companies": "ADB is a turnkey infrastructure contractor hiring data center fiber technicians and splicers (Level I–II, traveling) for sites such as Abilene and New Albany.",
+    "Black Box": "Black Box is a global infrastructure integrator hiring Infrastructure Technicians and QA roles on data center cabling projects, including Abilene.",
+    "Introl": "Introl supplies data center deployment technicians (rack and stack, cabling) to hyperscale and AI sites nationwide; postings list hourly pay and are often project-based.",
+    "TDS (Total Deployment Solutions)": "TDS is a deployment contractor hiring Data Center Deployment Technicians (I–II) and cable labeling techs for project work in Texas, Utah and other build markets.",
+    "M.C. Dean": "M.C. Dean is a large electrical and mission-critical contractor hiring electricians, technicians and critical-facilities staff on data center construction and operations, mostly in Virginia and the Mid-Atlantic.",
+    "The Archetype Strategy": "Archetype Infrastructure Solutions is a labor-support subcontractor supplying data center technicians, cable pullers, redlining techs and fiber splicers to hyperscale projects (Abilene, Dallas, Red Oak, Columbus, Ashburn…). Many roles list hourly pay and per diem.",
+    "Telvero": "Telvero is a fiber and inside-plant subcontractor on hyperscale projects (Abilene, Columbus, Bridgeport AL) whose postings state pay, per diem and rotation up front.",
+    "SRI Telecom": "SRI Telecom is a Baton Rouge–based fiber and data center contractor with 300+ W-2 technicians, hiring Data Center Technicians (Level I–IV) and ISP technicians nationwide.",
+    "Align": "Align is a data center cabling and fit-out contractor hiring Data Center Cabling Foremen and technicians in Sterling, Plano, Phoenix, Detroit, Salt Lake City and other build markets.",
+    "Rosendin": "Rosendin is one of the largest electrical contractors in the US and a prime on data center builds (including Abilene), hiring electricians, foremen and field technicians.",
+    "Holder Construction": "Holder is a general contractor specializing in mission-critical and data center construction, hiring field engineers and site technicians on projects nationwide.",
+    "Vision Technologies": "Vision Technologies is a low-voltage integrator hiring cabling technicians and installers for data center and commercial projects, mainly on the East Coast.",
+    "Cologix": "Cologix is a colocation operator (Columbus, Minneapolis, Montreal and more) hiring data center technicians for live facilities.",
+    "Nebius": "Nebius builds AI data centers (Kansas City, New Jersey) and hires data center technicians with posted ranges.",
+    "Crusoe": "Crusoe develops and operates AI data centers (including the Abilene campus) and hires data center technicians and operations roles.",
+    "Compu Dynamics": "Compu Dynamics designs, builds and maintains data centers, hiring critical-facilities technicians mostly in the Mid-Atlantic.",
+    "MidPoint Technology Group": "MidPoint Technology Group is a Maryland-based technology integrator (structured cabling, data center, AV, security) working on data center projects including Abilene; it hires through its own board and through subcontractors.",
+}
+
+
 class Site:
     def __init__(self, jobs, out: Path, preview: bool, today: date):
         self.jobs, self.out, self.preview, self.today = jobs, out, preview, today
@@ -426,6 +461,11 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   f"How much data center technicians make in {self.today.year}: {money(all_lo)}–{money(all_hi)}/hr typical, from {len(paid_js):,} employer-posted ranges at {len(companies)} employers, "
                   "by level, company, job type and state. No estimates.", body, head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
 
+        city_counts_all = Counter()
+        for j in js:
+            city_counts_all[(j["city"], j["state"])] += j["openings"]
+        city_pages_set = {k for k, v in city_counts_all.items() if v >= MIN_CITY_OPENINGS and k[0]}
+
         # ---- companies
         links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n:,}</small></a></li>'
                         for c, n in companies.most_common())
@@ -440,15 +480,48 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 cs[j["state"]] += j["openings"]
             st_links = "".join(f'<li><a href="../states/{slug(STATE_NAMES.get(s, s))}.html"><span>{E(STATE_NAMES.get(s, s))}</span><small>{k}</small></a></li>'
                                for s, k in cs.most_common())
+            cpaid = [j for j in rows if j["hourly_min"]]
+            c_lo = statistics.median([j["hourly_min"] for j in cpaid]) if cpaid else None
+            c_hi = statistics.median([j["hourly_max"] for j in cpaid]) if cpaid else None
+            fresh_c = sum(j["openings"] for j in rows if j.get("days_posted") is not None and j["days_posted"] <= 7)
+            entry_c = sum(j["openings"] for j in rows if j.get("entry"))
+            perk_c = sorted({t for j in rows for t in perk_labels(j)})
+            lv_c = Counter(j["level"] for j in rows if j.get("level"))
+            city_c = Counter()
+            for j in rows:
+                if j["city"]:
+                    city_c[(j["city"], j["state"])] += j["openings"]
+            city_links = "".join((f'<li><a href="../cities/{slug(ci + "-" + st)}.html"><span>{E(ci)}, {st}</span><small>{k}</small></a></li>'
+                                  if (ci, st) in city_pages_set else f'<li><a href="#jobs"><span>{E(ci)}, {st}</span><small>{k}</small></a></li>')
+                                 for (ci, st), k in city_c.most_common(12))
+            cfaq = [(f"How many data center technician jobs does {c} have open?",
+                     f"{n:,} technician openings as of {self.today:%B %-d, %Y}, in {len(cs)} states, read directly from {c}'s career page. {fresh_c} were posted in the last 7 days."),
+                    (f"How much does {c} pay data center technicians?",
+                     (f"{c}'s posted ranges for technician roles run {money(c_lo)}–{money(c_hi)} per hour (typical), by job type: see the table above. " if c_lo else f"{c} does not post pay ranges on most technician listings; ask the recruiter. ")
+                     + (f"Postings mention: {', '.join(perk_c)}." if perk_c else "No per diem, housing or schedule details are stated in current postings.")),
+                    (f"Does {c} hire entry-level data center technicians?",
+                     f"Yes — {entry_c} current openings are tagged entry level (Level I / no experience required)." if entry_c else f"Not in the current postings; check the entry-level page for employers hiring Level I techs now.")]
+            cfaq_html = "".join(f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in cfaq)
+            cfaq_ld = '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@type": "FAQPage",
+                      "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in cfaq]}) + '</script>'
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../companies.html">Companies</a> / {E(c)}</p>'
-                    f'<h1>{E(c)} data center technician jobs</h1>'
-                    f'<p class="lede">{n:,} open technician jobs at {E(c)} across {len(cs)} states.</p>'
-                    '<h2>Pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1)
+                    f'<h1>{logo(c)} {E(c)} data center jobs</h1>'
+                    f'<p class="lede">{n:,} open technician jobs at {E(c)} across {len(cs)} states, read from its career page this morning. '
+                    + (f'Typical posted pay: <b>{money(c_lo)}–{money(c_hi)}/hr</b>. ' if c_lo else 'Pay is not posted on most listings. ')
+                    + (f'{fresh_c} new this week. ' if fresh_c else '') + (f'{entry_c} entry level.' if entry_c else '') + '</p>'
+                    + (f'<div class="guide"><h2>About {E(c)}</h2><div class="prose"><p>{E(COMPANY_BLURBS[c])}</p></div></div>' if c in COMPANY_BLURBS else '')
+                    + f'<div class="stats"><div class="stat"><b>{n:,}</b><span>open jobs</span></div><div class="stat"><b>{fresh_c}</b><span>new this week</span></div>'
+                      f'<div class="stat"><b>{len(cpaid)}/{len(rows)}</b><span>postings with pay</span></div><div class="stat"><b>{entry_c}</b><span>entry level</span></div></div>'
+                    + '<h2>Pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1, lambda k: f"roles/{slug(k)}.html")
+                    + (('<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{k}</small></a>' for l, k in sorted(lv_c.items())) + '</div>') if lv_c else '')
                     + '<h2>Where they are hiring</h2>' + f'<ul class="grid-links">{st_links}</ul>'
-                    + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
+                    + (f'<h3>Cities</h3><ul class="grid-links">{city_links}</ul>' if city_links else '')
+                    + (f'<h2>Perks mentioned in postings</h2><div class="tags">' + "".join(f'<span class="chip perk">{E(t)}</span>' for t in perk_c) + '</div>' if perk_c else '')
+                    + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1)
+                    + '<h2>Questions people ask</h2><div class="faq">' + cfaq_html + '</div>' + self.signup())
             self.page(f"companies/{slug(c)}.html", f"{c} Data Center Jobs: {n:,} Open Technician Roles and Pay | {SITE_NAME}",
                       f"{n:,} open {c} data center technician jobs in {len(cs)} states, with posted pay ranges by job type. Updated {self.today:%B %-d, %Y}.", body,
-                      head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Companies", "companies.html"), (c, f"companies/{slug(c)}.html")]))
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Companies", "companies.html"), (c, f"companies/{slug(c)}.html")]) + cfaq_ld)
 
         # ---- states and cities
         links = "".join(f'<li><a href="states/{slug(STATE_NAMES.get(s, s))}.html"><span>{E(STATE_NAMES.get(s, s))}</span><small>{n:,}</small></a></li>'
