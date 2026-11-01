@@ -33,7 +33,7 @@ def money(v, unit="hour"):
     return f"${v:,.2f}" if unit == "hour" else f"${v:,.0f}"
 
 
-LOGO_COLORS = ["#2b6cb0", "#1f7a4d", "#6b46c1", "#b7791f", "#c53030", "#2c7a7b", "#4a5568", "#d53f8c", "#3182ce", "#805ad5"]
+LOGO_COLORS = ["#0f766e", "#1e40af", "#6d28d9", "#b45309", "#b91c1c", "#0e7490", "#374151", "#be185d", "#1d4ed8", "#4d7c0f"]
 
 
 COMPANY_DOMAINS = {
