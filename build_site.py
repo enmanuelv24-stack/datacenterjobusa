@@ -70,6 +70,18 @@ def clean_title(t: str) -> str:
 # ---------------------------------------------------------------------------
 CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 
+# Captación de correos/teléfonos: envía a Buttondown sin salir de la página, muestra la barra fija tras scroll y recuerda cierres.
+LEAD_JS = ("<script>"
+           "function dcjSub(f){try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
+           "f.innerHTML='<p class=\"ok\">Done. Check your inbox to confirm \\u2014 we\\u2019ll let you know when new jobs are posted.</p>';"
+           "try{localStorage.setItem('dcj_sub','1')}catch(e){}var b=document.getElementById('lbar');if(b&&!b.contains(f))b.remove();return false}"
+           "(function(){var b=document.getElementById('lbar');if(!b)return;"
+           "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_bar')>Date.now()){b.remove();return}}catch(e){}"
+           "var shown=false;function show(){if(shown)return;shown=true;b.hidden=false;requestAnimationFrame(function(){b.classList.add('on')})}"
+           "window.addEventListener('scroll',function(){if(window.scrollY>450)show()},{passive:true});setTimeout(show,15000);"
+           "b.querySelector('.x').addEventListener('click',function(){b.remove();try{localStorage.setItem('dcj_bar',String(Date.now()+5*864e5))}catch(e){}})})();"
+           "</script>")
+
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">')
 
@@ -327,6 +339,9 @@ class Site:
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
              + f'<div><b>Employers</b><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
+             + '<div class="leadbar" id="lbar" hidden><div class="wrap"><p><b>New data center jobs, sent to you.</b><span> Email + phone — we tell you when jobs with pay are posted.</span></p>'
+             + self.lead_form("bar", "Notify me", page=path) + '<button class="x" type="button" aria-label="Close">×</button></div></div>'
+             + LEAD_JS
              + ("" if bare else "</body></html>"))
         f = self.out / path
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -371,7 +386,13 @@ class Site:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
         rows = sorted(rows, key=lambda j: (-(j["hourly_max"] or 0)))
         shown = rows if limit is None else rows[:limit]
-        return '<ul class="jobs">' + "".join(self.job_row(j, depth, scale) for j in shown) + "</ul>"
+        items = [self.job_row(j, depth, scale) for j in shown]
+        if len(items) >= 8:
+            states = {j["state"] for j in shown}
+            cos = {j["company"] for j in shown}
+            items.insert(6, self.lead_inline(state=next(iter(states)) if len(states) == 1 else "",
+                                             company=next(iter(cos)) if len(cos) == 1 else ""))
+        return '<ul class="jobs">' + "".join(items) + "</ul>"
 
     def pay_table(self, rows, group_key, label, depth, link=None) -> str:
         groups = defaultdict(list)
@@ -390,15 +411,27 @@ class Site:
                 f"<th>{E(label)}</th><th>Openings</th><th>Typical low $/hr</th><th>Typical high $/hr</th><th>Postings with pay</th>"
                 "</tr></thead><tbody>" + "".join(body) + "</tbody></table></div>")
 
-    def signup(self) -> str:
-        return ('<div class="callout"><h3>Get the best new jobs every Monday</h3>'
-                '<p class="note">One email a week: the highest-paying new technician openings and one real number about pay or shifts. No spam, no recruiters.</p>'
-                f'<form class="signup" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" '
-                'onsubmit="const f=this;fetch(f.action,{method:\'POST\',mode:\'no-cors\',body:new FormData(f)}).then(()=>{f.innerHTML=\'<p class=ok>Check your inbox and confirm your email. Welcome aboard.</p>\'});event.preventDefault();">'
-                '<label for="nl-email" class="note" style="flex-basis:100%">Email</label>'
-                '<input id="nl-email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">'
-                '<input type="hidden" name="tag" value="site">'
-                '<button type="submit">Join the weekly list</button></form></div>')
+    def lead_form(self, variant: str = "box", button: str = "Send me jobs", state: str = "", company: str = "", page: str = "") -> str:
+        """Formulario de captación: correo + teléfono. Va a Buttondown; el teléfono y el contexto se guardan como metadata."""
+        hidden = "".join(f'<input type="hidden" name="{k}" value="{E(v)}">'
+                         for k, v in [("tag", "site"), ("metadata__source", variant), ("metadata__page", page),
+                                      ("metadata__state", state), ("metadata__company", company)] if v)
+        return (f'<form class="lead {variant}" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
+                '<input name="email" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
+                '<input name="metadata__phone" type="tel" placeholder="Phone (for text alerts)" aria-label="Phone number" autocomplete="tel" pattern="[0-9()+ .-]{7,20}">'
+                f'<button type="submit">{E(button)}</button>{hidden}</form>')
+
+    def signup(self, state: str = "", company: str = "", page: str = "") -> str:
+        what = (f"{company} jobs" if company else f"jobs in {STATE_NAMES.get(state, state)}" if state else "data center technician jobs")
+        return (f'<div class="callout leadbox"><h3>Want to know about more {E(what)}?</h3>'
+                '<p class="note">Enter your email and phone number and we\'ll tell you when new technician jobs are posted — pay, per diem and location included. '
+                'No spam, no recruiters, unsubscribe any time.</p>'
+                + self.lead_form("box", "Tell me about new jobs", state, company, page)
+                + '<p class="tiny">We email once a week and text only for jobs that match your state. Your number is never shared.</p></div>')
+
+    def lead_inline(self, state: str = "", company: str = "", page: str = "") -> str:
+        return ('<li class="job leadrow"><div><b>Don\'t miss the next one.</b><span>Email + phone and we\'ll let you know when more jobs like these are posted.</span>'
+                + self.lead_form("inline", "Notify me", state, company, page) + '</div></li>')
 
     # -------------------------------------------------------------- pages
     def build(self):
@@ -435,7 +468,9 @@ class Site:
                 '<input name="s" type="search" placeholder="Job title, keyword or city — fiber, electrician, Abilene…" aria-label="Search jobs">'
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
                 '<button type="submit">Find jobs</button></form>'
-                f'<div class="quick">{quick}</div></div>'
+                f'<div class="quick">{quick}</div>'
+                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Email + phone, and we tell you when technician jobs with pay are posted near you.</p>'
+                + self.lead_form("hero", "Send me jobs", page="index") + '</div></div>'
                 '<aside class="snap"><h2>Today on the site</h2><ul>'
                 f'<li><a href="index.html"><b>{total:,}</b><span>open technician jobs</span></a></li>'
                 f'<li><a href="new-jobs.html"><b>{fresh_n:,}</b><span>posted this week</span></a></li>'
@@ -474,7 +509,7 @@ class Site:
                 '<li><b>We put the pay first.</b> Hourly and salaried ranges are converted to $/hr so you can compare, and we flag per diem, housing and schedules when the employer states them.</li>'
                 '<li><b>You apply with the employer.</b> Every button goes to the company\'s own site. We never see your application.</li></ol></section>'
                 + self.signup()
-                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LG={json.dumps({c: logo(c) for c in companies})};const ST={json.dumps({s: STATE_NAMES.get(s, s) for s in states})};'
+                + f'<script>const J={json.dumps(data, separators=(",", ":"))};const SC={scale};const LEAD={json.dumps(self.lead_inline(state="__ST__", page="index"))};const LG={json.dumps({c: logo(c) for c in companies})};const ST={json.dumps({s: STATE_NAMES.get(s, s) for s in states})};'
                 + r"""
 const $=id=>document.getElementById(id);let N=40;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -490,7 +525,8 @@ function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$(
  let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk)))&&(!ex||j.e)&&(!lv||j.l===lv));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
  const n=r.reduce((s,j)=>s+j.n,0);$('cnt').textContent=`${n.toLocaleString()} openings in ${r.length.toLocaleString()} listings`;
- $('list').innerHTML=r.slice(0,N).map(row).join('');$('more').hidden=r.length<=N}
+ const out=r.slice(0,N).map(row);if(out.length>=8){for(let i=6;i<out.length;i+=31)out.splice(i,0,LEAD.replace('__ST__',esc(st)))}
+ $('list').innerHTML=out.join('');$('more').hidden=r.length<=N}
 ['q','st','co','ro','pay','lv','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 </script></div>""")
@@ -618,7 +654,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + (f'<h3>Cities</h3><ul class="grid-links">{city_links}</ul>' if city_links else '')
                     + (f'<h2>Perks mentioned in postings</h2><div class="tags">' + "".join(f'<span class="chip perk">{E(t)}</span>' for t in perk_c) + '</div>' if perk_c else '')
                     + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1)
-                    + '<h2>Questions people ask</h2><div class="faq">' + cfaq_html + '</div>' + self.signup())
+                    + '<h2>Questions people ask</h2><div class="faq">' + cfaq_html + '</div>' + self.signup(company=c, page=f"companies/{slug(c)}"))
             self.page(f"companies/{slug(c)}.html", f"{c} Data Center Jobs: {n:,} Open Technician Roles and Pay | {SITE_NAME}",
                       f"{n:,} open {c} data center technician jobs in {len(cs)} states, with posted pay ranges by job type. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Companies", "companies.html"), (c, f"companies/{slug(c)}.html")]) + cfaq_ld)
@@ -656,7 +692,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + sguide
                     + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Cities</h2>' + f'<ul class="grid-links">{c_links}</ul>'
-                    + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
+                    + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1) + self.signup(state=s, page=f"states/{slug(name)}"))
             self.page(f"states/{slug(name)}.html", f"Data Center Jobs in {name}: {n:,} Technician Openings with Pay | {SITE_NAME}",
                       f"{n:,} data center technician jobs in {name} across {len(cities)} cities, with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), ("States", "states.html"), (name, f"states/{slug(name)}.html")]))
@@ -683,7 +719,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + faq_html
                     + f'<p class="note">See also: <a href="../states/{slug(name)}.html">all {E(name)} data center jobs</a>, <a href="../travel-jobs.html">jobs with per diem and housing</a>, <a href="../entry-level-jobs.html">entry-level jobs</a>.</p>'
-                    + self.signup())
+                    + self.signup(state=s, page=f"cities/{slug(ci + '-' + s)}"))
             self.page(f"cities/{slug(ci + '-' + s)}.html", f"{ci} Data Center Jobs: {n:,} Technician Openings with Pay | {SITE_NAME}",
                       f"{n:,} data center technician jobs in {ci}, {s} with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), (name, f"states/{slug(name)}.html"), (ci, f"cities/{slug(ci + '-' + s)}.html")]) + faq_ld)
@@ -724,9 +760,11 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
                         f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
+                        f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
+                        + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
-                        + self.signup())
+                        + self.signup(j["state"], j["company"], f'jobs/{j["slug"]}'))
                 self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"]} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {j["city"]}, {j["state"]}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}')
