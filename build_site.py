@@ -71,8 +71,7 @@ def clean_title(t: str) -> str:
 CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700'
-         '&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;600;700&display=swap">')
+         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">')
 
 
 PERK_EN = {"per_diem": "Per diem", "housing": "Housing", "travel": "Travel", "overtime": "Overtime", "signon": "Sign-on bonus",
@@ -135,6 +134,30 @@ CITY_GUIDES = {
 }
 
 
+
+
+STATE_GUIDES = {
+    "TX": {"intro": "Texas is the busiest data center construction market in the country: the Oracle/OpenAI Stargate campus in Abilene, Vantage Frontier in Shackelford County, "
+                    "the OpenAI/SB Energy site in Milam County, Microsoft and Meta in San Antonio and Temple, Google in Midlothian and Red Oak, xAI's suppliers in the Dallas area, "
+                    "and hyperscale clusters across DFW, Austin and Houston. No state income tax, right-to-work, and contractors that travel crews in with per diem.",
+           "tips": [("Where the jobs cluster", "Abilene (construction, fiber and cabling), Dallas–Fort Worth (Red Oak, Midlothian, Plano, Irving: deployment and operations), San Antonio (Microsoft, operations), Austin/Temple/Round Rock and Houston."),
+                    ("Who hires most", "Amazon and Microsoft for operations roles; AFL, NTI, Team LINX, E2 Optics, ADB, TDS, Black Box and Align for cabling and deployment; staffing firms (TEKsystems, Insight Global, Archetype, Telvero) for project crews."),
+                    ("What to expect", "Construction-side roles run 6×10 or 6×12 with overtime; per diem of $100–$180/day is common for travelers but rarely posted. Operations roles are 12-hour rotations.")]},
+    "VA": {"intro": "Northern Virginia (Ashburn, Sterling, Manassas, Leesburg) is the largest data center market in the world, with hundreds of live facilities and constant expansion, "
+                    "plus new campuses in Richmond, Fredericksburg and Virginia Beach. It has the deepest pool of operations jobs — and the most competition for them.",
+           "tips": [("Where the jobs cluster", "Loudoun and Prince William counties (Ashburn, Sterling, Manassas, Gainesville), then Richmond/Chester and Hampton Roads."),
+                    ("Who hires most", "Amazon, Microsoft, Google, Equinix, QTS and Digital Realty on the operations side; M.C. Dean, Vision Technologies, Align, E2 Optics and TEKsystems-placed crews on construction and cabling."),
+                    ("What to expect", "Higher base pay than most states, less per diem (crews are local), strict badging and background checks, 12-hour rotating shifts in live facilities.")]},
+    "OH": {"intro": "Central Ohio (New Albany, Columbus, Hilliard, Marysville) is a top-five build market: Google, Amazon, Microsoft and Meta campuses, plus the Lordstown Stargate site in the northeast. "
+                    "Cabling and fiber contractors staff New Albany heavily with traveling crews.",
+           "tips": [("Where the jobs cluster", "New Albany and Columbus suburbs; Cedar Rapids-style projects to the west; Lordstown/Warren coming."),
+                    ("Who hires most", "Google and Amazon for operations; NTI, Telvero, SRI Telecom, Insight Global and TEKsystems for fiber and cabling crews."),
+                    ("What to expect", "Fiber splicers with ribbon experience are in demand (Telvero posts $27–$40/hr + $178/day). Winters are real; many crews rotate 3 weeks on / 1 off.")]},
+    "AZ": {"intro": "Phoenix–Goodyear–Mesa is one of the fastest-growing data center regions: Microsoft, Google, Meta, Vantage, Aligned, QTS, EdgeCore and many colocation operators. Heat and scale define the work.",
+           "tips": [("Where the jobs cluster", "Goodyear and the West Valley (Microsoft), Mesa (Google, Meta, Apple), Chandler and central Phoenix (colocation)."),
+                    ("Who hires most", "Microsoft and Amazon for operations; IES Communications, Align, Archetype and staffing firms for cabling and deployment."),
+                    ("What to expect", "Year-round construction; summer shifts start early. Arizona requires no low-voltage license for most cabling work, so entry is fast.")]},
+}
 
 # Descripciones cortas y neutrales de cada empleador (hechos públicos; sin afirmaciones de pago no publicadas)
 COMPANY_BLURBS = {
@@ -544,10 +567,17 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 (f'<li><a href="../cities/{slug(ci + "-" + s)}.html"><span>{E(ci)}</span><small>{k}</small></a></li>'
                  if (ci, s) in city_pages else f'<li><a href="#jobs"><span>{E(ci or "Statewide / unspecified")}</span><small>{k}</small></a></li>')
                 for ci, k in cities.most_common())
+            sg = STATE_GUIDES.get(s)
+            sguide = (('<section class="guide"><h2>Working in ' + E(name) + '</h2><div class="prose"><p>' + E(sg["intro"]) + '</p>'
+                       + "".join(f'<p><b>{E(h)}.</b> {E(t)}</p>' for h, t in sg["tips"]) + '</div></section>') if sg else '')
+            spaid = [j for j in rows if j["hourly_min"]]
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../states.html">States</a> / {E(name)}</p>'
                     f'<h1>Data center technician jobs in {E(name)}</h1>'
-                    f'<p class="lede">{n:,} open technician jobs in {len(cities)} {"city" if len(cities) == 1 else "cities"}.</p>'
-                    '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
+                    f'<p class="lede">{n:,} open technician jobs in {len(cities)} {"city" if len(cities) == 1 else "cities"} from {len({j["company"] for j in rows})} employers. '
+                    + (f'Typical posted pay: <b>{money(statistics.median([j["hourly_min"] for j in spaid]))}–{money(statistics.median([j["hourly_max"] for j in spaid]))}/hr</b>. ' if spaid else '')
+                    + f'{sum(j["openings"] for j in rows if j.get("entry"))} entry level · {sum(j["openings"] for j in rows if j.get("days_posted") is not None and j["days_posted"] <= 7)} new this week.</p>'
+                    + sguide
+                    + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Cities</h2>' + f'<ul class="grid-links">{c_links}</ul>'
                     + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
             self.page(f"states/{slug(name)}.html", f"Data Center Jobs in {name}: {n:,} Technician Openings with Pay | {SITE_NAME}",

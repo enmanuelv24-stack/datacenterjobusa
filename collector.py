@@ -139,14 +139,21 @@ def classify_role(title: str) -> str:
         return "Soporte TI"
     if re.search(r"infra ?-?delivery|\bid (flex|-)|decom|asset doc", t):
         return "Instalación / red"
+    if re.search(r"\bups\b|battery tech|medium voltage|high voltage|switchgear", t):
+        return "Energía / generación"
     if "electric" in t:
         return "Eléctrico"
     if re.search(r"hvac|mechanic|chiller|plumbing|fluids", t):
         return "Mecánico / HVAC"
     if "controls" in t:
         return "Controles / BMS"
-    if re.search(r"install|deploy|network|fiber|cabl|splic|infra delivery", t):
+    if re.search(r"install|deploy|network|fiber|cabl|splic|infra delivery|low voltage|infrastructure tech|communications tech|"
+                 r"telecom(munications)? tech|\bimac\b|structured|lead technician|field acceptance|acceptance test", t):
         return "Instalación / red"
+    if re.search(r"logistics tech|inventory tech|warehouse tech", t):
+        return "Técnico de data center (DCT)"
+    if re.search(r"\bibx\b|customer operations tech", t):
+        return "Técnico de data center (DCT)"
     if re.search(r"field engineer tech|engineer technician", t):
         return "Construcción"
     if re.search(r"data ?cent(er|re)|\bdct\b|\bdco\b|server|hardware|linux", t):
