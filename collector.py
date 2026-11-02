@@ -1130,7 +1130,7 @@ def fetch_applicantpro(company: str, sub: str, site_id: int, keep: "re.Pattern")
 # ---------------------------------------------------------------------------
 # Kelly Telecom (jobs.kellytelecom.com): staffing de telecom/data center; lista HTML paginada (?start=20)
 # ---------------------------------------------------------------------------
-KELLY_ITEM = re.compile(r'<li class="JobItem_module_jobItem"><a href="(/[^"]+/(\d+))"><h2[^>]*>(.*?)</h2>.*?<p>([^<]+)</p>(.*?)</li>', re.S)
+KELLY_ITEM = re.compile(r'<li[^>]*class="[^"]*JobItem_module_jobItem[^"]*"[^>]*>\s*<a[^>]*href="(/[^"]+/(\d+))"[^>]*>\s*<h2[^>]*>(.*?)</h2>.*?<p[^>]*>([^<]+?)</p>(.*?)</li>', re.S)
 KELLY_KEEP = re.compile(r"data center|cabl|fiber|splic|\bISP\b|low voltage", re.I)
 
 
@@ -1162,7 +1162,11 @@ def parse_kelly(html_text: str) -> list[dict]:
 def fetch_kelly() -> list[dict]:
     out, seen = [], set()
     for start in range(0, 200, 20):
-        rows = parse_kelly(get(f"https://jobs.kellytelecom.com/?start={start}", as_json=False))
+        page = get(f"https://jobs.kellytelecom.com/?start={start}", as_json=False)
+        rows = parse_kelly(page)
+        if start == 0 and not rows:
+            print(f"aviso: kelly sin filas (html {len(page)} bytes, items {page.count('JobItem_module_jobItem')}, "
+                  f"títulos {len(re.findall(r'<h2[^>]*JobItem_module_title', page))})", file=sys.stderr)
         new = [r for r in rows if r["id"] not in seen]
         if not rows and start > 0:
             break
