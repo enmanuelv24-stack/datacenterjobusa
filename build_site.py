@@ -44,7 +44,7 @@ COMPANY_DOMAINS = {
     "Rosendin": "rosendin.com", "Network Connex": "networkconnex.com", "AFL": "aflglobal.com", "Cologix": "cologix.com",
     "Nebius": "nebius.com", "Crusoe": "crusoe.ai", "ADB Companies": "adbcompanies.com", "Compu Dynamics": "compu-dynamics.com",
     "Lambda": "lambda.ai", "Team LINX": "teamlinx.com", "The Archetype Strategy": "archetypestrategy.com",
-    "MidPoint Technology Group": "midpointtechnologygroup.com", "Align": "align.com", "Telvero": "telvero.com", "SRI Telecom": "sritelecom.net",
+    "MidPoint Technology Group": "midpointtechnologygroup.com", "Align": "align.com", "Telvero": "telvero.com", "SRI Telecom": "sritelecom.net", "Kelly Telecom": "kellytelecom.com",
 }
 
 
@@ -226,6 +226,7 @@ COMPANY_BLURBS = {
     "The Archetype Strategy": "Archetype Infrastructure Solutions is a labor-support subcontractor supplying data center technicians, cable pullers, redlining techs and fiber splicers to hyperscale projects (Abilene, Dallas, Red Oak, Columbus, Ashburn…). Many roles list hourly pay and per diem.",
     "Telvero": "Telvero is a fiber and inside-plant subcontractor on hyperscale projects (Abilene, Columbus, Bridgeport AL) whose postings state pay, per diem and rotation up front.",
     "SRI Telecom": "SRI Telecom is a Baton Rouge–based fiber and data center contractor with 300+ W-2 technicians, hiring Data Center Technicians (Level I–IV) and ISP technicians nationwide.",
+    "Kelly Telecom": "Kelly Telecom is a telecom and data center staffing firm (Troy, MI) placing Data Center Field Technicians L1–L3 on hyperscale projects in Texas (Abernathy, Amarillo), Virginia and Georgia, with hourly pay posted on every role.",
     "Align": "Align is a data center cabling and fit-out contractor hiring Data Center Cabling Foremen and technicians in Sterling, Plano, Phoenix, Detroit, Salt Lake City and other build markets.",
     "Rosendin": "Rosendin is one of the largest electrical contractors in the US and a prime on data center builds (including Abilene), hiring electricians, foremen and field technicians.",
     "Holder Construction": "Holder is a general contractor specializing in mission-critical and data center construction, hiring field engineers and site technicians on projects nationwide.",

@@ -412,7 +412,7 @@ def from_other(r: dict) -> Job:
         pay_text = p
     return Job(r.get("source", "other"), r["company"], r.get("id") or r["url"], r["title"].strip(), "", "",
                r.get("loc", ""), parse_date(r.get("posted", "")), r["url"], lo, hi, unit, pay_text=pay_text,
-               desc=r.get("desc") or "")
+               desc=r.get("desc") or "", openings=int(r.get("openings") or 1))
 
 
 # ---------------------------------------------------------------------------
@@ -1127,6 +1127,62 @@ def fetch_applicantpro(company: str, sub: str, site_id: int, keep: "re.Pattern")
     return out
 
 
+# ---------------------------------------------------------------------------
+# Kelly Telecom (jobs.kellytelecom.com): staffing de telecom/data center; lista HTML paginada (?start=20)
+# ---------------------------------------------------------------------------
+KELLY_ITEM = re.compile(r'<li class="JobItem_module_jobItem"><a href="(/[^"]+/(\d+))"><h2[^>]*>(.*?)</h2>.*?<p>([^<]+)</p>(.*?)</li>', re.S)
+KELLY_KEEP = re.compile(r"data center|cabl|fiber|splic|\bISP\b|low voltage", re.I)
+
+
+def parse_kelly(html_text: str) -> list[dict]:
+    out = []
+    for href, jid, title, loc, rest in KELLY_ITEM.findall(html_text):
+        title = html.unescape(re.sub(r"<[^>]+>", "", title)).strip()
+        if not KELLY_KEEP.search(title) or not is_tech_title(title):
+            continue
+        openings = re.search(r"\((\d+) open positions?\)", title, re.I)
+        clean = re.sub(r"\s*\(\d+ open positions?\)", "", title)
+        clean = re.sub(r"\s+[A-Z][a-zA-Z .]+,\s*[A-Z]{2}\s*$", "", clean)  # quita ", Abernathy, TX" del título
+        loc = html.unescape(loc).strip()
+        m = re.match(r"(.+?),\s*([A-Za-z ]+)$", loc)
+        if not m:
+            continue
+        st = STATE_BY_NAME_UPPER.get(m.group(2).strip().upper())
+        if not st:
+            continue
+        pay = re.search(r"\$(\d[\d,.]*)\s*/hr\s*-\s*\$(\d[\d,.]*)\s*/hr", rest)
+        out.append({"company": "Kelly Telecom", "title": clean.strip(), "loc": f"{m.group(1).strip()}, {st}", "posted": "",
+                    "pay": (float(pay.group(1).replace(",", "")), float(pay.group(2).replace(",", "")), "hour") if pay else None,
+                    "url": "https://jobs.kellytelecom.com" + href, "id": f"kelly-{jid}", "source": "kelly",
+                    "openings": int(openings.group(1)) if openings else 1,
+                    "desc": strip_html(rest)[:2000]})
+    return out
+
+
+def fetch_kelly() -> list[dict]:
+    out, seen = [], set()
+    for start in range(0, 200, 20):
+        rows = parse_kelly(get(f"https://jobs.kellytelecom.com/?start={start}", as_json=False))
+        new = [r for r in rows if r["id"] not in seen]
+        if not rows and start > 0:
+            break
+        if not new and start > 0:
+            break
+        seen.update(r["id"] for r in new)
+        out += new
+        time.sleep(0.3)
+    for r in out:
+        try:
+            page = get(r["url"], as_json=False)
+            d = re.search(r'datePosted"?\s*:\s*"(\d{4}-\d\d-\d\d)', page)
+            r["posted"] = d.group(1) if d else ""
+            r["desc"] = strip_html(re.sub(r"<script[\s\S]*?</script>", "", page))[:6000]
+        except Exception as e:
+            print("aviso: kelly", r["url"], e, file=sys.stderr)
+        time.sleep(0.3)
+    return out
+
+
 def collect_live() -> dict:
     raw = {"amazon": [], "greenhouse": {}, "ashby": {}, "other": []}
     try:
@@ -1144,7 +1200,7 @@ def collect_live() -> dict:
         except Exception as e:
             print("aviso: ashby", o, e, file=sys.stderr)
     for fn in (fetch_microsoft, fetch_google, fetch_introl, fetch_afl, fetch_oracle, fetch_rosendin,
-               fetch_blackbox, fetch_vision, fetch_mcdean, fetch_e2, fetch_linx):
+               fetch_blackbox, fetch_vision, fetch_mcdean, fetch_e2, fetch_linx, fetch_kelly):
         try:
             raw["other"] += fn()
         except Exception as e:  # una fuente caída no debe tumbar todo

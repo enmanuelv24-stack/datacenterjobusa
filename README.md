@@ -63,6 +63,7 @@ DNS en GoDaddy: cuatro registros A en `@` (185.199.108.153, .109.153, .110.153, 
 | Align | Contratista de cableado de data center (foremen y técnicos; Sterling, Plano, Phoenix, Detroit…) | Greenhouse (API) |
 | Telvero | Sub de fibra/ISP hyperscale (Abilene, Columbus, Bridgeport AL); publica pago y per diem | CareerPlug (HTML + página por puesto) |
 | SRI Telecom | Sub ISP/fibra (300+ técnicos; Memphis, Fairfax IA, Atlanta, San Antonio) | ApplicantPro (API JSON) |
+| Kelly Telecom | Staffing de telecom/DC (Abernathy TX L1 $20–25 y L2 $28–32, Ashburn, Atlanta); publica pago | HTML propio (Next.js, ?start=20) |
 | Team LINX | Contratista de bajo voltaje / ISP en construcción de data centers (Abilene, Dallas, El Paso, SLC, Cheyenne) | WordPress (tabla HTML + página por puesto con "Pay:") |
 
 Pendientes: Total Team Communications (Houston; contratista ISP/fibra de Oracle, no tiene bolsa pública en su sitio),
