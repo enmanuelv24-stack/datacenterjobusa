@@ -206,3 +206,10 @@ h2{letter-spacing:-.01em}
 @media (max-width:860px){.hero{padding:22px 0 20px}.hero .search{flex-wrap:wrap}.hero .search select{border-left:0;border-top:1px solid var(--line);min-width:0;flex:1}.hero .search button{flex:1}}
 nav.main{font-size:14px;gap:2px} nav.main a{padding:6px 9px}
 .brand{font-size:20px}
+
+.reported{margin:22px 0 6px;padding:20px 22px 8px;border:1px solid #a7f3d0;background:#ecfdf5;border-radius:14px}
+.reported h2{margin-top:0;border:0;padding:0;font-size:20px}.reported h2 small{font-weight:400;color:var(--muted);font-size:14px}
+.reported ul{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.reported li{background:#fff;border:1px solid #d1fae5;border-radius:10px;padding:10px 12px}
+.reported li b{display:block;font:700 18px/1.2 var(--display);color:var(--ink)}.reported li span{font-size:12.5px;color:var(--muted)}
+@media (prefers-color-scheme:dark){.reported{background:#0f2f2a;border-color:#1f5f52}.reported li{background:#132b28;border-color:#1f5f52}}

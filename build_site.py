@@ -197,6 +197,33 @@ class Site:
     def __init__(self, jobs, out: Path, preview: bool, today: date):
         self.jobs, self.out, self.preview, self.today = jobs, out, preview, today
         self.pages: list[str] = []
+        self.survey = {"companies": {}}
+
+    def reported(self, company: str) -> str:
+        """Bloque 'Reported by techs' con agregados de la encuesta (solo con 3+ respuestas)."""
+        d = (self.survey.get("companies") or {}).get(company)
+        if not d:
+            return ""
+        items = []
+        if d.get("pay_median"):
+            items.append(f'<li><b>{money(d["pay_median"])}/hr</b><span>median base pay reported</span></li>')
+        if d.get("hours_week_median"):
+            items.append(f'<li><b>{d["hours_week_median"]} hrs</b><span>typical week</span></li>')
+        if d.get("shift"):
+            items.append(f'<li><b>{E(d["shift"])}</b><span>most common shift</span></li>')
+        if d.get("per_diem"):
+            items.append(f'<li><b>{E(d["per_diem"])}</b><span>per diem</span></li>')
+        if d.get("housing"):
+            items.append(f'<li><b>{E(d["housing"])}</b><span>housing</span></li>')
+        if d.get("rotation"):
+            items.append(f'<li><b>{E(d["rotation"])}</b><span>rotation</span></li>')
+        if d.get("overtime"):
+            items.append(f'<li><b>{E(d["overtime"])}</b><span>overtime</span></li>')
+        if d.get("again_yes_pct") is not None:
+            items.append(f'<li><b>{d["again_yes_pct"]}%</b><span>would work for them again</span></li>')
+        return (f'<section class="reported"><h2>Reported by techs <small>({d["n"]} anonymous responses)</small></h2>'
+                f'<ul>{"".join(items)}</ul><p class="note">What technicians who worked for {E(company)} told us in the '
+                f'<a href="../shift-survey.html">anonymous survey</a>. Shown only with {self.survey.get("min_responses", 3)}+ responses; never individual answers.</p></section>')
 
     def rel(self, path: str, depth: int) -> str:
         return "../" * depth + path
@@ -535,6 +562,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + (f'<div class="guide"><h2>About {E(c)}</h2><div class="prose"><p>{E(COMPANY_BLURBS[c])}</p></div></div>' if c in COMPANY_BLURBS else '')
                     + f'<div class="stats"><div class="stat"><b>{n:,}</b><span>open jobs</span></div><div class="stat"><b>{fresh_c}</b><span>new this week</span></div>'
                       f'<div class="stat"><b>{len(cpaid)}/{len(rows)}</b><span>postings with pay</span></div><div class="stat"><b>{entry_c}</b><span>entry level</span></div></div>'
+                    + self.reported(c)
                     + '<h2>Pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1, lambda k: f"roles/{slug(k)}.html")
                     + (('<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{k}</small></a>' for l, k in sorted(lv_c.items())) + '</div>') if lv_c else '')
                     + '<h2>Where they are hiring</h2>' + f'<ul class="grid-links">{st_links}</ul>'
@@ -902,6 +930,8 @@ def main():
         j["slug"] = s if seen[s] == 1 else f"{s}-{seen[s]}"
     today = date.fromisoformat(a.today) if a.today else date.today()
     site = Site(jobs, Path(a.out), a.preview, today)
+    sp = Path(a.data).with_name("survey.json")
+    site.survey = json.loads(sp.read_text()) if sp.exists() else {"companies": {}}
     site.build()
     print(f"{len(site.pages)} páginas -> {a.out}")
 

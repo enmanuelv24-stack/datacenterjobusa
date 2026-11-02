@@ -91,3 +91,8 @@ Nunca agregues Indeed, LinkedIn ni otros agregadores: sus términos lo prohíben
 - Datos estructurados: JobPosting (con validThrough, identifier, pago del empleador) en cada vacante, BreadcrumbList en empresa/estado/ciudad/vacante, WebSite/Organization en inicio y About, FAQ en principiantes.
 - `sitemap.xml` es un índice → `sitemap-pages.xml` (lastmod = hoy) y `sitemap-jobs.xml` (lastmod = fecha de publicación). `404.html` para vacantes retiradas.
 - Las vacantes que el empleador retira desaparecen al día siguiente; si una fuente falla, sus vacantes de ayer se conservan máximo 5 días (`MAX_KEEP_DAYS`).
+
+## Encuesta → "Reported by techs"
+- Formulario: Google Forms (anónimo). Respuestas en la hoja privada "DCJ Survey Responses" (Drive de Enmanuel). No se publica la hoja.
+- `python survey_aggregate.py respuestas.csv --out data/survey.json` agrega por empresa (mediana de pago, horas, turno, per diem, hospedaje, rotación, % que volvería). Solo empresas con 3+ respuestas.
+- `build_site.py` lee `data/survey.json` y muestra el bloque "Reported by techs" en la página de cada empresa. Refrescar: exportar la hoja a CSV, correr el script y subir `data/survey.json`.
