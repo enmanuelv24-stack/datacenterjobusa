@@ -1219,6 +1219,29 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
     return out
 
 
+def load_posted_jobs(path: Path, today: date) -> list[Job]:
+    """Vacantes enviadas por empleadores (formulario 'Post a job'), revisadas a mano en data/posted_jobs.json.
+    Campos: company, title, city, state, pay_min, pay_max, pay_unit, perks, per_diem, url, posted, expires, notes."""
+    if not path.exists():
+        return []
+    out = []
+    for d in json.loads(path.read_text(encoding="utf-8")):
+        if d.get("expires") and date.fromisoformat(d["expires"]) < today:
+            continue
+        j = Job("posted", d["company"], f"posted-{d.get('id') or slugify(d['company'] + d['title'] + d.get('city', ''))}", d["title"],
+                d.get("city", ""), d.get("state", ""), f"{d.get('city', '')}, {d.get('state', '')}", d.get("posted", str(today)), d["url"],
+                d.get("pay_min"), d.get("pay_max"), d.get("pay_unit", "hour"), perks=d.get("perks", ""), per_diem=d.get("per_diem"))
+        j = finalize(j)
+        j.days_posted = (today - date.fromisoformat(j.posted)).days if j.posted else 0
+        j.openings = int(d.get("openings") or 1)
+        out.append(j)
+    return out
+
+
+def slugify(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
 def write_outputs(jobs: list[Job], outdir: Path) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
     cols = ["company", "title", "role", "level", "city", "state", "openings", "posted", "days_posted",
@@ -1284,6 +1307,8 @@ def main(argv=None) -> int:
     jobs = build(raw, today, a.max_age)
     if not a.src:
         jobs = keep_previous_if_source_failed(jobs, Path(a.out) / "jobs.json", today)
+    posted = [j for j in load_posted_jobs(Path(a.out) / "posted_jobs.json", today) if j.company not in {x.company for x in jobs} or True]
+    jobs = [j for j in jobs if j.source != "posted"] + posted
     write_outputs(jobs, Path(a.out))
     print(f"{len(jobs)} vacantes de técnico en EE.UU. -> {a.out}/jobs.csv")
     return 0

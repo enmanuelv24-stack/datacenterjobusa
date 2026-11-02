@@ -96,3 +96,7 @@ Nunca agregues Indeed, LinkedIn ni otros agregadores: sus términos lo prohíben
 - Formulario: Google Forms (anónimo). Respuestas en la hoja privada "DCJ Survey Responses" (Drive de Enmanuel). No se publica la hoja.
 - `python survey_aggregate.py respuestas.csv --out data/survey.json` agrega por empresa (mediana de pago, horas, turno, per diem, hospedaje, rotación, % que volvería). Solo empresas con 3+ respuestas.
 - `build_site.py` lee `data/survey.json` y muestra el bloque "Reported by techs" en la página de cada empresa. Refrescar: exportar la hoja a CSV, correr el script y subir `data/survey.json`.
+
+## Vacantes publicadas por empleadores ("Post a job")
+- Formulario público: `POST_JOB_URL` en site_config.py (Google Forms, respuestas en el Drive de Enmanuel).
+- Cada envío se revisa a mano y se agrega a `data/posted_jobs.json` (ver `data/posted_jobs.example.json`); `collector.py` las mezcla en cada corrida con la etiqueta "Posted by employer" y las retira al pasar `expires`.

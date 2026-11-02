@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -279,6 +279,7 @@ class Site:
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
+             + f'<div><b>Employers</b><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
              + ("" if bare else "</body></html>"))
         f = self.out / path
@@ -305,6 +306,8 @@ class Site:
             chips += ' <span class="chip new">New</span>'
         if j.get("entry"):
             chips += ' <span class="chip entry">Entry level</span>'
+        if j.get("source") == "posted":
+            chips += ' <span class="chip posted">Posted by employer</span>'
         chips += self.perk_chips(j)
         age = ago(j.get("days_posted"))
         if j["hourly_min"]:
@@ -366,7 +369,7 @@ class Site:
         # ---- index with client-side filters
         data = [{"t": clean_title(j["title"]), "c": j["company"], "ci": j["city"], "s": j["state"],
                  "r": ROLE_EN.get(j["role"], j["role"]), "n": j["openings"], "lo": j["hourly_min"],
-                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j), "e": 1 if j.get("entry") else 0, "l": j.get("level") or "",
+                 "hi": j["hourly_max"], "d": j["days_posted"], "p": perk_labels(j), "e": 1 if j.get("entry") else 0, "l": j.get("level") or "", "po": 1 if j.get("source") == "posted" else 0,
                  "yr": [j["pay_min"], j["pay_max"]] if j["pay_unit"] == "year" and j["pay_min"] else None,
                  "u": (f'jobs/{j["slug"]}.html' if not self.preview else j["url"])} for j in js]
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
@@ -394,7 +397,7 @@ class Site:
                 f'<li><a href="travel-jobs.html"><b>{perk_n:,}</b><span>mention per diem or housing</span></a></li></ul>'
                 f'<p class="top">Most jobs: {top_states_snap}</p></aside>'
                 f'<p class="live"><a href="new-jobs.html"><b>{fresh_n:,}</b> posted this week</a><a href="entry-level-jobs.html"><b>{entry_n:,}</b> entry level</a>'
-                f'<a href="travel-jobs.html"><b>{perk_n:,}</b> mention per diem or housing</a><span><b>{len(companies)}</b> employers</span><span>Updated {self.today:%b %-d}</span></p>'
+                f'<a href="travel-jobs.html"><b>{perk_n:,}</b> mention per diem or housing</a><span><b>{len(companies)}</b> employers</span><span>Updated {self.today:%b %-d}</span><a href="post-a-job.html">Hiring? Post a job free</a></p>'
                 '</div></div></section><div class="wrap">'
                 f'<div class="stats"><div class="stat"><b>{self.today:%b %-d}</b><span>last updated · daily</span></div>'
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
@@ -436,7 +439,7 @@ function row(j){let pay='<div class="pay nopay">Pay not posted<small>ask the rec
  if(j.lo){pay=`<div class="pay">${m(j.lo)}–${m(j.hi)}<small>per hour${j.yr?' · '+yr(j.yr[0])+'–'+yr(j.yr[1])+'/yr':''}</small></div>`}
  const ext=/^https?:/.test(j.u)?' rel="noopener" target="_blank"':'';
  const a=ago(j.d);
- return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span>${a?`<span class="age">${a}</span>`:''}</div><div class="tags"><span class="chip">${esc(j.r)}</span>${j.l?`<span class="chip lvl">Level ${j.l}</span>`:''}${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${j.e?'<span class="chip entry">Entry level</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
+ return `<li class="job">${LG[j.c]||''}<div><a class="t" href="${esc(j.u)}"${ext}>${esc(j.t)}</a><div class="meta"><span class="co">${esc(j.c)}</span><span>${j.ci?esc(j.ci)+', '+j.s:esc(ST[j.s]||j.s)}</span>${a?`<span class="age">${a}</span>`:''}</div><div class="tags"><span class="chip">${esc(j.r)}</span>${j.l?`<span class="chip lvl">Level ${j.l}</span>`:''}${j.n>1?`<span class="chip">${j.n} openings</span>`:''}${j.d!==null&&j.d<=7?'<span class="chip new">New</span>':''}${j.e?'<span class="chip entry">Entry level</span>':''}${j.po?'<span class="chip posted">Posted by employer</span>':''}${(j.p||[]).map(t=>`<span class="chip perk">${esc(t)}</span>`).join('')}</div></div>${pay}</li>`}
 function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$('co').value,ro=$('ro').value,p=parseFloat($('pay').value)||0,so=$('so').value,pk=$('pk').value,ex=$('ex').value,lv=$('lv').value;
  let r=J.filter(j=>(!q||(j.t+' '+j.ci).toLowerCase().includes(q))&&(!st||j.s===st)&&(!co||j.c===co)&&(!ro||j.r===ro)&&(!p||(j.hi||0)>=p)&&(!pk||(j.p||[]).some(t=>t.startsWith(pk)))&&(!ex||j.e)&&(!lv||j.l===lv));
  r.sort(so==='new'?(a,b)=>(a.d??999)-(b.d??999):(a,b)=>(b.hi||0)-(a.hi||0));
@@ -674,7 +677,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
-                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">Apply on {E(j["company"])}\'s site</a></p>'
+                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
                         + self.signup())
@@ -846,6 +849,29 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 '<h2>Open jobs</h2>' + self.job_list(travel, 0) + self.signup())
         self.page("travel-jobs.html", f"Data Center Travel Jobs with Per Diem and Housing | {SITE_NAME}",
                   "Data center technician and fiber jobs that pay per diem, provide housing or run on a travel rotation, with pay ranges.", body)
+
+        # ---- post a job (empleadores: contratistas, subs, staffing)
+        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Post a job</p>'
+                '<h1>Post a data center job — free</h1>'
+                '<p class="lede">For contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. '
+                'Tell us the numbers techs ask about — pay, per diem, housing, schedule — and we publish it here and in the weekly email within 24 hours. No fee, no account.</p>'
+                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a job (2 minutes)</a></p>'
+                '<section class="guide"><h2>Why post here</h2><div class="prose">'
+                f'<p><b>You reach working techs, not résumé databases.</b> This site is read by data center technicians, fiber splicers and low-voltage techs who compare pay before they accept. '
+                'Every listing links straight to you — we never collect applications or sell leads.</p>'
+                '<p><b>Postings with per diem and housing stated get more applicants.</b> Most employer postings leave it out; techs tell us it is the first thing they want to know. '
+                'If you pay it, say it.</p>'
+                '<p><b>It stays current.</b> Tell us when the crew is full and the listing comes down the next morning. Large employers are read automatically from their career pages; '
+                'this form is for companies that hire by phone and word of mouth.</p>'
+                '<p><b>What we never publish:</b> site names, badge or access details, or your contact if you ask us to use a general line instead.</p>'
+                '</div></section>'
+                '<h2>What to include</h2><div class="prose"><ul>'
+                '<li>Company, job title and project city/state</li><li>Hourly pay range and the overtime rule (after 40 or after 8)</li>'
+                '<li>Per diem ($/day, how many days) and housing (hotel paid, stipend, none)</li><li>Schedule (6×10, 6×12, rotation) and start date</li>'
+                '<li>How techs should apply: phone, email or link</li><li>Requirements: OSHA 10, certs, drug test, travel</li></ul></div>'
+                + self.signup())
+        self.page("post-a-job.html", f"Post a Data Center Job Free: Contractors, Subs and Staffing | {SITE_NAME}",
+                  "Free job posting for contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. Published within 24 hours.", body)
 
         # ---- about + survey
         self.page("about.html", f"About: Who Runs {SITE_NAME} and Where the Data Comes From", f"Why {SITE_NAME} exists, who built it, how listings are collected and how pay is calculated.",

@@ -42,3 +42,5 @@ SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdAiL_Nd9-OX5mNSFFdpO6MuF
 
 # Formulario de suscripción (Buttondown). El sitio envía el correo a esta dirección.
 NEWSLETTER_ACTION = "https://buttondown.com/api/emails/embed-subscribe/datacenterjobusa"
+
+POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"
