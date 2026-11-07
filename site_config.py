@@ -74,3 +74,7 @@ JOB_PLANS = [
      "features": ["All your openings featured, unlimited", "Your company page kept at the top of Companies",
                   "A short paragraph in your words about pay, schedule and crews", "Same-day updates"]},
 ]
+
+# Tipos de trabajo que se pueden elegir en la ventana emergente de alertas (se guardan en el campo "source").
+JOB_ALERT_TYPES = ["Entry level / no experience", "Data center technician", "Critical facilities", "Cabling & fiber",
+                   "Electrical", "Controls & BMS", "Travel jobs with per diem"]

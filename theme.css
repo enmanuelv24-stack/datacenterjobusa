@@ -222,7 +222,7 @@ nav.main{font-size:14px;gap:2px} nav.main a{padding:6px 9px}
 .lead input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 .lead button{font:600 16px var(--body);padding:12px 22px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
 .lead button:hover{background:var(--accent-ink)}
-.lead .ok,.leadbar .ok{color:var(--good);font-weight:600;flex-basis:100%;margin:0}
+.lead .ok{color:var(--good);font-weight:600;flex-basis:100%;margin:0}
 .leadbox{border-left:4px solid var(--accent)}
 .leadbox .tiny{color:var(--muted);font-size:13px;margin:10px 0 0}
 .jobs li.leadrow{background:var(--bg);border:1px dashed var(--line);display:block}
@@ -235,15 +235,7 @@ nav.main{font-size:14px;gap:2px} nav.main a{padding:6px 9px}
 .hero .herolead .lead{margin-top:10px}
 .leadjob{margin:22px 0;padding:18px 20px;border-radius:12px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent)}
 .leadjob b{display:block;font-size:18px} .leadjob span{color:var(--muted);font-size:15px}
-.leadbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(0,0,0,.08);transform:translateY(110%);transition:transform .35s ease;padding:12px 0 calc(12px + env(safe-area-inset-bottom))}
-.leadbar.on{transform:none}
-.leadbar .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.leadbar p{margin:0;flex:1 1 260px;font-size:15px;color:var(--muted)} .leadbar p b{color:var(--ink)}
-.leadbar .lead{margin:0;flex:2 1 420px} .leadbar .lead input{padding:10px 12px;flex-basis:160px} .leadbar .lead button{padding:10px 16px}
-.leadbar .x{position:absolute;right:10px;top:6px;border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px}
-.leadbar .wrap{position:relative;padding-right:40px}
 body{padding-bottom:0}
-@media (max-width:700px){.leadbar p span{display:none}.leadbar .lead input{flex-basis:100%}.leadbar .lead button{flex:1}}
 
 /* ---- anuncios destacados y página de empleadores */
 .job.featured{border-color:var(--accent);box-shadow:0 0 0 2px rgba(15,118,110,.14)}
@@ -263,3 +255,19 @@ body{padding-bottom:0}
 .steps{counter-reset:s;list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0 26px}
 .steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 14px 52px;position:relative}
 .steps li::before{content:counter(s);position:absolute;left:14px;top:13px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+/* --- ventana emergente de alertas (correo + tipo de trabajo) --- */
+.lpop{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.55);display:grid;place-items:center;padding:16px;animation:lpop-in .25s ease}
+.lpop[hidden]{display:none}
+.lpop-card{position:relative;width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--panel);color:var(--ink);border-radius:16px;padding:26px 24px 22px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);border-top:5px solid var(--accent)}
+.lpop .kick{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.lpop h2{font-size:24px;margin:0 0 8px}.lpop h2::after{display:none}
+.lpop .sub{color:var(--muted);font-size:15px;margin:0 0 6px}
+.lpop .x{position:absolute;right:10px;top:8px;border:0;background:transparent;color:var(--muted);font-size:26px;line-height:1;cursor:pointer;padding:6px 10px}
+.lpop .types{border:0;padding:0;margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:8px;flex-basis:100%}
+.lpop .types legend{font-weight:600;font-size:14px;margin-bottom:8px;padding:0}
+.lpop .types label{display:inline-flex;flex:0 0 auto;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:14px;cursor:pointer;background:var(--bg)}
+.lpop .types label:has(input:checked){border-color:var(--accent);background:rgba(15,118,110,.08);color:var(--accent-ink)}
+.lpop .types input{accent-color:var(--accent);flex:0 0 16px;width:16px;height:16px;min-width:0;margin:0;padding:0;border:0}
+.lpop .lead.pop button{flex:1 1 100%}
+@keyframes lpop-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.lpop{animation:none}}

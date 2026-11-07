@@ -19,7 +19,7 @@ from pathlib import Path
 
 from employers_page import employer_pages
 from kit_page import kit_page
-from site_config import (GA4_ID, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (GA4_ID, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -100,16 +100,24 @@ CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 
 # Captación de correos/teléfonos: envía a Buttondown sin salir de la página, muestra la barra fija tras scroll y recuerda cierres.
 LEAD_JS = ("<script>"
-           "function dcjSub(f){try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
-           "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ','')});"
+           # Envío sin salir de la página. En la ventana emergente, los tipos marcados van en el campo "source".
+           "function dcjSub(f){var t=[].map.call(f.querySelectorAll('.jt:checked'),function(c){return c.value});"
+           "var src=f.querySelector('.src');if(src&&t.length)src.value='popup: '+t.join('; ');"
+           "try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
+           "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ',''),job_types:t.join('; ')});"
            "f.innerHTML='<p class=\"ok\">Done \\u2014 we\\u2019ll email you when new jobs with pay are posted.</p>';"
-           "try{localStorage.setItem('dcj_sub','1')}catch(e){}var b=document.getElementById('lbar');if(b&&!b.contains(f))b.remove();return false}"
-           "(function(){var b=document.getElementById('lbar');if(!b)return;"
-           "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_bar')>Date.now()){b.remove();return}}catch(e){}"
-           "var shown=false;function show(){if(shown)return;shown=true;b.hidden=false;requestAnimationFrame(function(){b.classList.add('on')})}"
-           "window.addEventListener('scroll',function(){if(window.scrollY>450)show()},{passive:true});setTimeout(show,15000);"
-           "b.querySelector('.x').addEventListener('click',function(){b.remove();try{localStorage.setItem('dcj_bar',String(Date.now()+5*864e5))}catch(e){}})})();"
-           # Clic en "Apply on …" -> evento apply_click en GA4 (evento clave).
+           "try{localStorage.setItem('dcj_sub','1')}catch(e){}return false}"
+           # Ventana emergente: tras 45 % de scroll o 25 s; no si ya se suscribió o la cerró hace menos de 5 días.
+           "(function(){var p=document.getElementById('lpop');if(!p)return;var last=null;"
+           "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_pop')>Date.now()){p.remove();return}}catch(e){}"
+           "function close(){p.hidden=true;try{localStorage.setItem('dcj_pop',String(Date.now()+5*864e5))}catch(e){}if(last)last.focus()}"
+           "var shown=false;function show(){if(shown)return;shown=true;last=document.activeElement;p.hidden=false;"
+           "var em=p.querySelector('input[type=email]');if(em)em.focus({preventScroll:true})}"
+           "window.addEventListener('scroll',function(){var h=document.documentElement;if(h.scrollTop/(h.scrollHeight-h.clientHeight)>.45)show()},{passive:true});"
+           "setTimeout(show,25000);p.querySelector('.x').addEventListener('click',close);"
+           "p.addEventListener('click',function(e){if(e.target===p)close()});"
+           "document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden)close()})})();"
+           # Clics con data-ev -> eventos GA4.
            "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev]');if(!a||!window.gtag)return;"
            "var ev=a.getAttribute('data-ev');if(ev==='apply')gtag('event','apply_click',{company:a.getAttribute('data-co')});"
            "else if(ev==='kit')gtag('event','begin_checkout',{item_name:'Job-Ready Kit'});"
@@ -381,8 +389,7 @@ class Site:
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
              + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
-             + '<div class="leadbar" id="lbar" hidden><div class="wrap"><p><b>New data center jobs, sent to you.</b><span> Email + phone — we tell you when jobs with pay are posted.</span></p>'
-             + self.lead_form("bar", "Notify me", page=path) + '<button class="x" type="button" aria-label="Close">×</button></div></div>'
+             + self.lead_popup(path)
              + LEAD_JS
              + ("" if bare else "</body></html>"))
         f = self.out / path
@@ -456,25 +463,39 @@ class Site:
                 "</tr></thead><tbody>" + "".join(body) + "</tbody></table></div>")
 
     def lead_form(self, variant: str = "box", button: str = "Send me jobs", state: str = "", company: str = "", page: str = "") -> str:
-        """Formulario de captación: correo + teléfono, más el contexto (página, estado, empresa) en campos ocultos."""
+        """Formulario de captación: correo, más el contexto (página, estado, empresa) en campos ocultos."""
         F = NEWSLETTER_FIELDS
         hidden = "".join(f'<input type="hidden" name="{F[k]}" value="{E(v)}">'
                          for k, v in [("source", variant), ("page", page), ("state", state), ("company", company)] if v)
         return (f'<form class="lead {variant}" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
                 f'<input name="{F["email"]}" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
-                f'<input name="{F["phone"]}" type="tel" placeholder="Phone (for text alerts)" aria-label="Phone number" autocomplete="tel" pattern="[0-9()+ .-]{{7,20}}">'
                 f'<button type="submit">{E(button)}</button>{hidden}</form>')
 
     def signup(self, state: str = "", company: str = "", page: str = "") -> str:
         what = (f"{company} jobs" if company else f"jobs in {STATE_NAMES.get(state, state)}" if state else "data center technician jobs")
         return (f'<div class="callout leadbox"><h3>Want to know about more {E(what)}?</h3>'
-                '<p class="note">Enter your email and phone number and we\'ll tell you when new technician jobs are posted — pay, per diem and location included. '
+                '<p class="note">Enter your email and we\'ll tell you when new technician jobs are posted — pay, per diem and location included. '
                 'No spam, no recruiters, unsubscribe any time.</p>'
                 + self.lead_form("box", "Tell me about new jobs", state, company, page)
-                + '<p class="tiny">We email once a week and text only for jobs that match your state. Your number is never shared.</p></div>')
+                + '<p class="tiny">Your email is never shared or sold.</p></div>')
+
+    def lead_popup(self, page: str) -> str:
+        """Ventana emergente de alertas: correo + tipos de trabajo (van en el campo "source" del formulario)."""
+        types = "".join(f'<label><input type="checkbox" class="jt" value="{E(t)}"> {E(t)}</label>' for t in JOB_ALERT_TYPES)
+        form = (f'<form class="lead pop" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
+                f'<fieldset class="types"><legend>What are you looking for?</legend>{types}</fieldset>'
+                f'<input name="{NEWSLETTER_FIELDS["email"]}" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
+                '<button type="submit">Send me jobs</button>'
+                f'<input type="hidden" name="{NEWSLETTER_FIELDS["source"]}" value="popup" class="src">'
+                f'<input type="hidden" name="{NEWSLETTER_FIELDS["page"]}" value="{E(page)}"></form>')
+        return ('<div class="lpop" id="lpop" hidden><div class="lpop-card" role="dialog" aria-modal="true" aria-labelledby="lpop-t">'
+                '<button class="x" type="button" aria-label="Close">×</button><p class="kick">Free job alerts</p>'
+                '<h2 id="lpop-t">Get new data center jobs by email</h2>'
+                '<p class="sub">Pick what you want and we\'ll email you when matching jobs with pay are posted. Your email is never shared.</p>'
+                + form + '</div></div>')
 
     def lead_inline(self, state: str = "", company: str = "", page: str = "") -> str:
-        return ('<li class="job leadrow"><div><b>Don\'t miss the next one.</b><span>Email + phone and we\'ll let you know when more jobs like these are posted.</span>'
+        return ('<li class="job leadrow"><div><b>Don\'t miss the next one.</b><span>Leave your email and we\'ll let you know when more jobs like these are posted.</span>'
                 + self.lead_form("inline", "Notify me", state, company, page) + '</div></li>')
 
     # -------------------------------------------------------------- pages
@@ -513,7 +534,7 @@ class Site:
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
                 '<button type="submit">Find jobs</button></form>'
                 f'<div class="quick">{quick}</div>'
-                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Email + phone, and we tell you when technician jobs with pay are posted near you.</p>'
+                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Leave your email and we\'ll tell you when technician jobs with pay are posted near you.</p>'
                 + self.lead_form("hero", "Send me jobs", page="index") + '</div></div>'
                 '<aside class="snap"><h2>Today on the site</h2><ul>'
                 f'<li><a href="index.html"><b>{total:,}</b><span>open technician jobs</span></a></li>'
@@ -837,7 +858,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
                         f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank" data-ev="apply" data-co="{E(j["company"])}">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
                         + about
-                        + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
+                        + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
                         + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
