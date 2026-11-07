@@ -257,3 +257,5 @@ body{padding-bottom:0}
 .plan ul{padding-left:18px;margin:0 0 14px}
 .plan li{margin:4px 0}
 .plan .note{font-size:.85rem;color:var(--muted)}
+/* --- encabezado de empresa: logo al lado del H1, fuera del texto del título --- */
+.cohead{display:flex;gap:14px;align-items:center}

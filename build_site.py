@@ -74,6 +74,17 @@ def logo(company: str) -> str:
     return f'<span class="logo" style="background:{col}" aria-hidden="true"><b>{E(txt)}</b>{img}</span>'
 
 
+def role_title(role_en: str) -> str:
+    """Título SEO de una categoría: "Critical Facilities Data Center Jobs", "Data Center Technician Jobs"."""
+    words = " ".join(w if w.isupper() else w[:1].upper() + w[1:] for w in role_en.split())
+    return f"{words} Jobs" if "data center" in role_en.lower() else f"{words} Data Center Jobs"
+
+
+def role_heading(role_en: str) -> str:
+    """H1 de una categoría en minúsculas de oración: "Critical facilities data center jobs"."""
+    return f"{role_en} jobs" if "data center" in role_en.lower() else f"{role_en} data center jobs"
+
+
 def clean_title(t: str) -> str:
     t = re.sub(r"\s+,", ",", t)
     t = re.sub(r",\s*(DCC Communities|Amazon Web Services|AWS Support|AWS)\b", "", t)
@@ -360,7 +371,8 @@ class Site:
              + f'<div><b>Find jobs</b><a href="{r("index.html")}">All technician jobs</a><a href="{r("entry-level-jobs.html")}">Entry-level jobs</a>'
                f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
              + f'<div><b>Pay &amp; career</b><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
-               f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
+               f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a>'
+               f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
              + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
@@ -668,7 +680,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
             cfaq_ld = '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@type": "FAQPage",
                       "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in cfaq]}) + '</script>'
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../companies.html">Companies</a> / {E(c)}</p>'
-                    f'<h1>{logo(c)} {E(c)} data center jobs</h1>'
+                    f'<div class="cohead">{logo(c)}<h1>{E(c)} data center jobs</h1></div>'
                     f'<p class="lede">{n:,} open technician jobs at {E(c)} across {len(cs)} states, read from its career page this morning. '
                     + (f'Typical posted pay: <b>{money(c_lo)}–{money(c_hi)}/hr</b>. ' if c_lo else 'Pay is not posted on most listings. ')
                     + (f'{fresh_c} new this week. ' if fresh_c else '') + (f'{entry_c} entry level.' if entry_c else '') + '</p>'
@@ -676,7 +688,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + f'<div class="stats"><div class="stat"><b>{n:,}</b><span>open jobs</span></div><div class="stat"><b>{fresh_c}</b><span>new this week</span></div>'
                       f'<div class="stat"><b>{len(cpaid)}/{len(rows)}</b><span>postings with pay</span></div><div class="stat"><b>{entry_c}</b><span>entry level</span></div></div>'
                     + self.reported(c)
-                    + '<h2>Pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1, lambda k: f"roles/{slug(k)}.html")
+                    + f'<h2>{E(c)} data center technician pay by job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1, lambda k: f"roles/{slug(k)}.html")
                     + (('<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{k}</small></a>' for l, k in sorted(lv_c.items())) + '</div>') if lv_c else '')
                     + '<h2>Where they are hiring</h2>' + f'<ul class="grid-links">{st_links}</ul>'
                     + (f'<h3>Cities</h3><ul class="grid-links">{city_links}</ul>' if city_links else '')
@@ -846,7 +858,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
             rows = [j for j in js if ROLE_EN.get(j["role"], j["role"]) == role_en]
             lv = Counter(j["level"] or "—" for j in rows)
             body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../index.html#browse">Categories</a> / {E(role_en)}</p>'
-                    f'<h1>{E(role_en)} jobs in data centers</h1>'
+                    f'<h1>{E(role_heading(role_en))}</h1>'
                     f'<p class="lede">{n:,} open {E(role_en.lower())} jobs. {E(ROLE_BLURB.get(role_en, ""))}</p>'
                     '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{c}</small></a>' for l, c in sorted(lv.items()) if l != "—") + '</div>'
@@ -855,7 +867,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                                   for (r, st), c in rs_counts.most_common() if r == role_en and (r, st) in role_state_pages)
                         + '</div>') if any(r == role_en for r, _ in role_state_pages) else "")
                     + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
-            self.page(f"roles/{slug(role_en)}.html", f"{role_en} Jobs in Data Centers: {n:,} Open with Pay | {SITE_NAME}",
+            self.page(f"roles/{slug(role_en)}.html", f"{role_title(role_en)}: {n:,} Open with Pay | {SITE_NAME}",
                       f"{n:,} {role_en.lower()} jobs in US data centers with posted pay by employer and level. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), (role_en, f"roles/{slug(role_en)}.html")]))
 
@@ -1026,7 +1038,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Post a job</p>'
                 '<h1>Post a data center job — free</h1>'
                 '<p class="lede">For contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. '
-                'Tell us the numbers techs ask about — pay, per diem, housing, schedule — and we publish it here and in the weekly email within 24 hours. No fee, no account.</p>'
+                'Tell us the numbers techs ask about — pay, per diem, housing, schedule — and we publish it here within 24 hours. No fee, no account.</p>'
                 f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a job (2 minutes)</a> '
                 f'<a class="more" href="employers.html">Need it seen first? Featured listings →</a></p>'
                 '<section class="guide"><h2>Why post here</h2><div class="prose">'
@@ -1048,7 +1060,6 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 
 
         # ---- employers (planes de pago: destacado, correo patrocinado, perfil de empresa)
-        subs_line = (f'{self.subscribers:,} techs on the weekly email' if getattr(self, "subscribers", 0) else "a weekly email to techs who signed up for alerts")
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
                 '<h1>Hire data center technicians who compare pay before they apply</h1>'
                 f'<p class="lede">{SITE_NAME} is read by working techs: fiber, cabling, electrical, critical facilities and DCT roles. '
@@ -1060,12 +1071,12 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 f'<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a free job</a></p></section>'
                 '<section class="plan main"><h2>Featured listing</h2><p class="price">$149 <small>for 30 days</small></p>'
                 '<ul><li>Pinned at the top of the home page and of your state and job-type pages</li><li>"Featured" tag in every list</li>'
-                f'<li>Included in {subs_line}</li><li>Up to 5 openings in one listing; extra listings $99 each</li><li>Your first featured listing is free while we build the audience</li></ul>'
+                f'<li>Listed first on every city, company and job-type page where it appears</li><li>Up to 5 openings in one listing; extra listings $99 each</li><li>Your first featured listing is free while we build the audience</li></ul>'
                 f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Request a featured listing</a></p>'
                 '<p class="note">Write "featured" in the notes field of the form. We confirm by email within 24 hours and invoice after the listing is live.</p></section>'
                 '<section class="plan"><h2>Company page</h2><p class="price">$299 <small>per month</small></p>'
-                '<ul><li>Your company page kept at the top of <a href="companies.html">Companies</a></li><li>All your openings featured</li><li>A short paragraph in your words about pay, schedule and crews</li><li>One sponsored block in the weekly email per month</li></ul>'
-                '<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Ask about a company page</a></p><p class="note">Write "company page" in the notes field.</p></section>'
+                '<ul><li>Your company page kept at the top of <a href="companies.html">Companies</a></li><li>All your openings featured</li><li>A short paragraph in your words about pay, schedule and crews</li><li>Priority answers: we publish your updates the same day</li></ul>'
+                f'<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Ask about a company page</a></p><p class="note">Write "company page" in the notes field.</p></section>'
                 '</div>'
                 '<section class="guide"><h2>Who posts here</h2><div class="prose">'
                 '<p>Contractors and subcontractors on data center builds (fiber, structured cabling, electrical, mechanical), staffing firms that place technicians on hyperscale projects, and operators hiring critical facilities and DCT roles. '
