@@ -17,8 +17,9 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from employers_page import employer_pages
 from kit_page import kit_page
-from site_config import (GA4_ID, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (GA4_ID, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -99,19 +100,28 @@ CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 
 # Captación de correos/teléfonos: envía a Buttondown sin salir de la página, muestra la barra fija tras scroll y recuerda cierres.
 LEAD_JS = ("<script>"
-           "function dcjSub(f){try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
-           "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ','')});"
+           # Envío sin salir de la página. En la ventana emergente, los tipos marcados van en el campo "source".
+           "function dcjSub(f){var t=[].map.call(f.querySelectorAll('.jt:checked'),function(c){return c.value});"
+           "var src=f.querySelector('.src');if(src&&t.length)src.value='popup: '+t.join('; ');"
+           "try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
+           "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ',''),job_types:t.join('; ')});"
            "f.innerHTML='<p class=\"ok\">Done \\u2014 we\\u2019ll email you when new jobs with pay are posted.</p>';"
-           "try{localStorage.setItem('dcj_sub','1')}catch(e){}var b=document.getElementById('lbar');if(b&&!b.contains(f))b.remove();return false}"
-           "(function(){var b=document.getElementById('lbar');if(!b)return;"
-           "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_bar')>Date.now()){b.remove();return}}catch(e){}"
-           "var shown=false;function show(){if(shown)return;shown=true;b.hidden=false;requestAnimationFrame(function(){b.classList.add('on')})}"
-           "window.addEventListener('scroll',function(){if(window.scrollY>450)show()},{passive:true});setTimeout(show,15000);"
-           "b.querySelector('.x').addEventListener('click',function(){b.remove();try{localStorage.setItem('dcj_bar',String(Date.now()+5*864e5))}catch(e){}})})();"
-           # Clic en "Apply on …" -> evento apply_click en GA4 (evento clave).
+           "try{localStorage.setItem('dcj_sub','1')}catch(e){}return false}"
+           # Ventana emergente: tras 45 % de scroll o 25 s; no si ya se suscribió o la cerró hace menos de 5 días.
+           "(function(){var p=document.getElementById('lpop');if(!p)return;var last=null;"
+           "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_pop')>Date.now()){p.remove();return}}catch(e){}"
+           "function close(){p.hidden=true;try{localStorage.setItem('dcj_pop',String(Date.now()+5*864e5))}catch(e){}if(last)last.focus()}"
+           "var shown=false;function show(){if(shown)return;shown=true;last=document.activeElement;p.hidden=false;"
+           "var em=p.querySelector('input[type=email]');if(em)em.focus({preventScroll:true})}"
+           "window.addEventListener('scroll',function(){var h=document.documentElement;if(h.scrollTop/(h.scrollHeight-h.clientHeight)>.45)show()},{passive:true});"
+           "setTimeout(show,25000);p.querySelector('.x').addEventListener('click',close);"
+           "p.addEventListener('click',function(e){if(e.target===p)close()});"
+           "document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden)close()})})();"
+           # Clics con data-ev -> eventos GA4.
            "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev]');if(!a||!window.gtag)return;"
            "var ev=a.getAttribute('data-ev');if(ev==='apply')gtag('event','apply_click',{company:a.getAttribute('data-co')});"
-           "else if(ev==='kit')gtag('event','begin_checkout',{item_name:'Job-Ready Kit'})});"
+           "else if(ev==='kit')gtag('event','begin_checkout',{item_name:'Job-Ready Kit'});"
+           "else if(ev==='plan')gtag('event','begin_checkout',{item_name:a.getAttribute('data-plan')})});"
            "</script>")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -377,10 +387,9 @@ class Site:
                f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
-             + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
+             + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
-             + '<div class="leadbar" id="lbar" hidden><div class="wrap"><p><b>New data center jobs, sent to you.</b><span> Email + phone — we tell you when jobs with pay are posted.</span></p>'
-             + self.lead_form("bar", "Notify me", page=path) + '<button class="x" type="button" aria-label="Close">×</button></div></div>'
+             + self.lead_popup(path)
              + LEAD_JS
              + ("" if bare else "</body></html>"))
         f = self.out / path
@@ -454,25 +463,39 @@ class Site:
                 "</tr></thead><tbody>" + "".join(body) + "</tbody></table></div>")
 
     def lead_form(self, variant: str = "box", button: str = "Send me jobs", state: str = "", company: str = "", page: str = "") -> str:
-        """Formulario de captación: correo + teléfono, más el contexto (página, estado, empresa) en campos ocultos."""
+        """Formulario de captación: correo, más el contexto (página, estado, empresa) en campos ocultos."""
         F = NEWSLETTER_FIELDS
         hidden = "".join(f'<input type="hidden" name="{F[k]}" value="{E(v)}">'
                          for k, v in [("source", variant), ("page", page), ("state", state), ("company", company)] if v)
         return (f'<form class="lead {variant}" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
                 f'<input name="{F["email"]}" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
-                f'<input name="{F["phone"]}" type="tel" placeholder="Phone (for text alerts)" aria-label="Phone number" autocomplete="tel" pattern="[0-9()+ .-]{{7,20}}">'
                 f'<button type="submit">{E(button)}</button>{hidden}</form>')
 
     def signup(self, state: str = "", company: str = "", page: str = "") -> str:
         what = (f"{company} jobs" if company else f"jobs in {STATE_NAMES.get(state, state)}" if state else "data center technician jobs")
         return (f'<div class="callout leadbox"><h3>Want to know about more {E(what)}?</h3>'
-                '<p class="note">Enter your email and phone number and we\'ll tell you when new technician jobs are posted — pay, per diem and location included. '
+                '<p class="note">Enter your email and we\'ll tell you when new technician jobs are posted — pay, per diem and location included. '
                 'No spam, no recruiters, unsubscribe any time.</p>'
                 + self.lead_form("box", "Tell me about new jobs", state, company, page)
-                + '<p class="tiny">We email once a week and text only for jobs that match your state. Your number is never shared.</p></div>')
+                + '<p class="tiny">Your email is never shared or sold.</p></div>')
+
+    def lead_popup(self, page: str) -> str:
+        """Ventana emergente de alertas: correo + tipos de trabajo (van en el campo "source" del formulario)."""
+        types = "".join(f'<label><input type="checkbox" class="jt" value="{E(t)}"> {E(t)}</label>' for t in JOB_ALERT_TYPES)
+        form = (f'<form class="lead pop" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
+                f'<fieldset class="types"><legend>What are you looking for?</legend>{types}</fieldset>'
+                f'<input name="{NEWSLETTER_FIELDS["email"]}" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
+                '<button type="submit">Send me jobs</button>'
+                f'<input type="hidden" name="{NEWSLETTER_FIELDS["source"]}" value="popup" class="src">'
+                f'<input type="hidden" name="{NEWSLETTER_FIELDS["page"]}" value="{E(page)}"></form>')
+        return ('<div class="lpop" id="lpop" hidden><div class="lpop-card" role="dialog" aria-modal="true" aria-labelledby="lpop-t">'
+                '<button class="x" type="button" aria-label="Close">×</button><p class="kick">Free job alerts</p>'
+                '<h2 id="lpop-t">Get new data center jobs by email</h2>'
+                '<p class="sub">Pick what you want and we\'ll email you when matching jobs with pay are posted. Your email is never shared.</p>'
+                + form + '</div></div>')
 
     def lead_inline(self, state: str = "", company: str = "", page: str = "") -> str:
-        return ('<li class="job leadrow"><div><b>Don\'t miss the next one.</b><span>Email + phone and we\'ll let you know when more jobs like these are posted.</span>'
+        return ('<li class="job leadrow"><div><b>Don\'t miss the next one.</b><span>Leave your email and we\'ll let you know when more jobs like these are posted.</span>'
                 + self.lead_form("inline", "Notify me", state, company, page) + '</div></li>')
 
     # -------------------------------------------------------------- pages
@@ -511,7 +534,7 @@ class Site:
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
                 '<button type="submit">Find jobs</button></form>'
                 f'<div class="quick">{quick}</div>'
-                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Email + phone, and we tell you when technician jobs with pay are posted near you.</p>'
+                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Leave your email and we\'ll tell you when technician jobs with pay are posted near you.</p>'
                 + self.lead_form("hero", "Send me jobs", page="index") + '</div></div>'
                 '<aside class="snap"><h2>Today on the site</h2><ul>'
                 f'<li><a href="index.html"><b>{total:,}</b><span>open technician jobs</span></a></li>'
@@ -835,7 +858,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
                         f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank" data-ev="apply" data-co="{E(j["company"])}">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
                         + about
-                        + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
+                        + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
                         + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
@@ -1036,73 +1059,14 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
         self.page("travel-jobs.html", f"Data Center Travel Jobs with Per Diem and Housing | {SITE_NAME}",
                   "Data center technician and fiber jobs that pay per diem, provide housing or run on a travel rotation, with pay ranges.", body)
 
-        # ---- post a job (empleadores: contratistas, subs, staffing)
-        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Post a job</p>'
-                '<h1>Post a data center job — free</h1>'
-                '<p class="lede">For contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. '
-                'Tell us the numbers techs ask about — pay, per diem, housing, schedule — and we publish it here within 24 hours. No fee, no account.</p>'
-                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a job (2 minutes)</a> '
-                f'<a class="more" href="employers.html">Need it seen first? Featured listings →</a></p>'
-                '<section class="guide"><h2>Why post here</h2><div class="prose">'
-                f'<p><b>You reach working techs, not résumé databases.</b> This site is read by data center technicians, fiber splicers and low-voltage techs who compare pay before they accept. '
-                'Every listing links straight to you — we never collect applications or sell leads.</p>'
-                '<p><b>Postings with per diem and housing stated get more applicants.</b> Most employer postings leave it out; techs tell us it is the first thing they want to know. '
-                'If you pay it, say it.</p>'
-                '<p><b>It stays current.</b> Tell us when the crew is full and the listing comes down the next morning. Large employers are read automatically from their career pages; '
-                'this form is for companies that hire by phone and word of mouth.</p>'
-                '<p><b>What we never publish:</b> site names, badge or access details, or your contact if you ask us to use a general line instead.</p>'
-                '</div></section>'
-                '<h2>What to include</h2><div class="prose"><ul>'
-                '<li>Company, job title and project city/state</li><li>Hourly pay range and the overtime rule (after 40 or after 8)</li>'
-                '<li>Per diem ($/day, how many days) and housing (hotel paid, stipend, none)</li><li>Schedule (6×10, 6×12, rotation) and start date</li>'
-                '<li>How techs should apply: phone, email or link</li><li>Requirements: OSHA 10, certs, drug test, travel</li></ul></div>'
-                + self.signup())
-        self.page("post-a-job.html", f"Post a Data Center Job Free: Contractors, Subs and Staffing | {SITE_NAME}",
-                  "Free job posting for contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. Published within 24 hours.", body)
-
         # ---- producto digital: Job-Ready Kit (kit_page.py)
         kp = kit_page(js, self.lead_form)
         self.page(kp["path"], kp["title"], kp["desc"], kp["body"], head_extra=kp["head_extra"])
 
 
-        # ---- employers (planes de pago: destacado, correo patrocinado, perfil de empresa)
-        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
-                '<h1>Hire data center technicians who compare pay before they apply</h1>'
-                f'<p class="lede">{SITE_NAME} is read by working techs: fiber, cabling, electrical, critical facilities and DCT roles. '
-                f'{len(js):,} open jobs from {len(companies)} employers are listed today, with posted pay on {sum(1 for j in js if j["hourly_min"]):,} of them. '
-                'Every listing links straight to you. We never collect applications or sell leads.</p>'
-                '<div class="plans">'
-                '<section class="plan"><h2>Free listing</h2><p class="price">$0</p>'
-                '<ul><li>Published within 24 hours</li><li>Listed with pay, per diem and schedule</li><li>Linked to your phone, email or career page</li><li>Comes down the morning after you tell us the crew is full</li></ul>'
-                f'<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a free job</a></p></section>'
-                '<section class="plan main"><h2>Featured listing</h2><p class="price">$149 <small>for 30 days</small></p>'
-                '<ul><li>Pinned at the top of the home page and of your state and job-type pages</li><li>"Featured" tag in every list</li>'
-                f'<li>Listed first on every city, company and job-type page where it appears</li><li>Up to 5 openings in one listing; extra listings $99 each</li><li>Your first featured listing is free while we build the audience</li></ul>'
-                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Request a featured listing</a></p>'
-                '<p class="note">Write "featured" in the notes field of the form. We confirm by email within 24 hours and invoice after the listing is live.</p></section>'
-                '<section class="plan"><h2>Company page</h2><p class="price">$299 <small>per month</small></p>'
-                '<ul><li>Your company page kept at the top of <a href="companies.html">Companies</a></li><li>All your openings featured</li><li>A short paragraph in your words about pay, schedule and crews</li><li>Priority answers: we publish your updates the same day</li></ul>'
-                f'<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Ask about a company page</a></p><p class="note">Write "company page" in the notes field.</p></section>'
-                '</div>'
-                '<section class="guide"><h2>Who posts here</h2><div class="prose">'
-                '<p>Contractors and subcontractors on data center builds (fiber, structured cabling, electrical, mechanical), staffing firms that place technicians on hyperscale projects, and operators hiring critical facilities and DCT roles. '
-                f'Large employers such as Amazon, Microsoft, Google, QTS and Equinix are read automatically from their career pages; paid plans are for companies that hire by phone and word of mouth and need the crew filled this month.</p>'
-                '<p><b>What techs read first:</b> hourly pay, per diem per day, housing, the schedule (6×10, 6×12, rotation) and the start date. Listings that state all five get the most clicks. If you pay it, say it.</p>'
-                '<p><b>What we never publish:</b> site names, badge or access details, or your direct contact if you ask us to use a general line.</p>'
-                '</div></section>'
-                '<h2>Questions</h2><div class="faq">'
-                '<details><summary>How do I pay?</summary><p>We send an invoice by email after the listing is live; pay by card or bank transfer. No account needed. Your first featured listing is free.</p></details>'
-                '<details><summary>Can I post more than one job?</summary><p>Yes. Free listings are unlimited. Featured listings are $149 for the first and $99 for each additional one in the same month.</p></details>'
-                '<details><summary>Do you share the techs\' contact details?</summary><p>No. Techs apply to you directly through the link, phone or email on your listing. If you want us to send your listing to techs in one state by email, that is included in the featured plan.</p></details>'
-                '<details><summary>What if the job fills early?</summary><p>Tell us and the listing comes down the next morning. The remaining days of a featured listing can be moved to another opening.</p></details>'
-                '</div>'
-                f'<p class="note">Questions: use the <a href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">same form</a> and write "question" in the notes; we answer within 24 hours.</p>')
-        self.page("employers.html", f"Hire Data Center Technicians: Featured Listings from $149 | {SITE_NAME}",
-                  f"Reach data center technicians, fiber and cabling crews who compare pay before they apply. Free listings, featured listings for 30 days, company pages. {len(js):,} open jobs listed today.", body,
-                  head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Employers", "employers.html")]) + '<script type="application/ld+json">' + json.dumps({
-                      "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-                          {"@type": "Question", "name": "How do I pay for a featured listing?", "acceptedAnswer": {"@type": "Answer", "text": "We send an invoice by email after the listing is live; pay by card or bank transfer. The first featured listing is free."}},
-                          {"@type": "Question", "name": "Do you share technicians' contact details?", "acceptedAnswer": {"@type": "Answer", "text": "No. Technicians apply directly through the link, phone or email on the listing."}}]}) + '</script>')
+        # ---- empresas: planes de pago y "Post a job" (employers_page.py)
+        for ep in employer_pages(js, len(companies), self.signup(), self.breadcrumbs):
+            self.page(ep["path"], ep["title"], ep["desc"], ep["body"], head_extra=ep["head_extra"])
 
         # ---- about + survey
         self.page("about.html", f"About: Who Runs {SITE_NAME} and Where the Data Comes From", f"Why {SITE_NAME} exists, who built it, how listings are collected and how pay is calculated.",
