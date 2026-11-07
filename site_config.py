@@ -54,3 +54,8 @@ NEWSLETTER_FIELDS = {"email": "entry.97542317", "phone": "entry.1281027727", "st
 GA4_ID = "G-RPPV8TW7WJ"
 
 POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"
+
+# Producto digital "Job-Ready Kit" (PDF). Pega aquí el enlace de compra de la tienda donde lo vendas
+# (Gumroad, Lemon Squeezy o un Payment Link de Stripe). Vacío = la página dice "muy pronto" y recoge correos.
+KIT_URL = ""
+KIT_PRICE = "$27"
