@@ -88,6 +88,7 @@ CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 # Captación de correos/teléfonos: envía a Buttondown sin salir de la página, muestra la barra fija tras scroll y recuerda cierres.
 LEAD_JS = ("<script>"
            "function dcjSub(f){try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
+           "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ','')});"
            "f.innerHTML='<p class=\"ok\">Done \\u2014 we\\u2019ll email you when new jobs with pay are posted.</p>';"
            "try{localStorage.setItem('dcj_sub','1')}catch(e){}var b=document.getElementById('lbar');if(b&&!b.contains(f))b.remove();return false}"
            "(function(){var b=document.getElementById('lbar');if(!b)return;"
@@ -95,6 +96,9 @@ LEAD_JS = ("<script>"
            "var shown=false;function show(){if(shown)return;shown=true;b.hidden=false;requestAnimationFrame(function(){b.classList.add('on')})}"
            "window.addEventListener('scroll',function(){if(window.scrollY>450)show()},{passive:true});setTimeout(show,15000);"
            "b.querySelector('.x').addEventListener('click',function(){b.remove();try{localStorage.setItem('dcj_bar',String(Date.now()+5*864e5))}catch(e){}})})();"
+           # Clic en "Apply on …" -> evento apply_click en GA4 (evento clave).
+           "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev=apply]');"
+           "if(a&&window.gtag)gtag('event','apply_click',{company:a.getAttribute('data-co')})});"
            "</script>")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -815,7 +819,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
-                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
+                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank" data-ev="apply" data-co="{E(j["company"])}">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
                         + about
                         + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
                         + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
