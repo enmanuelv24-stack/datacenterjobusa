@@ -388,6 +388,37 @@ def make_summary(text: str) -> str:
     return summary if len(summary) >= SUMMARY_MIN else ""
 
 
+# ---------------------------------------------------------------------------
+# Descripción desde la página del puesto (fuentes que solo dan la lista)
+# ---------------------------------------------------------------------------
+_PAGE_NOISE = re.compile(r"<(script|style|nav|header|footer|noscript|svg|form)\b[\s\S]*?</\1>", re.I)
+
+
+def page_text(html_text: str, title: str = "") -> str:
+    """Texto legible de la página de una vacante: sin menús ni pies, desde el título del puesto en adelante."""
+    t = strip_html(_PAGE_NOISE.sub(" ", html_text or "")).strip()
+    if title:
+        k = t.lower().find(title.lower()[:40])
+        if k >= 0:
+            t = t[k + len(title):].strip()
+    return t[:6000]
+
+
+def add_page_descs(rows: list[dict], base: str = "", workers: int = 3) -> list[dict]:
+    """Rellena r["desc"] visitando r["url"] en las filas que no la traen. Un fallo en una página no detiene el resto."""
+    def one(r):
+        if r.get("desc") or not r.get("url"):
+            return r
+        url = r["url"] if r["url"].startswith("http") else base + r["url"]
+        try:
+            r["desc"] = page_text(get(url, as_json=False), r.get("title", ""))
+        except Exception:
+            pass
+        return r
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        return list(ex.map(one, rows))
+
+
 def parse_date(s: str) -> str:
     s = (s or "").strip()
     for fmt in ("%B %d, %Y", "%b %d, %Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"):
@@ -553,7 +584,7 @@ def fetch_rosendin() -> list[dict]:
             continue
         out.append({"company": "Rosendin", "title": title, "loc": r.get("location", ""), "posted": "",
                     "pay": None, "url": r.get("url", ""), "id": "rosendin-" + str(r.get("id")), "source": "rosendin"})
-    return out
+    return add_page_descs(out)
 
 
 def fetch_ashby(org: str) -> list[dict]:
@@ -661,7 +692,7 @@ def fetch_google() -> list[dict]:
         loc = (re.search(r"corporate_fare Google place (.*?) bar_chart", t) or [None, ""])[1].split(";")[0]
         m = re.search(r"US: \$([\d,]+) - \$([\d,]+) \(USD\)", h)
         out.append({"company": "Google", "title": title, "loc": loc.replace(", USA", ""), "posted": "",
-                    "pay": [m.group(1), m.group(2), "year"] if m else None,
+                    "pay": [m.group(1), m.group(2), "year"] if m else None, "desc": t.split(title, 1)[-1][:6000],
                     "url": f"{base}/{jid}-{sl}", "id": jid, "source": "google"})
     return out
 
@@ -714,13 +745,15 @@ def parse_introl(html_text: str) -> list[dict]:
         m = re.search(r'job-salary">(.*?)<', rest)
         pay = html.unescape(m.group(1)).strip() if m else ""
         jid = url.rstrip("/").rsplit("/", 1)[-1]
+        if not url.startswith("http"):
+            url = "https://introl.com" + url
         out.append({"company": "Introl", "title": title, "loc": html.unescape(loc).strip(), "posted": "",
                     "pay": pay, "url": url, "id": "introl-" + jid, "source": "introl"})
     return out
 
 
 def fetch_introl() -> list[dict]:
-    return parse_introl(get("https://introl.com/careers", as_json=False))
+    return add_page_descs(parse_introl(get("https://introl.com/careers", as_json=False)))
 
 
 # ---------------------------------------------------------------------------
@@ -813,7 +846,9 @@ def fetch_oracle_hcm(company: str, api: str, site: str, keywords: tuple, keep: "
         try:
             d = get(f"{api}recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;"
                     f"Id=%22{r['id'].split('-', 1)[1]}%22,siteNumber={site}")
-            text = strip_html(" ".join(str(v) for v in (d.get("items") or [{}])[0].values() if isinstance(v, str)))
+            item = (d.get("items") or [{}])[0]
+            text = strip_html(" ".join(str(v) for v in item.values() if isinstance(v, str)))
+            r["desc"] = strip_html(item.get("ExternalDescriptionStr") or item.get("ExternalQualificationsStr") or "") or text
             m = ORACLE_PAY.search(text)
             if m:
                 r["pay"] = [m.group(1), m.group(2), "hour" if m.group(3).lower() == "hour" else "year"]
@@ -863,7 +898,7 @@ def parse_vision(html_text: str) -> list[dict]:
 
 
 def fetch_vision() -> list[dict]:
-    return parse_vision(get(VISION_URL, as_json=False))
+    return add_page_descs(parse_vision(get(VISION_URL, as_json=False)))
 
 
 # ---------------------------------------------------------------------------
@@ -929,7 +964,7 @@ def fetch_e2() -> list[dict]:
         seen.update(r["id"] for r in new)
         out += new
         time.sleep(0.3)
-    return out
+    return add_page_descs(out)
 
 
 # ---------------------------------------------------------------------------
@@ -968,8 +1003,9 @@ def fetch_ultipro(company: str, board: str, keep: "re.Pattern") -> list[dict]:
         if not loc:
             continue
         out.append({"company": company, "title": title, "loc": loc, "posted": (o.get("PostedDate") or "")[:10], "pay": None,
-                    "url": f"{board}/OpportunityDetail?opportunityId={o.get('Id')}", "id": f"ultipro-{o.get('Id')}", "source": "ultipro"})
-    return out
+                    "url": f"{board}/OpportunityDetail?opportunityId={o.get('Id')}", "id": f"ultipro-{o.get('Id')}", "source": "ultipro",
+                    "desc": strip_html(o.get("BriefDescription") or o.get("Description") or "")})
+    return add_page_descs(out)
 
 
 STATE_BY_NAME_UPPER = {v.upper(): k for k, v in US_STATES.items()}

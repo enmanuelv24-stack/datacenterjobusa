@@ -205,6 +205,22 @@ def test_summary():
     assert j.summary and j.desc == ""
 
 
+def test_page_text_and_introl_url():
+    page = ("<html><head><style>.x{}</style><script>var a=1;</script></head><body>"
+            "<nav>Home Careers About Contact Login</nav><h1>Data Center Technician</h1>"
+            "<p>You will install and troubleshoot servers and fiber in a live data hall, working 12-hour rotating shifts "
+            "with a crew of four. Travel to new builds across Texas is required about one week per month.</p>"
+            "<footer>Introl Inc. All rights reserved. Privacy policy</footer></body></html>")
+    t = c.page_text(page, "Data Center Technician")
+    assert t.startswith("You will install"), t
+    assert "Careers About" not in t and "rights reserved" not in t
+    assert c.make_summary(t).startswith("You will install")
+    rows = c.parse_introl('<a href="/careers/data-center-technician-atlanta-ga" class="job-card w-inline-block">'
+                          '<h3 class="job-title">Data Center Technician</h3><p class="job-location">Atlanta, GA</p>'
+                          '<span class="job-salary">$30/hr</span></a>')
+    assert rows and rows[0]["url"] == "https://introl.com/careers/data-center-technician-atlanta-ga", rows
+
+
 if __name__ == "__main__":
     import sys
     fails = 0
