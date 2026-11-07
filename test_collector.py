@@ -215,6 +215,14 @@ def test_page_text_and_introl_url():
     assert t.startswith("You will install"), t
     assert "Careers About" not in t and "rights reserved" not in t
     assert c.make_summary(t).startswith("You will install")
+    g = c.page_text("<p>Apply share Share Data Center Technician II link Copy link email Email a friend info_outline X "
+                    "This role is not eligible for U.S. immigration sponsorship. Candidates must be able to work 100% onsite.</p>",
+                    "Data Center Technician II")
+    assert g.startswith("This role is not eligible"), g
+    r = c.page_text("<p>If you have previously applied, please login. Login Whether you're a recent grad or a seasoned professional, "
+                    "you can grow at Rosendin. YOUR NEXT OPPORTUNITY: The Foreman is responsible for monitoring installations.</p>",
+                    "Electrical Foreman")
+    assert r.startswith("The Foreman is responsible"), r
     rows = c.parse_introl('<a href="/careers/data-center-technician-atlanta-ga" class="job-card w-inline-block">'
                           '<h3 class="job-title">Data Center Technician</h3><p class="job-location">Atlanta, GA</p>'
                           '<span class="job-salary">$30/hr</span></a>')

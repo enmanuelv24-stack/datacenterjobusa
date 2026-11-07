@@ -362,7 +362,8 @@ _BOILER = re.compile(
     r"(equal (employment )?opportunity|\bEEO\b|affirmative action|reasonable accommodation|"
     r"pay transparency|e-?verify|privacy (notice|policy)|applicants? with (a )?disabilit|"
     r"we are (an|a proud) equal|without regard to (race|age)|background check and drug|"
-    r"by applying|click (here|apply)|share this job|apply now)", re.I)
+    r"by applying|click (here|apply)|share this job|apply now|previously applied|please log ?in|"
+    r"all rights reserved|cookie)", re.I)
 SUMMARY_MAX = 900   # caracteres; un extracto, no la oferta completa (la completa vive en el sitio del empleador)
 SUMMARY_MIN = 160   # menos que esto no aporta: se usa la ficha generada
 
@@ -392,15 +393,37 @@ def make_summary(text: str) -> str:
 # Descripción desde la página del puesto (fuentes que solo dan la lista)
 # ---------------------------------------------------------------------------
 _PAGE_NOISE = re.compile(r"<(script|style|nav|header|footer|noscript|svg|form)\b[\s\S]*?</\1>", re.I)
+# Encabezados con los que suele empezar la descripción real del puesto
+_DESC_HEAD = re.compile(r"(position summary|job summary|job description|summary of position|overview|your next opportunity|"
+                        r"about the (role|position|job)|what you(?:'|’)ll (do|be doing)|responsibilities|the role)\s*:?", re.I)
+# Fragmentos de interfaz que se cuelan entre el título y la descripción
+_UI_JUNK = re.compile(r"\b(back to careers|copy link|email a friend|email|share|apply now|apply|login|sign in|info_outline|link)\b", re.I)
 
 
 def page_text(html_text: str, title: str = "") -> str:
     """Texto legible de la página de una vacante: sin menús ni pies, desde el título del puesto en adelante."""
-    t = strip_html(_PAGE_NOISE.sub(" ", html_text or "")).strip()
+    t = strip_html(_PAGE_NOISE.sub(" ", html_text or "")).replace("*", "").strip()
     if title:
-        k = t.lower().find(title.lower()[:40])
-        if k >= 0:
-            t = t[k + len(title):].strip()
+        tl, needle = t.lower(), title.lower()[:40]
+        best, last, k = -1, -1, tl.find(needle)
+        while 0 <= k < 800:  # el <h1> es la última mención del título en la cabecera, no una mención dentro del texto
+            after = t[k + len(title):k + len(title) + 2].strip()
+            if not after or not after[0].islower():
+                best = k
+            last = k
+            k = tl.find(needle, k + 1)
+        best = best if best >= 0 else last
+        if best >= 0:
+            t = t[best + len(title):].strip()
+    m = _DESC_HEAD.search(t[:2500])
+    if m:
+        t = t[m.end():].strip()
+    else:  # sin encabezado: quitar botones, migas y símbolos sueltos que preceden al texto
+        head = re.sub(r"(?:\b[_|X]\b|[_|]|" + _UI_JUNK.pattern + r")", " ", t[:300], flags=re.I)
+        t = (re.sub(r"\s+", " ", head).strip() + " " + t[300:]).strip()
+        if t[:1].islower():  # empieza a media frase: saltar a la siguiente
+            m2 = re.search(r"[.!?]\s+(?=[A-Z])", t)
+            t = t[m2.end():] if m2 else t
     return t[:6000]
 
 
@@ -409,7 +432,8 @@ def add_page_descs(rows: list[dict], base: str = "", workers: int = 3) -> list[d
     def one(r):
         if r.get("desc") or not r.get("url"):
             return r
-        url = r["url"] if r["url"].startswith("http") else base + r["url"]
+        url = r.get("desc_url") or r["url"]
+        url = url if url.startswith("http") else base + url
         try:
             r["desc"] = page_text(get(url, as_json=False), r.get("title", ""))
         except Exception:
@@ -950,7 +974,8 @@ def parse_e2(html_text: str) -> list[dict]:
         city = html.unescape(city).split(" - ")[0].strip()  # "Salt Lake City - Eagle Mountain" -> ciudad principal
         jid = (re.search(r"/jobs/(\d+)/", href) or [None, href])[1]
         out.append({"company": "E2 Optics", "title": title, "loc": f"{city}, {st}", "posted": "", "pay": None,
-                    "url": href.split("?")[0], "id": f"e2-{jid}", "source": "e2optics"})
+                    "url": href.split("?")[0], "id": f"e2-{jid}", "source": "e2optics",
+                    "desc_url": href.split("?")[0] + "?in_iframe=1"})  # sin in_iframe la página no muestra el texto
     return out
 
 
