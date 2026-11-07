@@ -1071,7 +1071,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 
         # ---- recursos estáticos (ícono, imagen para compartir)
         import shutil
-        for name in ("favicon.svg", "apple-touch-icon.png", "og.png"):
+        for name in ("favicon.svg", "apple-touch-icon.png", "og.png", "google54c12a19332ec2d6.html"):  # el último verifica el sitio en Google Search Console; no borrar
             src = Path(__file__).with_name(name)
             if src.exists():
                 shutil.copy(src, self.out / name)
