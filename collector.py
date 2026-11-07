@@ -113,6 +113,7 @@ class Job:
     days_posted: int | None = field(default=None)  # días desde que se publicó
     openings: int = 1   # vacantes con el mismo puesto y ubicación (Amazon publica muchas iguales)
     desc: str = ""      # descripción completa (no se guarda; sirve para detectar per diem, hospedaje, etc.)
+    summary: str = ""   # extracto corto de la descripción del empleador (para la página de la vacante y Google Jobs)
     perks: str = ""     # beneficios detectados, separados por "|": per_diem, housing, travel, rotation:3/1, overtime, ...
     per_diem: float | None = None  # monto diario del per diem si lo dicen
     entry: bool = False  # apto para principiantes (nivel I / sin experiencia, según título o descripción)
@@ -195,10 +196,19 @@ def parse_location(raw: str) -> tuple[str, str]:
             state = p.upper()
         elif p.lower() in STATE_BY_NAME:
             state = STATE_BY_NAME[p.lower()]
-    if parts:
-        cand = parts[0]
-        if cand.upper() not in US_STATES and cand.lower() not in STATE_BY_NAME and cand.lower() not in {"usa", "us", "united states"}:
-            city = cand
+    places = [p for p in parts if p.lower() not in {"usa", "us", "united states"}]
+
+    def is_state(p: str) -> bool:
+        return (p.upper() in US_STATES and len(p) == 2) or p.lower() in STATE_BY_NAME
+
+    if places and not is_state(places[0]):
+        city = places[0]
+    elif state == "DC":
+        city = "Washington"  # "District Of Columbia, Washington, DC"
+    elif len(places) >= 2 and places[0].lower() == places[1].lower() == "new york":
+        city = "New York"    # "New York, New York, United States"
+    elif len(places) >= 2 and not is_state(places[1]):
+        city = places[1]     # "Texas, Austin"
     return city, state
 
 
@@ -335,6 +345,8 @@ def finalize(job: Job) -> Job:
         job.perks, job.per_diem = extract_perks(job.desc or job.pay_text)
         if re.search(r"\btravel(ing)?\b", job.title, re.I) and "travel" not in job.perks.split("|"):
             job.perks = "|".join(x for x in ["travel", job.perks] if x)
+    if not job.summary:
+        job.summary = make_summary(job.desc or job.pay_text)
     job.desc = ""
     job.hourly_min = to_hourly(job.pay_min, job.pay_unit)
     job.hourly_max = to_hourly(job.pay_max, job.pay_unit)
@@ -343,6 +355,37 @@ def finalize(job: Job) -> Job:
     if not job.state:
         job.city, job.state = parse_location(job.location_raw)
     return job
+
+
+# Párrafos legales o de relleno que no describen el puesto: se cortan del extracto
+_BOILER = re.compile(
+    r"(equal (employment )?opportunity|\bEEO\b|affirmative action|reasonable accommodation|"
+    r"pay transparency|e-?verify|privacy (notice|policy)|applicants? with (a )?disabilit|"
+    r"we are (an|a proud) equal|without regard to (race|age)|background check and drug|"
+    r"by applying|click (here|apply)|share this job|apply now)", re.I)
+SUMMARY_MAX = 900   # caracteres; un extracto, no la oferta completa (la completa vive en el sitio del empleador)
+SUMMARY_MIN = 160   # menos que esto no aporta: se usa la ficha generada
+
+
+def make_summary(text: str) -> str:
+    """Extracto limpio de la descripción del empleador: primeras frases útiles, sin texto legal ni salarios repetidos."""
+    t = strip_html(text or "").strip()
+    if len(t) < SUMMARY_MIN:
+        return ""
+    sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z])", t)
+    out, size = [], 0
+    for s in sentences:
+        s = s.strip()
+        if not s or _BOILER.search(s) or len(s) < 25:
+            continue
+        if size + len(s) > SUMMARY_MAX:
+            if not out:  # una sola frase enorme: se corta en una palabra
+                out.append(s[:SUMMARY_MAX].rsplit(" ", 1)[0] + "…")
+            break
+        out.append(s)
+        size += len(s) + 1
+    summary = " ".join(out).strip()
+    return summary if len(summary) >= SUMMARY_MIN else ""
 
 
 def parse_date(s: str) -> str:
@@ -375,6 +418,7 @@ def from_amazon(r: dict) -> Job:
             r.get("loc", ""), parse_date(r.get("d", "")), "https://www.amazon.jobs" + r.get("path", ""),
             lo, hi, unit)
     j.openings = int(r.get("n", 1))
+    j.desc = r.get("desc") or ""
     return j
 
 
@@ -392,7 +436,8 @@ def from_ashby(org: str, company: str, r: dict) -> Job:
     pay_text = r.get("pay_text") or (r.get("compensation") or {}).get("compensationTierSummary", "") or ""
     return Job("ashby", company, str(r["id"]), r["title"].strip(), "", "", loc,
                parse_date(r.get("publishedAt", "")),
-               r.get("jobUrl") or f"https://jobs.ashbyhq.com/{org}/{r['id']}", pay_text=pay_text)
+               r.get("jobUrl") or f"https://jobs.ashbyhq.com/{org}/{r['id']}", pay_text=pay_text,
+               desc=r.get("descriptionPlain") or strip_html(r.get("descriptionHtml") or ""))
 
 
 def from_other(r: dict) -> Job:
@@ -443,7 +488,9 @@ def fetch_amazon() -> list[dict]:
             for j in jobs:
                 seen[j.get("id_icims") or j["id"]] = {
                     "id": j.get("id_icims"), "path": j["job_path"], "t": j["title"],
-                    "loc": j.get("normalized_location") or j.get("location", ""), "d": j.get("posted_date", "")}
+                    "loc": j.get("normalized_location") or j.get("location", ""), "d": j.get("posted_date", ""),
+                    "desc": " ".join(x for x in (j.get("description") or j.get("description_short") or "",
+                                                 j.get("basic_qualifications") or "") if x)}
             if len(jobs) < 100:
                 break
             time.sleep(0.5)
@@ -562,7 +609,7 @@ def fetch_workday(company: str, host: str, tenant: str, site: str) -> list[dict]
         loc = f"{city}, {CITY_STATE[city]}" if city in CITY_STATE else city
         out.append({"company": company, "title": p["title"], "loc": loc, "posted": info.get("startDate", ""),
                     "pay": pay, "url": info.get("externalUrl") or f"https://{host}/{site}{path}",
-                    "id": info.get("jobReqId") or path, "source": "workday"})
+                    "id": info.get("jobReqId") or path, "source": "workday", "desc": desc})
     return out
 
 
