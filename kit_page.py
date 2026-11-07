@@ -15,14 +15,14 @@ E = html.escape
 PATH = "job-ready-kit.html"
 
 CONTENTS = [
-    ("The jobs and what they pay", "Median posted pay for each job family and level, from 1,000+ real listings."),
-    ("Who hires beginners", "The employers with the most entry-level listings right now, and where the jobs are."),
-    ("Certifications worth your money", "Which ones help on the IT side and the facilities side, and which to skip."),
-    ("Your 30-day plan", "What to do each week, from OSHA 10 to your first interviews."),
-    ("Résumé template", "A one-page template plus ready-made bullets for electricians, IT, military, cabling and warehouse backgrounds."),
-    ("The 15 interview questions", "Technical and behavioral questions with answers that work, and what to ask them."),
-    ("Comparing offers", "How to compare hourly pay, overtime, per diem and housing on travel jobs."),
-    ("Application tracker", "A printable table to track every application and follow-up."),
+    ("How techs reach six figures", "Worked examples with overtime, per diem and paid hotels, plus the salaried roles that already pay $100k+."),
+    ("The jobs and what they pay", "Median posted pay for each job family, with charts, from 1,000+ real listings."),
+    ("The career ladder", "Pay from Level I to Level IV and what actually moves you up."),
+    ("Who pays the most and who hires beginners", "Top-paying employers, the companies with the most entry-level listings, and where the jobs are."),
+    ("Travel jobs guide", "Per diem, hotels, rotations, the questions to ask, taxes, and a packing list for your first rotation."),
+    ("Certifications worth your money", "What each one is for, who wants it and what it costs, and which to skip."),
+    ("30-day plan, résumé and interview", "A week-by-week plan, a résumé template with bullets for every background, and the 15 questions with answers."),
+    ("Offer worksheet, glossary, tools and red flags", "Compare offers by yearly value, speak the language on site, and spot bad offers."),
 ]
 
 
@@ -39,7 +39,7 @@ def _entry_pay(jobs: list[dict]) -> str:
 def _buy_block(lead_form) -> str:
     if KIT_URL:
         return (f'<p><a class="more primary" href="{E(KIT_URL)}" rel="noopener" data-ev="kit">Get the kit — {E(KIT_PRICE)}</a></p>'
-                '<p class="note">Instant PDF download. 12 pages, US Letter, prints well.</p>')
+                '<p class="note">Instant PDF download. Reads on a phone, prints on US Letter. All sales are final.</p>')
     return ('<p><b>Launching soon.</b> Leave your email and we will send you the kit link the day it is ready.</p>'
             + lead_form("kit", "Tell me when it's ready", page=PATH))
 
@@ -49,7 +49,7 @@ def _product_ld() -> str:
         return ""
     price = "".join(ch for ch in KIT_PRICE if ch.isdigit() or ch == ".")
     ld = {"@context": "https://schema.org", "@type": "Product", "name": "Data Center Technician Job-Ready Kit 2026",
-          "description": "PDF guide to landing a first data center technician job: pay data, employers hiring beginners, certifications, résumé template and interview questions.",
+          "description": "PDF guide to landing a data center technician job: six-figure pay paths, travel jobs, employers hiring beginners, certifications, résumé template and interview questions.",
           "brand": {"@type": "Brand", "name": SITE_NAME}, "url": f"{SITE_URL}/{PATH}",
           "offers": {"@type": "Offer", "price": price, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": KIT_URL}}
     return f'<script type="application/ld+json">{json.dumps(ld)}</script>'
@@ -66,7 +66,8 @@ def kit_page(jobs: list[dict], lead_form) -> dict:
          "applying fast and being flexible on shifts and travel is still on you."),
         ("Is this for people with no experience?", "Yes. It is written for people coming from the trades, IT help desk, the military, cabling crews or general labor."),
         ("Where does the data come from?", f"From the {n:,} listings on this site, read every morning from {n_cos} employers' own career pages."),
-        ("What format is it?", "A 12-page PDF you download right after paying. It reads on a phone and prints on US Letter paper."),
+        ("What format is it?", "A PDF you download right after paying. It reads on a phone and prints on US Letter paper."),
+        ("Can I get a refund?", "Because the kit is an instant digital download, all sales are final."),
     ]
     faq_html = "".join(f"<details><summary>{E(q)}</summary><p>{E(a)}</p></details>" for q, a in faq)
     body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Job-Ready Kit</p>'
@@ -86,6 +87,6 @@ def kit_page(jobs: list[dict], lead_form) -> dict:
     faq_ld = '<script type="application/ld+json">' + json.dumps({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}) + '</script>'
     return {"path": PATH, "title": f"Data Center Technician Job-Ready Kit 2026: Pay, Employers, Résumé, Interview | {SITE_NAME}",
-            "desc": "A printable kit to land your first data center technician job: real pay by job and level, employers hiring beginners, "
-                    "certifications worth it, a résumé template and the 15 interview questions.",
+            "desc": "A printable kit to land a data center technician job: how techs reach six figures with overtime and per diem, real pay by job and level, "
+                    "employers hiring beginners, certifications, a résumé template and the 15 interview questions.",
             "body": body, "head_extra": _product_ld() + faq_ld}

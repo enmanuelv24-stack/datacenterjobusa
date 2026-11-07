@@ -259,3 +259,7 @@ body{padding-bottom:0}
 .plan .note{font-size:.85rem;color:var(--muted)}
 /* --- encabezado de empresa: logo al lado del H1, fuera del texto del título --- */
 .cohead{display:flex;gap:14px;align-items:center}
+/* --- pasos numerados (empresas) --- */
+.steps{counter-reset:s;list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0 26px}
+.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 14px 52px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:13px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
