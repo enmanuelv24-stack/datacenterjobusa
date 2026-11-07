@@ -182,6 +182,29 @@ def test_perks():
     assert (j.perks, j.per_diem, j.desc) == ("per_diem|housing|rotation:2/1", 178.0, "")
 
 
+
+def test_location_city_after_state():
+    assert c.parse_location("District Of Columbia, Washington, DC") == ("Washington", "DC")
+    assert c.parse_location("New York, New York, United States") == ("New York", "NY")
+    assert c.parse_location("Minnesota, United States") == ("", "MN")
+    assert c.parse_location("Aurora, Colorado, USA") == ("Aurora", "CO")
+
+
+def test_summary():
+    desc = ("<p>As a Data Center Technician you will rack and stack servers, run fiber and copper, and replace failed "
+            "hardware inside live data halls. You will follow tickets and keep documentation current.</p>"
+            "<p>We are an equal opportunity employer and value diversity at our company.</p>"
+            "<p>Basic qualifications: high school diploma, able to lift 50 lbs, available for 12-hour shifts.</p>")
+    s = c.make_summary(desc)
+    assert s.startswith("As a Data Center Technician"), s
+    assert "equal opportunity" not in s, s
+    assert len(s) <= c.SUMMARY_MAX + 1
+    assert c.make_summary("Apply now.") == ""
+    assert c.make_summary("x " * 2000) != "" and len(c.make_summary("word " * 2000)) <= c.SUMMARY_MAX + 1
+    j = c.finalize(c.Job("x", "X", "1", "Data Center Technician", "Aurora", "CO", "Aurora, CO", "2026-11-01", "u", desc=desc))
+    assert j.summary and j.desc == ""
+
+
 if __name__ == "__main__":
     import sys
     fails = 0

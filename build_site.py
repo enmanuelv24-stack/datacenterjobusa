@@ -17,11 +17,26 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
 
+
+# Qué hace cada tipo de trabajo (páginas de categoría y ficha de cada vacante)
+ROLE_BLURB = {
+    "Data center technician": "Rack and stack, cabling, hardware swaps, tickets and documentation inside live data halls. The core technician job at hyperscalers, operators and contractors.",
+    "Critical facilities": "Keeping power and cooling alive: UPS, generators, switchgear, chillers, rounds and emergency response. Usually shift work on a rotation.",
+    "Install & network": "Structured cabling, fiber splicing and testing, network hardware installs and deployment on new builds and expansions. Where contractors hire most.",
+    "Electrical": "Journeyman and apprentice electricians, medium-voltage and low-voltage work on data center construction and maintenance.",
+    "Mechanical & HVAC": "Chillers, CRAH/CRAC units, pumps, controls and the mechanical side of cooling.",
+    "Controls & BMS": "Building management systems, PLCs, controls commissioning and tuning.",
+    "Power & generators": "Generator, turbine and power-plant technicians supporting campus power.",
+    "Operations center": "Control-room and NOC/SOC operators monitoring alarms, access and systems.",
+    "Construction site": "Field engineers and site technicians on active data center construction projects.",
+    "IT support": "Hands-on IT support roles based inside data centers.",
+    "Other technician": "Technician roles that don't fit the other categories.",
+}
 
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -659,8 +674,18 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                       f"{n:,} open {c} data center technician jobs in {len(cs)} states, with posted pay ranges by job type. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Companies", "companies.html"), (c, f"companies/{slug(c)}.html")]) + cfaq_ld)
 
+        # ---- tipo de trabajo × estado: página propia si hay suficientes vacantes (evita páginas vacías)
+        rs_counts = Counter()
+        for j in js:
+            rs_counts[(ROLE_EN.get(j["role"], j["role"]), j["state"])] += j["openings"]
+        role_state_pages = {k for k, v in rs_counts.items() if v >= MIN_ROLE_STATE_OPENINGS and k[1]
+                            and len({x["job_id"] for x in js if ROLE_EN.get(x["role"], x["role"]) == k[0] and x["state"] == k[1]}) >= 2}
+
+        def rs_path(role_en: str, st: str) -> str:
+            return f"roles/{slug(role_en)}/{slug(STATE_NAMES.get(st, st))}.html"
+
         # ---- states and cities
-        links = "".join(f'<li><a href="states/{slug(STATE_NAMES.get(s, s))}.html"><span>{E(STATE_NAMES.get(s, s))}</span><small>{n:,}</small></a></li>'
+        links ="".join(f'<li><a href="states/{slug(STATE_NAMES.get(s, s))}.html"><span>{E(STATE_NAMES.get(s, s))}</span><small>{n:,}</small></a></li>'
                         for s, n in states.most_common())
         self.page("states.html", f"Data Center Technician Jobs by State | {SITE_NAME}",
                   "Data center technician jobs and pay in every state with openings.",
@@ -692,6 +717,10 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     + sguide
                     + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Cities</h2>' + f'<ul class="grid-links">{c_links}</ul>'
+                    + (('<h2>By type of work</h2><div class="quick">'
+                        + "".join(f'<a href="../{rs_path(r, s)}">{E(r)} <small>{c:,}</small></a>'
+                                  for (r, st), c in rs_counts.most_common() if st == s and (r, st) in role_state_pages)
+                        + '</div>') if any(st == s for _, st in role_state_pages) else "")
                     + '<h2 id="jobs">Open jobs</h2>' + self.job_list(rows, 1) + self.signup(state=s, page=f"states/{slug(name)}"))
             self.page(f"states/{slug(name)}.html", f"Data Center Jobs in {name}: {n:,} Technician Openings with Pay | {SITE_NAME}",
                       f"{n:,} data center technician jobs in {name} across {len(cities)} cities, with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
@@ -726,21 +755,34 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
 
         # ---- job pages (full build only), with JobPosting structured data for Google
         if not self.preview:
+            # vacantes con el mismo puesto, empresa y ciudad: el título de la página lleva el número de la vacante
+            same_title = Counter((clean_title(j["title"]), j["company"], j["city"]) for j in js)
             for j in js:
                 posted_d = date.fromisoformat(j["posted"]) if j["posted"] else self.today
                 valid = max(posted_d, self.today - timedelta(days=1)) + timedelta(days=45)
                 perks_txt = ", ".join(perk_labels(j))
+                role_en = ROLE_EN.get(j["role"], j["role"])
+                where = f'{j["city"]}, {j["state"]}' if j["city"] else STATE_NAMES.get(j["state"], j["state"])
+                facts = (f'{clean_title(j["title"])} at {j["company"]} in {where}. '
+                         + (f'{j["openings"]} openings for this role. ' if j["openings"] > 1 else "")
+                         + (f'Posted pay: {money(j["pay_min"], j["pay_unit"])}–{money(j["pay_max"], j["pay_unit"])} per {j["pay_unit"]}. ' if j["pay_min"] else "")
+                         + (f'Level {j["level"]}. ' if j.get("level") else "")
+                         + ("Open to beginners: no prior data center experience required. " if j.get("entry") else "")
+                         + (f"The employer mentions: {perks_txt}. " if perks_txt else "")
+                         + f"Job type: {role_en}. {ROLE_BLURB.get(role_en, '')} "
+                         + "Apply on the employer's career site.").strip()
+                summary = (j.get("summary") or "").strip()
+                desc_html = (f"<p>{E(summary)}</p>" if summary else "") + f"<p>{E(facts)}</p>"
+                address = {"@type": "PostalAddress", "addressRegion": j["state"], "addressCountry": "US"}
+                if j["city"]:
+                    address["addressLocality"] = j["city"]
                 ld = {"@context": "https://schema.org/", "@type": "JobPosting", "title": clean_title(j["title"]),
-                      "description": f"<p>{E(clean_title(j['title']))} at {E(j['company'])} in {E(j['city'])}, {j['state']}. "
-                                     + (f"Posted pay: {E(money(j['pay_min'], j['pay_unit']))}–{E(money(j['pay_max'], j['pay_unit']))} per {j['pay_unit']}. " if j["pay_min"] else "")
-                                     + (f"Employer mentions: {E(perks_txt)}. " if perks_txt else "")
-                                     + f"Job type: {E(ROLE_EN.get(j['role'], j['role']))}. Apply on the employer's career site.</p>",
+                      "description": desc_html,
                       "datePosted": str(posted_d), "validThrough": f"{valid}T23:59:59",
                       "employmentType": "FULL_TIME",
                       "identifier": {"@type": "PropertyValue", "name": j["company"], "value": str(j["job_id"])},
                       "hiringOrganization": {"@type": "Organization", "name": j["company"]},
-                      "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": j["city"],
-                                                                     "addressRegion": j["state"], "addressCountry": "US"}},
+                      "jobLocation": {"@type": "Place", "address": address},
                       "directApply": False}
                 crumbs_ld = self.breadcrumbs([("Jobs", "index.html"), (j["company"], f"companies/{slug(j['company'])}.html"),
                                               (clean_title(j["title"]), f"jobs/{j['slug']}.html")])
@@ -750,9 +792,14 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                                                   "unitText": "HOUR" if j["pay_unit"] == "hour" else "YEAR"}}
                 pay = (f'{money(j["pay_min"], j["pay_unit"])}–{money(j["pay_max"], j["pay_unit"])} per {j["pay_unit"]}'
                        if j["pay_min"] else "Not posted by the employer")
+                about = ('<h2>About this job</h2><div class="prose">'
+                         + (f'<p>{E(summary)}</p>' if summary else "")
+                         + f'<p>{E(facts)}</p>'
+                         + (f'<p class="note">Excerpt from {E(j["company"])}\'s posting. Full duties, requirements and benefits are on their site.</p>' if summary else "")
+                         + '</div>')
                 body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../companies/{slug(j["company"])}.html">{E(j["company"])}</a></p>'
                         f'<h1>{E(clean_title(j["title"]))}</h1>'
-                        f'<p class="lede">{E(j["company"])} · {E(j["city"])}, {j["state"]}</p>'
+                        f'<p class="lede">{E(j["company"])} · {E(where)}</p>'
                         '<div class="tablebox"><table><tbody>'
                         f'<tr><th>Posted pay</th><td>{pay}</td></tr>'
                         f'<tr><th>Job type</th><td>{E(ROLE_EN.get(j["role"], j["role"]))}</td></tr>'
@@ -760,32 +807,22 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
                         + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
                         f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
-                        f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
+                        + about
+                        + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and phone and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
                         + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
                         + self.signup(j["state"], j["company"], f'jobs/{j["slug"]}'))
-                self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"]} | {SITE_NAME}',
-                          f'{clean_title(j["title"])} at {j["company"]} in {j["city"]}, {j["state"]}. Pay: {pay}.', body,
+                dup = same_title[(clean_title(j["title"]), j["company"], j["city"])] > 1
+                ref = f' (#{str(j["job_id"])[-6:]})' if dup else ""
+                self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"] or j["state"]}{ref} | {SITE_NAME}',
+                          f'{clean_title(j["title"])} at {j["company"]} in {where}{ref}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}')
 
         # ---- categorías: por tipo de trabajo y por nivel
         role_counts = Counter()
         for j in js:
             role_counts[ROLE_EN.get(j["role"], j["role"])] += j["openings"]
-        ROLE_BLURB = {
-            "Data center technician": "Rack and stack, cabling, hardware swaps, tickets and documentation inside live data halls. The core technician job at hyperscalers, operators and contractors.",
-            "Critical facilities": "Keeping power and cooling alive: UPS, generators, switchgear, chillers, rounds and emergency response. Usually shift work on a rotation.",
-            "Install & network": "Structured cabling, fiber splicing and testing, network hardware installs and deployment on new builds and expansions. Where contractors hire most.",
-            "Electrical": "Journeyman and apprentice electricians, medium-voltage and low-voltage work on data center construction and maintenance.",
-            "Mechanical & HVAC": "Chillers, CRAH/CRAC units, pumps, controls and the mechanical side of cooling.",
-            "Controls & BMS": "Building management systems, PLCs, controls commissioning and tuning.",
-            "Power & generators": "Generator, turbine and power-plant technicians supporting campus power.",
-            "Operations center": "Control-room and NOC/SOC operators monitoring alarms, access and systems.",
-            "Construction site": "Field engineers and site technicians on active data center construction projects.",
-            "IT support": "Hands-on IT support roles based inside data centers.",
-            "Other technician": "Technician roles that don't fit the other categories.",
-        }
         LEVEL_BLURB = {
             "I": ("Level I / entry", "First-rung technician roles: no data center experience required, training on the job. Often 12-hour shifts on construction sites or nights in live facilities."),
             "II": ("Level II", "1–3 years of experience: works independently on installs, troubleshooting and documentation; often trains Level I techs."),
@@ -800,10 +837,48 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                     f'<p class="lede">{n:,} open {E(role_en.lower())} jobs. {E(ROLE_BLURB.get(role_en, ""))}</p>'
                     '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>By level</h2><div class="quick">' + "".join(f'<a href="../levels/{slug(l)}.html">Level {E(l)} <small>{c}</small></a>' for l, c in sorted(lv.items()) if l != "—") + '</div>'
+                    + (('<h2>By state</h2><div class="quick">'
+                        + "".join(f'<a href="../{rs_path(r, st)}">{E(STATE_NAMES.get(st, st))} <small>{c:,}</small></a>'
+                                  for (r, st), c in rs_counts.most_common() if r == role_en and (r, st) in role_state_pages)
+                        + '</div>') if any(r == role_en for r, _ in role_state_pages) else "")
                     + '<h2>Open jobs</h2>' + self.job_list(rows, 1) + self.signup())
             self.page(f"roles/{slug(role_en)}.html", f"{role_en} Jobs in Data Centers: {n:,} Open with Pay | {SITE_NAME}",
                       f"{n:,} {role_en.lower()} jobs in US data centers with posted pay by employer and level. Updated {self.today:%B %-d, %Y}.", body,
                       head_extra=self.breadcrumbs([("Jobs", "index.html"), (role_en, f"roles/{slug(role_en)}.html")]))
+
+        # ---- tipo de trabajo × estado ("Electrical data center jobs in Texas")
+        for (role_en, s) in sorted(role_state_pages):
+            name = STATE_NAMES.get(s, s)
+            rows = [j for j in js if ROLE_EN.get(j["role"], j["role"]) == role_en and j["state"] == s]
+            n = rs_counts[(role_en, s)]
+            paid = [j for j in rows if j["hourly_min"]]
+            cities = Counter()
+            for j in rows:
+                cities[j["city"] or "Statewide"] += j["openings"]
+            employers = len({j["company"] for j in rows})
+            entry_n = sum(j["openings"] for j in rows if j.get("entry"))
+            perks_n = sum(j["openings"] for j in rows if perk_labels(j))
+            others = [r for (r, st) in sorted(role_state_pages) if st == s and r != role_en]
+            lede = (f'{n:,} open {E(role_en.lower())} jobs in {E(name)} from {employers} {"employer" if employers == 1 else "employers"}, '
+                    f'read daily from their career pages. '
+                    + (f'Typical posted pay: <b>{money(statistics.median([j["hourly_min"] for j in paid]))}–{money(statistics.median([j["hourly_max"] for j in paid]))}/hr</b>. ' if paid else '')
+                    + (f'{entry_n} open to beginners. ' if entry_n else '')
+                    + (f'{perks_n} mention per diem, housing or travel. ' if perks_n else ''))
+            body = (f'<p class="crumbs"><a href="../../index.html">Jobs</a> / <a href="../../roles/{slug(role_en)}.html">{E(role_en)}</a> / {E(name)}</p>'
+                    f'<h1>{E(role_en)} data center jobs in {E(name)}</h1>'
+                    f'<p class="lede">{lede}</p>'
+                    f'<p>{E(ROLE_BLURB.get(role_en, ""))}</p>'
+                    + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 2, lambda k: f"companies/{slug(k)}.html")
+                    + '<h2>Where the jobs are</h2><div class="quick">' + "".join(f'<span class="chip">{E(ci)} <small>{c}</small></span>' for ci, c in cities.most_common(12)) + '</div>'
+                    + '<h2>Open jobs</h2>' + self.job_list(rows, 2)
+                    + '<p class="note">See also: '
+                    + f'<a href="../../states/{slug(name)}.html">all data center jobs in {E(name)}</a>, '
+                    + f'<a href="../../roles/{slug(role_en)}.html">{E(role_en.lower())} jobs in every state</a>'
+                    + "".join(f', <a href="../../{rs_path(r, s)}">{E(r.lower())} in {E(name)}</a>' for r in others[:4]) + '.</p>'
+                    + self.signup(state=s, page=rs_path(role_en, s)[:-5]))
+            self.page(rs_path(role_en, s), f"{role_en} Data Center Jobs in {name}: {n:,} Open with Pay | {SITE_NAME}",
+                      f"{n:,} {role_en.lower()} jobs at data centers in {name}, with posted pay by employer. Updated {self.today:%B %-d, %Y}.", body,
+                      head_extra=self.breadcrumbs([("Jobs", "index.html"), (role_en, f"roles/{slug(role_en)}.html"), (name, rs_path(role_en, s))]))
         for lvl, (lname, blurb) in LEVEL_BLURB.items():
             rows = [j for j in js if j.get("level") == lvl]
             if not rows:

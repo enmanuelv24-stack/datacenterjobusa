@@ -36,6 +36,7 @@ STATE_NAMES = {
 }
 
 MIN_CITY_OPENINGS = 3  # una ciudad tiene página propia si tiene al menos estas vacantes
+MIN_ROLE_STATE_OPENINGS = 5  # "tipo de trabajo × estado" tiene página propia con al menos estas vacantes (y 2 avisos distintos)
 
 # Enlace de la encuesta de turnos (Google Forms, Tally, etc.). Vacío = el sitio dice "muy pronto".
 SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdAiL_Nd9-OX5mNSFFdpO6MuF6_aGw-_2hpg5V9P-P706oPVQ/viewform"
