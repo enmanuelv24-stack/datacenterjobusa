@@ -64,13 +64,13 @@ KIT_PRICE = "$27"
 # En Stripe pon "After payment → redirect" a POST_JOB_URL para que la empresa mande los datos del empleo.
 # pay_url vacío = el botón abre el formulario y se factura por correo.
 JOB_PLANS = [
-    {"name": "Job listing", "price": "$99", "term": "for 30 days", "pay_url": "",
+    {"name": "Job listing", "price": "$99", "term": "for 30 days", "pay_url": "https://buy.stripe.com/6oUfZgazu5y40TE7cHeIw00",
      "features": ["Live within 24 hours", "Shown with pay, per diem, housing and schedule", "In every matching state, city, company and job-type page",
                   "Linked straight to your phone, email or career page"]},
-    {"name": "Featured listing", "price": "$199", "term": "for 30 days", "pay_url": "",
+    {"name": "Featured listing", "price": "$199", "term": "for 30 days", "pay_url": "https://buy.stripe.com/fZueVcbDyf8EfOy9kPeIw01",
      "features": ["Everything in Job listing", "Pinned at the top of the home page and your state and job-type pages",
                   "\"Featured\" badge in every list", "Up to 5 openings in one listing"]},
-    {"name": "Company page", "price": "$299", "term": "per month", "pay_url": "",
+    {"name": "Company page", "price": "$299", "term": "per month", "pay_url": "https://buy.stripe.com/9B6bJ04b66C8byi54zeIw02",
      "features": ["All your openings featured, unlimited", "Your company page kept at the top of Companies",
                   "A short paragraph in your words about pay, schedule and crews", "Same-day updates"]},
 ]
