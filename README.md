@@ -100,6 +100,12 @@ Nunca agregues Indeed, LinkedIn ni otros agregadores: sus términos lo prohíben
 - `python survey_aggregate.py respuestas.csv --out data/survey.json` agrega por empresa (mediana de pago, horas, turno, per diem, hospedaje, rotación, % que volvería). Solo empresas con 3+ respuestas.
 - `build_site.py` lee `data/survey.json` y muestra el bloque "Reported by techs" en la página de cada empresa. Refrescar: exportar la hoja a CSV, correr el script y subir `data/survey.json`.
 
+## Empleadores y anuncios destacados
+- `employers.html`: planes para empleadores (gratis, destacado $149/30 días, página de empresa $299/mes). Los precios están en `build_site.py` (sección "employers").
+- Un anuncio destacado es una vacante de `data/posted_jobs.json` con `"featured": true` (ver el ejemplo): sale arriba de todas las listas con la etiqueta "Featured". Al vencer `expires` desaparece sola.
+- Las solicitudes llegan por el mismo formulario de "Post a job" (Google Forms, Drive de Enmanuel); se facturan a mano.
+- Suscriptores de alertas: Google Form "DCJ Job Alerts" → hoja "DCJ Job Alerts (respuestas)" en Drive (ver `NEWSLETTER_ACTION` en site_config.py).
+
 ## Vacantes publicadas por empleadores ("Post a job")
 - Formulario público: `POST_JOB_URL` en site_config.py (Google Forms, respuestas en el Drive de Enmanuel).
 - Cada envío se revisa a mano y se agrega a `data/posted_jobs.json` (ver `data/posted_jobs.example.json`); `collector.py` las mezcla en cada corrida con la etiqueta "Posted by employer" y las retira al pasar `expires`.

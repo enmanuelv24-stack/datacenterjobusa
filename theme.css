@@ -244,3 +244,16 @@ nav.main{font-size:14px;gap:2px} nav.main a{padding:6px 9px}
 .leadbar .wrap{position:relative;padding-right:40px}
 body{padding-bottom:0}
 @media (max-width:700px){.leadbar p span{display:none}.leadbar .lead input{flex-basis:100%}.leadbar .lead button{flex:1}}
+
+/* ---- anuncios destacados y página de empleadores */
+.job.featured{border-color:var(--accent);box-shadow:0 0 0 2px rgba(15,118,110,.14)}
+.chip.featured{background:var(--accent);color:#fff;border:1px solid var(--accent-ink);font-weight:600}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:22px 0 30px}
+.plan{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 14px}
+.plan.main{border-color:var(--accent);box-shadow:0 0 0 2px rgba(15,118,110,.14)}
+.plan h2{margin:0 0 6px;font-size:1.15rem}
+.plan .price{font-size:1.9rem;font-weight:700;margin:0 0 10px;line-height:1.1}
+.plan .price small{font-size:.85rem;font-weight:400;color:var(--muted)}
+.plan ul{padding-left:18px;margin:0 0 14px}
+.plan li{margin:4px 0}
+.plan .note{font-size:.85rem;color:var(--muted)}

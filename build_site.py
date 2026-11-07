@@ -325,7 +325,7 @@ class Site:
                f'<a href="{r("states.html")}">States</a><a href="{r("certifications.html")}">Certifications</a>'
                f'<a href="{r("travel-jobs.html")}">Per diem</a>'
                f'<a href="{r("shift-schedules.html")}">Shifts</a>'
-               f'<a href="{r("about.html")}">About</a></nav>')
+               f'<a href="{r("employers.html")}">Employers</a></nav>')
         url = f"{SITE_URL}/{path}".replace("/index.html", "/")
         bare = self.preview and path == "index.html"
         doc_head = ("" if bare else "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
@@ -352,7 +352,7 @@ class Site:
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
-             + f'<div><b>Employers</b><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
+             + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
              + '<div class="leadbar" id="lbar" hidden><div class="wrap"><p><b>New data center jobs, sent to you.</b><span> Email + phone — we tell you when jobs with pay are posted.</span></p>'
              + self.lead_form("bar", "Notify me", page=path) + '<button class="x" type="button" aria-label="Close">×</button></div></div>'
@@ -382,6 +382,8 @@ class Site:
             chips += ' <span class="chip new">New</span>'
         if j.get("entry"):
             chips += ' <span class="chip entry">Entry level</span>'
+        if j.get("featured"):
+            chips = '<span class="chip featured">Featured</span> ' + chips
         if j.get("source") == "posted":
             chips += ' <span class="chip posted">Posted by employer</span>'
         chips += self.perk_chips(j)
@@ -393,13 +395,13 @@ class Site:
                    + '</small></div>')
         else:
             pay = '<div class="pay nopay">Pay not posted<small>ask the recruiter</small></div>'
-        return (f'<li class="job">{logo(j["company"])}<div><a class="t" href="{E(href)}"{ext}>{E(title)}</a>'
+        return (f'<li class="job{" featured" if j.get("featured") else ""}">{logo(j["company"])}<div><a class="t" href="{E(href)}"{ext}>{E(title)}</a>'
                 f'<div class="meta"><span class="co">{E(j["company"])}</span><span>{E(loc)}</span>{f"<span class=age>{age}</span>" if age else ""}</div>'
                 f'<div class="tags">{chips}</div></div>{pay}</li>')
 
     def job_list(self, rows, depth: int, limit: int | None = None) -> str:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
-        rows = sorted(rows, key=lambda j: (-(j["hourly_max"] or 0)))
+        rows = sorted(rows, key=lambda j: (not j.get("featured"), -(j["hourly_max"] or 0)))  # destacados primero
         shown = rows if limit is None else rows[:limit]
         items = [self.job_row(j, depth, scale) for j in shown]
         if len(items) >= 8:
@@ -493,7 +495,7 @@ class Site:
                 f'<li><a href="travel-jobs.html"><b>{perk_n:,}</b><span>mention per diem or housing</span></a></li></ul>'
                 f'<p class="top">Most jobs: {top_states_snap}</p></aside>'
                 f'<p class="live"><a href="new-jobs.html"><b>{fresh_n:,}</b> posted this week</a><a href="entry-level-jobs.html"><b>{entry_n:,}</b> entry level</a>'
-                f'<a href="travel-jobs.html"><b>{perk_n:,}</b> mention per diem or housing</a><span><b>{len(companies)}</b> employers</span><span>Updated {self.today:%b %-d}</span><a href="post-a-job.html">Hiring? Post a job free</a></p>'
+                f'<a href="travel-jobs.html"><b>{perk_n:,}</b> mention per diem or housing</a><span><b>{len(companies)}</b> employers</span><span>Updated {self.today:%b %-d}</span><a href="employers.html">Hiring? Reach techs here</a></p>'
                 '</div></div></section><div class="wrap">'
                 f'<div class="stats"><div class="stat"><b>{self.today:%b %-d}</b><span>last updated · daily</span></div>'
                 f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
@@ -1014,7 +1016,8 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 '<h1>Post a data center job — free</h1>'
                 '<p class="lede">For contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. '
                 'Tell us the numbers techs ask about — pay, per diem, housing, schedule — and we publish it here and in the weekly email within 24 hours. No fee, no account.</p>'
-                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a job (2 minutes)</a></p>'
+                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a job (2 minutes)</a> '
+                f'<a class="more" href="employers.html">Need it seen first? Featured listings →</a></p>'
                 '<section class="guide"><h2>Why post here</h2><div class="prose">'
                 f'<p><b>You reach working techs, not résumé databases.</b> This site is read by data center technicians, fiber splicers and low-voltage techs who compare pay before they accept. '
                 'Every listing links straight to you — we never collect applications or sell leads.</p>'
@@ -1031,6 +1034,47 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 + self.signup())
         self.page("post-a-job.html", f"Post a Data Center Job Free: Contractors, Subs and Staffing | {SITE_NAME}",
                   "Free job posting for contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. Published within 24 hours.", body)
+
+
+        # ---- employers (planes de pago: destacado, correo patrocinado, perfil de empresa)
+        subs_line = (f'{self.subscribers:,} techs on the weekly email' if getattr(self, "subscribers", 0) else "a weekly email to techs who signed up for alerts")
+        body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
+                '<h1>Hire data center technicians who compare pay before they apply</h1>'
+                f'<p class="lede">{SITE_NAME} is read by working techs: fiber, cabling, electrical, critical facilities and DCT roles. '
+                f'{len(js):,} open jobs from {len(companies)} employers are listed today, with posted pay on {sum(1 for j in js if j["hourly_min"]):,} of them. '
+                'Every listing links straight to you. We never collect applications or sell leads.</p>'
+                '<div class="plans">'
+                '<section class="plan"><h2>Free listing</h2><p class="price">$0</p>'
+                '<ul><li>Published within 24 hours</li><li>Listed with pay, per diem and schedule</li><li>Linked to your phone, email or career page</li><li>Comes down the morning after you tell us the crew is full</li></ul>'
+                f'<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Post a free job</a></p></section>'
+                '<section class="plan main"><h2>Featured listing</h2><p class="price">$149 <small>for 30 days</small></p>'
+                '<ul><li>Pinned at the top of the home page and of your state and job-type pages</li><li>"Featured" tag in every list</li>'
+                f'<li>Included in {subs_line}</li><li>Up to 5 openings in one listing; extra listings $99 each</li><li>Your first featured listing is free while we build the audience</li></ul>'
+                f'<p><a class="more primary" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Request a featured listing</a></p>'
+                '<p class="note">Write "featured" in the notes field of the form. We confirm by email within 24 hours and invoice after the listing is live.</p></section>'
+                '<section class="plan"><h2>Company page</h2><p class="price">$299 <small>per month</small></p>'
+                '<ul><li>Your company page kept at the top of <a href="companies.html">Companies</a></li><li>All your openings featured</li><li>A short paragraph in your words about pay, schedule and crews</li><li>One sponsored block in the weekly email per month</li></ul>'
+                '<p><a class="more" href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">Ask about a company page</a></p><p class="note">Write "company page" in the notes field.</p></section>'
+                '</div>'
+                '<section class="guide"><h2>Who posts here</h2><div class="prose">'
+                '<p>Contractors and subcontractors on data center builds (fiber, structured cabling, electrical, mechanical), staffing firms that place technicians on hyperscale projects, and operators hiring critical facilities and DCT roles. '
+                f'Large employers such as Amazon, Microsoft, Google, QTS and Equinix are read automatically from their career pages; paid plans are for companies that hire by phone and word of mouth and need the crew filled this month.</p>'
+                '<p><b>What techs read first:</b> hourly pay, per diem per day, housing, the schedule (6×10, 6×12, rotation) and the start date. Listings that state all five get the most clicks. If you pay it, say it.</p>'
+                '<p><b>What we never publish:</b> site names, badge or access details, or your direct contact if you ask us to use a general line.</p>'
+                '</div></section>'
+                '<h2>Questions</h2><div class="faq">'
+                '<details><summary>How do I pay?</summary><p>We send an invoice by email after the listing is live; pay by card or bank transfer. No account needed. Your first featured listing is free.</p></details>'
+                '<details><summary>Can I post more than one job?</summary><p>Yes. Free listings are unlimited. Featured listings are $149 for the first and $99 for each additional one in the same month.</p></details>'
+                '<details><summary>Do you share the techs\' contact details?</summary><p>No. Techs apply to you directly through the link, phone or email on your listing. If you want us to send your listing to techs in one state by email, that is included in the featured plan.</p></details>'
+                '<details><summary>What if the job fills early?</summary><p>Tell us and the listing comes down the next morning. The remaining days of a featured listing can be moved to another opening.</p></details>'
+                '</div>'
+                f'<p class="note">Questions: use the <a href="{E(POST_JOB_URL)}" rel="noopener" target="_blank">same form</a> and write "question" in the notes; we answer within 24 hours.</p>')
+        self.page("employers.html", f"Hire Data Center Technicians: Featured Listings from $149 | {SITE_NAME}",
+                  f"Reach data center technicians, fiber and cabling crews who compare pay before they apply. Free listings, featured listings for 30 days, company pages. {len(js):,} open jobs listed today.", body,
+                  head_extra=self.breadcrumbs([("Jobs", "index.html"), ("Employers", "employers.html")]) + '<script type="application/ld+json">' + json.dumps({
+                      "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+                          {"@type": "Question", "name": "How do I pay for a featured listing?", "acceptedAnswer": {"@type": "Answer", "text": "We send an invoice by email after the listing is live; pay by card or bank transfer. The first featured listing is free."}},
+                          {"@type": "Question", "name": "Do you share technicians' contact details?", "acceptedAnswer": {"@type": "Answer", "text": "No. Technicians apply directly through the link, phone or email on the listing."}}]}) + '</script>')
 
         # ---- about + survey
         self.page("about.html", f"About: Who Runs {SITE_NAME} and Where the Data Comes From", f"Why {SITE_NAME} exists, who built it, how listings are collected and how pay is calculated.",

@@ -114,6 +114,7 @@ class Job:
     openings: int = 1   # vacantes con el mismo puesto y ubicación (Amazon publica muchas iguales)
     desc: str = ""      # descripción completa (no se guarda; sirve para detectar per diem, hospedaje, etc.)
     summary: str = ""   # extracto corto de la descripción del empleador (para la página de la vacante y Google Jobs)
+    featured: bool = False  # anuncio destacado (de pago): arriba de las listas, etiqueta "Featured" y en el correo semanal
     perks: str = ""     # beneficios detectados, separados por "|": per_diem, housing, travel, rotation:3/1, overtime, ...
     per_diem: float | None = None  # monto diario del per diem si lo dicen
     entry: bool = False  # apto para principiantes (nivel I / sin experiencia, según título o descripción)
@@ -1389,7 +1390,8 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
 
 def load_posted_jobs(path: Path, today: date) -> list[Job]:
     """Vacantes enviadas por empleadores (formulario 'Post a job'), revisadas a mano en data/posted_jobs.json.
-    Campos: company, title, city, state, pay_min, pay_max, pay_unit, perks, per_diem, url, posted, expires, notes."""
+    Campos: company, title, city, state, pay_min, pay_max, pay_unit, perks, per_diem, url, posted, expires, notes,
+    featured (true = anuncio destacado de pago), description (texto del empleador, máx. 900 caracteres)."""
     if not path.exists():
         return []
     out = []
@@ -1402,6 +1404,8 @@ def load_posted_jobs(path: Path, today: date) -> list[Job]:
         j = finalize(j)
         j.days_posted = (today - date.fromisoformat(j.posted)).days if j.posted else 0
         j.openings = int(d.get("openings") or 1)
+        j.featured = bool(d.get("featured"))
+        j.summary = (d.get("description") or "")[:900]
         out.append(j)
     return out
 
