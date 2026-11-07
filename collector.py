@@ -370,7 +370,7 @@ SUMMARY_MIN = 160   # menos que esto no aporta: se usa la ficha generada
 
 def make_summary(text: str) -> str:
     """Extracto limpio de la descripción del empleador: primeras frases útiles, sin texto legal ni salarios repetidos."""
-    t = strip_html(text or "").strip()
+    t = strip_html(text or "").replace("*", "").strip()
     if len(t) < SUMMARY_MIN:
         return ""
     sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z])", t)
@@ -716,7 +716,7 @@ def fetch_google() -> list[dict]:
         loc = (re.search(r"corporate_fare Google place (.*?) bar_chart", t) or [None, ""])[1].split(";")[0]
         m = re.search(r"US: \$([\d,]+) - \$([\d,]+) \(USD\)", h)
         out.append({"company": "Google", "title": title, "loc": loc.replace(", USA", ""), "posted": "",
-                    "pay": [m.group(1), m.group(2), "year"] if m else None, "desc": t.split(title, 1)[-1][:6000],
+                    "pay": [m.group(1), m.group(2), "year"] if m else None, "desc": page_text(h, title),
                     "url": f"{base}/{jid}-{sl}", "id": jid, "source": "google"})
     return out
 
