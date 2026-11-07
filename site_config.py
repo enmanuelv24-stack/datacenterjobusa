@@ -49,4 +49,8 @@ NEWSLETTER_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfbmj05TnX5Ee-bcC_
 NEWSLETTER_FIELDS = {"email": "entry.97542317", "phone": "entry.1281027727", "state": "entry.1454022816",
                      "company": "entry.1956447035", "source": "entry.1474231209", "page": "entry.466877246"}
 
+# Google Analytics 4: pega aquí el ID de medición ("G-XXXXXXXXXX", en Admin > Flujos de datos de tu propiedad).
+# Vacío = el sitio no carga ninguna analítica.
+GA4_ID = ""
+
 POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"

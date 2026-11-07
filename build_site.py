@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from site_config import (NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (GA4_ID, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -98,7 +98,14 @@ LEAD_JS = ("<script>"
            "</script>")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">')
+         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=optional">')
+# display=optional: si la fuente no llega a tiempo se queda la de respaldo. Con "swap" el menú cambiaba de
+# 3 a 2 líneas al llegar la fuente y la portada saltaba (CLS 0.32 en móvil).
+
+# Google Analytics 4: solo se incluye si GA4_ID tiene valor en site_config.py.
+ANALYTICS = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>'
+             "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}"
+             f"gtag('js',new Date());gtag('config','{GA4_ID}');</script>") if GA4_ID else ""
 
 
 PERK_EN = {"per_diem": "Per diem", "housing": "Housing", "travel": "Travel", "overtime": "Overtime", "signon": "Sign-on bonus",
@@ -338,7 +345,7 @@ class Site:
              + f'<link rel="icon" href="{r("favicon.svg")}" type="image/svg+xml"><link rel="apple-touch-icon" href="{r("apple-touch-icon.png")}">'
              + f'<meta property="og:image" content="{SITE_URL}/og.png"><meta name="twitter:card" content="summary_large_image">'
              + f'<link rel="alternate" type="application/rss+xml" title="New data center jobs" href="{r("feed.xml")}">'
-             + FONTS + f"<style>{CSS}</style>{head_extra}"
+             + FONTS + ("" if self.preview else ANALYTICS) + f"<style>{CSS}</style>{head_extra}"
              + ("" if bare else "</head><body>")
              + f'<header class="site"><div class="wrap"><a class="brand" href="{r("index.html")}"><i aria-hidden="true"></i>Data Center <em>Job USA</em></a>{nav}</div></header>'
              + (f'<main>{body}</main>' if body.startswith('<section class="hero">') else f'<main><div class="wrap">{body}</div></main>')
