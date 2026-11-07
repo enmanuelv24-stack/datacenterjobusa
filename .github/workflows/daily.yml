@@ -36,8 +36,8 @@ jobs:
           git add data/jobs.csv data/jobs.json
           if git commit -m "Vacantes $(date -u +%F)"; then
             # si alguien subió un cambio mientras corría, se trae primero y se vuelve a intentar
-            git pull --rebase origin main || true
-            git push || (git pull --rebase origin main && git push)
+            git pull --rebase -X theirs origin main || true
+            git push || (git pull --rebase -X theirs origin main && git push)
           else
             echo "sin cambios"
           fi
