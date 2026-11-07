@@ -17,6 +17,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from kit_page import kit_page
 from site_config import (GA4_ID, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
@@ -108,8 +109,9 @@ LEAD_JS = ("<script>"
            "window.addEventListener('scroll',function(){if(window.scrollY>450)show()},{passive:true});setTimeout(show,15000);"
            "b.querySelector('.x').addEventListener('click',function(){b.remove();try{localStorage.setItem('dcj_bar',String(Date.now()+5*864e5))}catch(e){}})})();"
            # Clic en "Apply on …" -> evento apply_click en GA4 (evento clave).
-           "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev=apply]');"
-           "if(a&&window.gtag)gtag('event','apply_click',{company:a.getAttribute('data-co')})});"
+           "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev]');if(!a||!window.gtag)return;"
+           "var ev=a.getAttribute('data-ev');if(ev==='apply')gtag('event','apply_click',{company:a.getAttribute('data-co')});"
+           "else if(ev==='kit')gtag('event','begin_checkout',{item_name:'Job-Ready Kit'})});"
            "</script>")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -372,7 +374,7 @@ class Site:
                f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
              + f'<div><b>Pay &amp; career</b><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a>'
-               f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
+               f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
              + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job (free)</a><a href="{r("companies.html")}">Companies listed</a></div>'
@@ -1057,6 +1059,10 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 + self.signup())
         self.page("post-a-job.html", f"Post a Data Center Job Free: Contractors, Subs and Staffing | {SITE_NAME}",
                   "Free job posting for contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. Published within 24 hours.", body)
+
+        # ---- producto digital: Job-Ready Kit (kit_page.py)
+        kp = kit_page(js, self.lead_form)
+        self.page(kp["path"], kp["title"], kp["desc"], kp["body"], head_extra=kp["head_extra"])
 
 
         # ---- employers (planes de pago: destacado, correo patrocinado, perfil de empresa)
