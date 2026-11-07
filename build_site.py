@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from site_config import (NEWSLETTER_ACTION, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -88,7 +88,7 @@ CSS = (Path(__file__).with_name("theme.css")).read_text(encoding="utf-8")
 # Captación de correos/teléfonos: envía a Buttondown sin salir de la página, muestra la barra fija tras scroll y recuerda cierres.
 LEAD_JS = ("<script>"
            "function dcjSub(f){try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
-           "f.innerHTML='<p class=\"ok\">Done. Check your inbox to confirm \\u2014 we\\u2019ll let you know when new jobs are posted.</p>';"
+           "f.innerHTML='<p class=\"ok\">Done \\u2014 we\\u2019ll email you when new jobs with pay are posted.</p>';"
            "try{localStorage.setItem('dcj_sub','1')}catch(e){}var b=document.getElementById('lbar');if(b&&!b.contains(f))b.remove();return false}"
            "(function(){var b=document.getElementById('lbar');if(!b)return;"
            "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_bar')>Date.now()){b.remove();return}}catch(e){}"
@@ -427,13 +427,13 @@ class Site:
                 "</tr></thead><tbody>" + "".join(body) + "</tbody></table></div>")
 
     def lead_form(self, variant: str = "box", button: str = "Send me jobs", state: str = "", company: str = "", page: str = "") -> str:
-        """Formulario de captación: correo + teléfono. Va a Buttondown; el teléfono y el contexto se guardan como metadata."""
-        hidden = "".join(f'<input type="hidden" name="{k}" value="{E(v)}">'
-                         for k, v in [("tag", "site"), ("metadata__source", variant), ("metadata__page", page),
-                                      ("metadata__state", state), ("metadata__company", company)] if v)
+        """Formulario de captación: correo + teléfono, más el contexto (página, estado, empresa) en campos ocultos."""
+        F = NEWSLETTER_FIELDS
+        hidden = "".join(f'<input type="hidden" name="{F[k]}" value="{E(v)}">'
+                         for k, v in [("source", variant), ("page", page), ("state", state), ("company", company)] if v)
         return (f'<form class="lead {variant}" action="{E(NEWSLETTER_ACTION)}" method="post" target="_blank" onsubmit="return dcjSub(this)">'
-                '<input name="email" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
-                '<input name="metadata__phone" type="tel" placeholder="Phone (for text alerts)" aria-label="Phone number" autocomplete="tel" pattern="[0-9()+ .-]{7,20}">'
+                f'<input name="{F["email"]}" type="email" required placeholder="Your email" aria-label="Email" autocomplete="email">'
+                f'<input name="{F["phone"]}" type="tel" placeholder="Phone (for text alerts)" aria-label="Phone number" autocomplete="tel" pattern="[0-9()+ .-]{{7,20}}">'
                 f'<button type="submit">{E(button)}</button>{hidden}</form>')
 
     def signup(self, state: str = "", company: str = "", page: str = "") -> str:

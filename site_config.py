@@ -41,7 +41,12 @@ MIN_ROLE_STATE_OPENINGS = 5  # "tipo de trabajo × estado" tiene página propia 
 # Enlace de la encuesta de turnos (Google Forms, Tally, etc.). Vacío = el sitio dice "muy pronto".
 SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdAiL_Nd9-OX5mNSFFdpO6MuF6_aGw-_2hpg5V9P-P706oPVQ/viewform"
 
-# Formulario de suscripción (Buttondown). El sitio envía el correo a esta dirección.
-NEWSLETTER_ACTION = "https://buttondown.com/api/emails/embed-subscribe/datacenterjobusa"
+# Formulario de suscripción ("Send me jobs"). Hoy va a un Google Form de la cuenta de Enmanuel
+# ("DCJ Job Alerts"; respuestas en la hoja "DCJ Job Alerts (respuestas)" en Drive). La cuenta de Buttondown
+# que había antes no existía y los correos se perdían. Cuando haya un servicio de newsletter, cambia estas
+# dos líneas: NEWSLETTER_ACTION al endpoint y NEWSLETTER_FIELDS a los nombres de campo que espere.
+NEWSLETTER_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfbmj05TnX5Ee-bcC_w9KFdpqQvHRAYD1Jz51CApgX53AurcA/formResponse"
+NEWSLETTER_FIELDS = {"email": "entry.97542317", "phone": "entry.1281027727", "state": "entry.1454022816",
+                     "company": "entry.1956447035", "source": "entry.1474231209", "page": "entry.466877246"}
 
 POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"
