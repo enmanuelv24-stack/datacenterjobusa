@@ -19,6 +19,7 @@ from pathlib import Path
 
 from employers_page import employer_pages
 from kit_page import kit_page
+from veterans_page import veteran_page
 from site_config import (GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
@@ -519,7 +520,7 @@ class Site:
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
-        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="how-to-become-a-data-center-technician.html">How to get in</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="shift-survey.html">Tech survey</a>')
+        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="how-to-become-a-data-center-technician.html">How to get in</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="military-veteran-data-center-jobs.html">Military &amp; SkillBridge</a><a href="shift-survey.html">Tech survey</a>')
         fresh_n = sum(j["openings"] for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7)
         entry_n = sum(j["openings"] for j in js if j.get("entry"))
         perk_n = sum(j["openings"] for j in js if j.get("perks") and re.search(r"per_diem|housing", j["perks"]))
@@ -1006,6 +1007,11 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                   f"{sum(j['openings'] for j in entry):,} entry-level data center technician jobs with no experience required, posted pay ranges, "
                   "requirements, certifications that help and how to get hired.", body,
                   head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
+
+        # ---- militares y veteranos (SkillBridge y puestos "Military & Veterans Encouraged")
+        vp = veteran_page(js, self.job_list, self.signup())
+        if vp:
+            self.page(vp["path"], vp["title"], vp["desc"], vp["body"], head_extra=vp["head_extra"])
 
         # ---- new this week: recién publicados + RSS
         fresh = sorted([j for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7],
