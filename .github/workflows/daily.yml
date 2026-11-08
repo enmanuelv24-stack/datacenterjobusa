@@ -24,11 +24,19 @@ jobs:
         with:
           python-version: "3.12"
       - name: Pruebas
-        run: python test_collector.py
+        run: |
+          python test_collector.py
+          python test_indexnow.py
       - name: Recolectar vacantes
         run: python collector.py --out data
       - name: Construir sitio
         run: python build_site.py --out site
+      - name: Empleos nuevos y cerrados para IndexNow
+        run: python indexnow.py diff --old https://datacenterjobusa.com/sitemap-jobs.xml --new site/sitemap-jobs.xml --out indexnow-urls.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: indexnow-urls
+          path: indexnow-urls.txt
       - name: Guardar los datos del día en el repositorio
         run: |
           git config user.name "data-bot"
@@ -54,3 +62,19 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  indexnow:
+    # avisa a Bing, Yandex y DuckDuckGo (vía Bing) después de publicar; si falla no afecta al sitio
+    needs: deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: indexnow-urls
+      - name: Avisar a IndexNow
+        run: python indexnow.py submit --urls indexnow-urls.txt
