@@ -57,7 +57,7 @@ POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cag
 
 # Producto digital "Job-Ready Kit" (PDF). Pega aquí el enlace de compra de la tienda donde lo vendas
 # (Gumroad, Lemon Squeezy o un Payment Link de Stripe). Vacío = la página dice "muy pronto" y recoge correos.
-KIT_URL = ""
+KIT_URL = "https://buy.stripe.com/6oUcN47nibWsaue7cHeIw03"
 KIT_PRICE = "$27"
 
 # Planes para empresas (páginas Employers y Post a job). pay_url = Payment Link de Stripe de ese plan.
