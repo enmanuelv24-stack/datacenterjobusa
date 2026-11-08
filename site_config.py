@@ -53,7 +53,7 @@ NEWSLETTER_FIELDS = {"email": "entry.97542317", "phone": "entry.1281027727", "st
 # Vacío = el sitio no carga ninguna analítica.
 GA4_ID = "G-RPPV8TW7WJ"
 # ID del proyecto de Microsoft Clarity (clarity.microsoft.com). Vacío = sin Clarity.
-CLARITY_ID = ""
+CLARITY_ID = "zajlzfhozy"
 
 POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"
 
