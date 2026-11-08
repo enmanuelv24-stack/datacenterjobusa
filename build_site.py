@@ -20,7 +20,7 @@ from pathlib import Path
 from employers_page import employer_pages
 from kit_page import kit_page
 from veterans_page import veteran_page
-from site_config import (GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (CLARITY_ID, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -106,23 +106,28 @@ LEAD_JS = ("<script>"
            "var src=f.querySelector('.src');if(src&&t.length)src.value='popup: '+t.join('; ');"
            "try{fetch(f.action,{method:'POST',mode:'no-cors',body:new FormData(f)}).catch(function(){})}catch(e){}"
            "if(window.gtag)gtag('event','generate_lead',{form_location:f.className.replace('lead ',''),job_types:t.join('; ')});"
-           "f.innerHTML='<p class=\"ok\">Done \\u2014 we\\u2019ll email you when new jobs with pay are posted.</p>';"
+           "f.innerHTML='<p class=\"ok\">You\\u2019re in \\u2014 we\\u2019ll email you new jobs with pay. While you wait: '"
+           "+'<a href=\"/how-to-become-a-data-center-technician.html\" data-ev=\"next\">how to get hired fast</a> \\u00b7 '"
+           "+'<a href=\"/job-ready-kit.html\" data-ev=\"next\">the $27 Job-Ready Kit</a></p>';"
            "try{localStorage.setItem('dcj_sub','1')}catch(e){}return false}"
            # Ventana emergente: tras 45 % de scroll o 25 s; no si ya se suscribió o la cerró hace menos de 5 días.
            "(function(){var p=document.getElementById('lpop');if(!p)return;var last=null;"
            "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_pop')>Date.now()){p.remove();return}}catch(e){}"
-           "function close(){p.hidden=true;try{localStorage.setItem('dcj_pop',String(Date.now()+5*864e5))}catch(e){}if(last)last.focus()}"
-           "var shown=false;function show(){if(shown)return;shown=true;last=document.activeElement;p.hidden=false;"
+           "function close(){p.hidden=true;if(window.gtag)gtag('event','popup_close');try{localStorage.setItem('dcj_pop',String(Date.now()+5*864e5))}catch(e){}if(last)last.focus()}"
+           "var shown=false;function show(){if(shown)return;shown=true;last=document.activeElement;p.hidden=false;if(window.gtag)gtag('event','popup_view');"
            "var em=p.querySelector('input[type=email]');if(em)em.focus({preventScroll:true})}"
            "window.addEventListener('scroll',function(){var h=document.documentElement;if(h.scrollTop/(h.scrollHeight-h.clientHeight)>.45)show()},{passive:true});"
            "setTimeout(show,25000);p.querySelector('.x').addEventListener('click',close);"
            "p.addEventListener('click',function(e){if(e.target===p)close()});"
            "document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden)close()})})();"
+           # Vista de una vacante (las páginas de empleo definen window.dcjItem).
+           "if(window.dcjItem&&window.gtag)gtag('event','view_item',{items:[window.dcjItem]});"
            # Clics con data-ev -> eventos GA4.
            "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-ev]');if(!a||!window.gtag)return;"
            "var ev=a.getAttribute('data-ev');if(ev==='apply')gtag('event','apply_click',{company:a.getAttribute('data-co')});"
            "else if(ev==='kit')gtag('event','begin_checkout',{item_name:'Job-Ready Kit'});"
-           "else if(ev==='plan')gtag('event','begin_checkout',{item_name:a.getAttribute('data-plan')})});"
+           "else if(ev==='plan')gtag('event','begin_checkout',{item_name:a.getAttribute('data-plan')});"
+           "else if(ev==='next')gtag('event','select_content',{content_type:'after_signup',item_id:a.getAttribute('href')})});"
            "</script>")
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -134,6 +139,17 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 ANALYTICS = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>'
              "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}"
              f"gtag('js',new Date());gtag('config','{GA4_ID}');</script>") if GA4_ID else ""
+# Microsoft Clarity (grabaciones anónimas y mapas de calor): se activa al poner CLARITY_ID en site_config.py.
+ANALYTICS += ('<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
+              't=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)'
+              f'}})(window,document,"clarity","script","{CLARITY_ID}");</script>') if CLARITY_ID else ""
+
+
+def item_js(j: dict, role: str) -> str:
+    """Datos de la vacante para el evento GA4 view_item (qué empleos, empresas y tipos se miran)."""
+    item = {"item_id": str(j["job_id"]), "item_name": clean_title(j["title"])[:100], "item_brand": j["company"],
+            "item_category": role, "item_category2": j["state"], "price": j.get("hourly_max") or j.get("hourly_min") or 0}
+    return "<script>window.dcjItem=" + json.dumps(item).replace("</", "<\\/") + "</script>"
 
 
 PERK_EN = {"per_diem": "Per diem", "housing": "Housing", "travel": "Travel", "overtime": "Overtime", "signon": "Sign-on bonus",
@@ -868,7 +884,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                 ref = f' (#{str(j["job_id"])[-6:]})' if dup else ""
                 self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"] or j["state"]}{ref} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {where}{ref}. Pay: {pay}.', body,
-                          head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}')
+                          head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}' + item_js(j, role_en))
 
         # ---- categorías: por tipo de trabajo y por nivel
         role_counts = Counter()
