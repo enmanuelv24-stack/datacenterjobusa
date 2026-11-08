@@ -19,7 +19,7 @@ from pathlib import Path
 
 from employers_page import employer_pages
 from kit_page import kit_page
-from site_config import (GA4_ID, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -1126,6 +1126,7 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                                                   f'<sitemap><loc>{SITE_URL}/sitemap-pages.xml</loc><lastmod>{self.today}</lastmod></sitemap>'
                                                   f'<sitemap><loc>{SITE_URL}/sitemap-jobs.xml</loc><lastmod>{self.today}</lastmod></sitemap></sitemapindex>', encoding="utf-8")
             (self.out / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
+            (self.out / f"{INDEXNOW_KEY}.txt").write_text(INDEXNOW_KEY, encoding="utf-8")  # prueba de dominio para IndexNow
             self.page("404.html", f"Job closed or page not found | {SITE_NAME}", "This job was taken down by the employer or the page moved.",
                       '<h1>That job is closed or the page moved</h1>'
                       '<p class="lede">Employers take listings down when they fill them, and this site removes them the next morning. The ones below are live today.</p>'

@@ -60,6 +60,9 @@ POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cag
 KIT_URL = "https://buy.stripe.com/6oUcN47nibWsaue7cHeIw03"
 KIT_PRICE = "$27"
 
+# Clave de IndexNow (pública por diseño: el sitio la sirve en /<clave>.txt para avisar a Bing y Yandex de empleos nuevos).
+INDEXNOW_KEY = "80f6b05d5c7bb5703a404c84f4d306ef"
+
 # Planes para empresas (páginas Employers y Post a job). pay_url = Payment Link de Stripe de ese plan.
 # En Stripe pon "After payment → redirect" a POST_JOB_URL para que la empresa mande los datos del empleo.
 # pay_url vacío = el botón abre el formulario y se factura por correo.
