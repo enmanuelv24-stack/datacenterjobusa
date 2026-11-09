@@ -55,6 +55,9 @@ GA4_ID = "G-RPPV8TW7WJ"
 # ID del proyecto de Microsoft Clarity (clarity.microsoft.com). Vacío = sin Clarity.
 CLARITY_ID = "zajlzfhozy"
 
+# Verificación del sitio en Pinterest (meta p:domain_verify; el código es público por diseño)
+PINTEREST_VERIFY = "5b8c6128565e50b5589f43b699e77268"
+
 POST_JOB_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfzxQ_P8s06lyesFXN__cagUqwp0443kYG9-Hx6B89lp-KJ6g/viewform"
 
 # Producto digital "Job-Ready Kit" (PDF). Pega aquí el enlace de compra de la tienda donde lo vendas

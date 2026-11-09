@@ -21,7 +21,7 @@ from employers_page import employer_pages
 from job_feed import write_job_feed
 from kit_page import kit_page
 from veterans_page import veteran_page
-from site_config import (CLARITY_ID, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (CLARITY_ID, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -387,6 +387,7 @@ class Site:
              f'<meta name="description" content="{E(desc)}">'
              + (f'<link rel="canonical" href="{E(url)}">' if canonical and not self.preview else "")
              + f'<meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
+             + (f'<meta name="p:domain_verify" content="{PINTEREST_VERIFY}">' if PINTEREST_VERIFY else "")
              + f'<link rel="icon" href="{r("favicon.svg")}" type="image/svg+xml"><link rel="apple-touch-icon" href="{r("apple-touch-icon.png")}">'
              + f'<meta property="og:image" content="{SITE_URL}/og.png"><meta name="twitter:card" content="summary_large_image">'
              + f'<link rel="alternate" type="application/rss+xml" title="New data center jobs" href="{r("feed.xml")}">'
