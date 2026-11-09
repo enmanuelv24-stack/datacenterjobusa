@@ -62,11 +62,13 @@ def _faq() -> tuple[str, str]:
 
 
 def employer_pages(jobs: list[dict], n_companies: int, signup_html: str, breadcrumbs) -> list[dict]:
-    """Devuelve los argumentos de Site.page() para employers.html y post-a-job.html."""
+    """Devuelve los argumentos de Site.page() para employers.html (post-a-job.html redirige aquí)."""
     n_paid = sum(1 for j in jobs if j.get("hourly_min"))
+    n_open = sum(j.get("openings") or 1 for j in jobs)
     low = JOB_PLANS[0]["price"]
     faq_html, faq_ld = _faq()
-    reach = (f'{SITE_NAME} lists {len(jobs):,} open technician jobs from {n_companies} employers today, {n_paid:,} with posted pay. '
+    reach = (f'{SITE_NAME} lists {n_open:,} open positions across {len(jobs):,} technician listings from {n_companies} employers today, '
+             f'{n_paid:,} with posted pay. '
              'It is read by working techs: fiber, cabling, electrical, critical facilities and DCT roles. '
              'Every listing links straight to you; we never collect applications or sell leads.')
     employers = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
@@ -79,18 +81,10 @@ def employer_pages(jobs: list[dict], n_companies: int, signup_html: str, breadcr
                  '<p><b>What techs read first:</b> hourly pay, per diem per day, housing, the schedule (6×10, 6×12, rotation) and the start date. '
                  'Listings that state all five get the most clicks. If you pay it, say it.</p>'
                  '<p><b>What we never publish:</b> site names, badge or access details, or your direct contact if you ask us to use a general line.</p>'
-                 '</div></section>' + faq_html)
-    post = ('<p class="crumbs"><a href="index.html">Jobs</a> / Post a job</p>'
-            f'<h1>Post a data center job from {E(low)}</h1>'
-            '<p class="lede">For contractors, subcontractors and staffing firms hiring data center technicians, cabling and fiber crews. '
-            'Pick a plan, send the details, and techs see your pay, per diem and schedule within 24 hours.</p>'
-            + STEPS + plans_html() + WHAT_TO_INCLUDE + faq_html + signup_html)
+                 '</div></section>' + WHAT_TO_INCLUDE + faq_html + signup_html)
     crumbs = breadcrumbs([("Jobs", "index.html"), ("Employers", "employers.html")])
     return [
         {"path": "employers.html", "title": f"Hire Data Center Technicians: Job Listings from {low} | {SITE_NAME}",
-         "desc": f"Reach data center technicians, fiber and cabling crews who compare pay before they apply. Job listings from {low}, featured listings, company pages. {len(jobs):,} open jobs listed today.",
+         "desc": f"Reach data center technicians, fiber and cabling crews who compare pay before they apply. Job listings from {low}, featured listings, company pages. {n_open:,} open positions listed today.",
          "body": employers, "head_extra": crumbs + faq_ld},
-        {"path": "post-a-job.html", "title": f"Post a Data Center Job from {low}: Contractors, Subs and Staffing | {SITE_NAME}",
-         "desc": "Post a job for data center technicians, cabling and fiber crews. Pay by card, live within 24 hours, linked straight to you.",
-         "body": post, "head_extra": faq_ld},
     ]

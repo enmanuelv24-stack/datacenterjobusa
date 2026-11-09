@@ -229,6 +229,42 @@ def test_page_text_and_introl_url():
     assert rows and rows[0]["url"] == "https://introl.com/careers/data-center-technician-atlanta-ga", rows
 
 
+def _job(company, title, city="Abilene", state="TX", posted="2026-11-01", lo=27.0, hi=40.0, openings=1, perks="", jid=None):
+    j = c.Job("other", company, jid or f"{title}-{posted}", title, city, state, f"{city}, {state}", posted, "https://x", lo, hi, "hour")
+    j.hourly_min, j.hourly_max, j.openings, j.perks = lo, hi, openings, perks
+    return j
+
+
+def test_merge_duplicates_keeps_newest_and_sums_openings():
+    a = _job("Amazon", "Data Center Technician", posted="2026-10-01", lo=25.0, hi=40.0, openings=5, perks="travel")
+    b = _job("Amazon", "Data Center Technician", posted="2026-11-05", lo=27.0, hi=44.0, openings=5, perks="overtime")
+    other = _job("Amazon", "Data Center Technician", city="Boardman", state="OR")
+    out = c.merge_duplicates([a, b, other])
+    assert len(out) == 2
+    merged = next(j for j in out if j.city == "Abilene")
+    assert merged.posted == "2026-11-05" and merged.openings == 10
+    assert (merged.hourly_min, merged.hourly_max) == (25.0, 44.0)
+    assert set(merged.perks.split("|")) == {"travel", "overtime"}
+
+
+def test_merge_duplicates_ignores_title_case_and_leaves_singles_alone():
+    a = _job("QTS", "Critical Operations Technician I", city="Chicago", state="IL")
+    b = _job("QTS", "critical operations technician i", city="Chicago", state="IL", posted="2026-10-20")
+    out = c.merge_duplicates([a, b])
+    assert len(out) == 1 and out[0].openings == 2
+    single = _job("Oracle", "Data Center Technician", city="Hillsboro", state="OR")
+    assert c.merge_duplicates([single])[0].openings == 1
+
+
+def test_finalize_normalizes_title_whitespace():
+    j = _job("Amazon", "Engineering Operation Technician\n ")
+    assert c.finalize(j).title == "Engineering Operation Technician"
+
+
+def test_default_max_age_hides_ghost_postings():
+    assert c.MAX_AGE_DAYS == 120
+
+
 if __name__ == "__main__":
     import sys
     fails = 0

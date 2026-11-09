@@ -404,7 +404,7 @@ class Site:
                f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
                f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
-             + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs</a><a href="{r("post-a-job.html")}">Post a job</a><a href="{r("companies.html")}">Companies listed</a></div>'
+             + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs / post a job</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
              + self.lead_popup(path)
              + LEAD_JS
@@ -1089,6 +1089,11 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
         # ---- empresas: planes de pago y "Post a job" (employers_page.py)
         for ep in employer_pages(js, len(companies), self.signup(), self.breadcrumbs):
             self.page(ep["path"], ep["title"], ep["desc"], ep["body"], head_extra=ep["head_extra"])
+        # La antigua post-a-job.html redirige a employers.html (una sola página para empleadores; no va al sitemap)
+        (self.out / "post-a-job.html").write_text(
+            '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Post a job | Data Center Job USA</title>'
+            f'<meta http-equiv="refresh" content="0; url={SITE_URL}/employers.html"><link rel="canonical" href="{SITE_URL}/employers.html">'
+            f'</head><body><p>This page moved to <a href="{SITE_URL}/employers.html">employers.html</a>.</p></body></html>', encoding="utf-8")
 
         # ---- about + survey
         self.page("about.html", f"About: Who Runs {SITE_NAME} and Where the Data Comes From", f"Why {SITE_NAME} exists, who built it, how listings are collected and how pay is calculated.",

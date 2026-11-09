@@ -49,7 +49,9 @@ AMAZON_QUERIES = [
 # Las fuentes son las páginas de empleo de las propias empresas: si la vacante sigue
 # publicada ahí, sigue abierta. Por eso no se borran vacantes viejas por defecto; se
 # guarda cuántos días lleva publicada para mostrarlo y filtrar en el sitio.
-MAX_AGE_DAYS: int | None = None
+# Vacantes publicadas hace más de esto no se muestran: a los 4 meses casi siempre son avisos fantasma que el
+# empleador nunca cerró (había una de 2023), y un lector que abre una vacante muerta no vuelve.
+MAX_AGE_DAYS: int | None = 120
 USER_AGENT = "dc-tech-jobs-collector/0.1 (+contact: site owner)"
 
 # Títulos que cuentan como "técnico" (operaciones e instalaciones críticas).
@@ -339,6 +341,7 @@ def is_entry(title: str, level: str, text: str) -> bool:
 
 
 def finalize(job: Job) -> Job:
+    job.title = " ".join(job.title.split())  # sin saltos de línea ni espacios dobles
     job.entry = is_entry(job.title, classify_level(job.title), job.desc or job.pay_text)
     if job.pay_min is None and job.pay_text:
         job.pay_min, job.pay_max, job.pay_unit = parse_pay(job.pay_text)
@@ -1384,7 +1387,31 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
             if max_age_days is not None and j.days_posted > max_age_days:
                 continue
         out.append(j)
+    out = merge_duplicates(out)
     out.sort(key=lambda j: (j.posted or ""), reverse=True)
+    return out
+
+
+def merge_duplicates(jobs: list[Job]) -> list[Job]:
+    """Un mismo puesto en la misma ciudad publicado varias veces (Amazon abre una requisición por vacante) se muestra una
+    sola vez: se conserva la más reciente, se suman las vacantes y se toma el rango de pago más amplio."""
+    groups: dict[tuple, list[Job]] = {}
+    for j in jobs:
+        groups.setdefault((j.company, j.title.lower(), j.city.lower(), j.state), []).append(j)
+    out = []
+    for js in groups.values():
+        js.sort(key=lambda j: (j.posted or ""), reverse=True)
+        keep = js[0]
+        if len(js) > 1:
+            keep.openings = sum(j.openings for j in js)
+            lows = [j.hourly_min for j in js if j.hourly_min is not None]
+            highs = [j.hourly_max for j in js if j.hourly_max is not None]
+            if lows and highs and (keep.hourly_min is None or min(lows) < keep.hourly_min or max(highs) > (keep.hourly_max or 0)):
+                keep.hourly_min, keep.hourly_max = min(lows), max(highs)
+            keep.perks = "|".join(dict.fromkeys(t for j in js for t in j.perks.split("|") if t))
+            keep.per_diem = keep.per_diem or next((j.per_diem for j in js if j.per_diem), None)
+            keep.entry = any(j.entry for j in js)
+        out.append(keep)
     return out
 
 
