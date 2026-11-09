@@ -18,6 +18,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from employers_page import employer_pages
+from job_feed import write_job_feed
 from kit_page import kit_page
 from veterans_page import veteran_page
 from site_config import (CLARITY_ID, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
@@ -1057,6 +1058,8 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
             (self.out / "feed.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
                                                f'<title>{E(SITE_NAME)}: new technician jobs</title><link>{E(SITE_URL)}/new-jobs.html</link>'
                                                f'<description>Data center technician jobs posted this week, with pay.</description>{items}</channel></rss>', encoding="utf-8")
+            # Feed XML para agregadores (Jooble, Talent.com, Adzuna...): enlazan a nuestras páginas de vacantes
+            write_job_feed(self.out, js, SITE_URL, SITE_NAME, self.today, clean_title, lambda r: ROLE_EN.get(r, r))
 
         # ---- travel jobs: per diem, housing, rotations
         travel = [j for j in js if j.get("perks")]
