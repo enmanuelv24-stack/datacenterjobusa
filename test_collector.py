@@ -59,8 +59,9 @@ def test_build_from_saved_sample():
                                       "pay_text": "The base salary range for this role is $65,000 to $83,000."}]},
         "ashby": {},
     }
-    jobs = c.build(raw, date(2026, 10, 30))
+    jobs = c.build(raw, date(2026, 10, 30), max_age_days=None)
     assert [j.company for j in jobs] == ["Amazon", "CoreWeave"]
+    assert [j.company for j in c.build(raw, date(2026, 10, 30))] == ["Amazon"]  # la de 144 días se oculta por defecto
     amz = jobs[0]
     assert (amz.city, amz.state, amz.hourly_min, amz.hourly_max, amz.days_posted) == ("Wink", "TX", 30.91, 54.18, 1)
     assert jobs[1].days_posted == 144
