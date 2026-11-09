@@ -9,7 +9,7 @@ from __future__ import annotations
 import html
 import json
 
-from site_config import JOB_PLANS, POST_JOB_URL, SITE_NAME
+from site_config import CONTACT_EMAIL, JOB_PLANS, POST_JOB_URL, SITE_NAME
 
 E = html.escape
 
@@ -73,7 +73,9 @@ def employer_pages(jobs: list[dict], n_companies: int, signup_html: str, breadcr
              'Every listing links straight to you; we never collect applications or sell leads.')
     employers = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
                  '<h1>Hire data center technicians who compare pay before they apply</h1>'
-                 f'<p class="lede">{E(reach)}</p>' + plans_html() + '<h2>How it works</h2>' + STEPS
+                 f'<p class="lede">{E(reach)}</p>' + plans_html()
+                 + f'<p>Questions, bulk postings or a custom plan? Email <a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>.</p>'
+                 + '<h2>How it works</h2>' + STEPS
                  + '<section class="guide"><h2>Who posts here</h2><div class="prose">'
                  '<p>Contractors and subcontractors on data center builds (fiber, structured cabling, electrical, mechanical), staffing firms that place '
                  'technicians on hyperscale projects, and operators hiring critical facilities and DCT roles. Large employers such as Amazon, Microsoft, '

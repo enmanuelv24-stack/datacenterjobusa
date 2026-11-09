@@ -21,7 +21,7 @@ from employers_page import employer_pages
 from job_feed import write_job_feed
 from kit_page import kit_page
 from veterans_page import veteran_page
-from site_config import (CLARITY_ID, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
+from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
 E = html.escape
@@ -405,7 +405,7 @@ class Site:
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a>'
                f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
-               f'<a href="{r("shift-survey.html")}">Send feedback</a></div>'
+               f'<a href="{r("shift-survey.html")}">Send feedback</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></div>'
              + f'<div><b>Employers</b><a href="{r("employers.html")}">Hire data center techs / post a job</a><a href="{r("companies.html")}">Companies listed</a></div>'
              + '</div></div></footer>'
              + self.lead_popup(path)

@@ -3,6 +3,7 @@
 SITE_NAME = "Data Center Job USA"
 SITE_TAGLINE = "Data center tech jobs with the pay up front"
 SITE_URL = "https://datacenterjobusa.com"
+CONTACT_EMAIL = "hello@datacenterjobusa.com"  # buzón en Zoho Mail (plan gratis)
 OWNER_BLURB = ("Built by a working data center technician in Texas who got tired of job boards "
                "that hide the pay and mix our jobs with call centers.")
 
