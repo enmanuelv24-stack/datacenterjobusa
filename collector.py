@@ -116,6 +116,7 @@ class Job:
     openings: int = 1   # vacantes con el mismo puesto y ubicación (Amazon publica muchas iguales)
     desc: str = ""      # descripción completa (no se guarda; sirve para detectar per diem, hospedaje, etc.)
     summary: str = ""   # extracto corto de la descripción del empleador (para la página de la vacante y Google Jobs)
+    description: str = ""  # descripción larga y limpia (funciones y requisitos) para el feed de agregadores (Jooble pide la completa)
     featured: bool = False  # anuncio destacado (de pago): arriba de las listas, etiqueta "Featured" y en el correo semanal
     perks: str = ""     # beneficios detectados, separados por "|": per_diem, housing, travel, rotation:3/1, overtime, ...
     per_diem: float | None = None  # monto diario del per diem si lo dicen
@@ -351,6 +352,8 @@ def finalize(job: Job) -> Job:
             job.perks = "|".join(x for x in ["travel", job.perks] if x)
     if not job.summary:
         job.summary = make_summary(job.desc or job.pay_text)
+    if not job.description:
+        job.description = make_description(job.desc or job.pay_text)
     job.desc = ""
     job.hourly_min = to_hourly(job.pay_min, job.pay_unit)
     job.hourly_max = to_hourly(job.pay_max, job.pay_unit)
@@ -367,21 +370,37 @@ _BOILER = re.compile(
     r"pay transparency|e-?verify|privacy (notice|policy)|applicants? with (a )?disabilit|"
     r"we are (an|a proud) equal|without regard to (race|age)|background check and drug|"
     r"by applying|click (here|apply)|share this job|apply now|previously applied|please log ?in|"
-    r"all rights reserved|cookie)", re.I)
+    r"all rights reserved|cookie|sign up for job alerts|hiring software|search the faq|jobs login|common questions)", re.I)
 SUMMARY_MAX = 900   # caracteres; un extracto, no la oferta completa (la completa vive en el sitio del empleador)
 SUMMARY_MIN = 160   # menos que esto no aporta: se usa la ficha generada
+DESCRIPTION_MAX = 3500  # caracteres de la descripción larga del feed: funciones y requisitos, sin el texto legal
+# Restos de atributos HTML que quedan cuando se corta una página a mitad de etiqueta, p. ej. 'id="job-description">'
+_ATTR_JUNK = re.compile(r'(?:\b[\w:-]+="[^"]*"\s*)+/?>')
+_BLOCK_END = re.compile(r"<\s*(?:br|/p|/li|/h\d|/div|/ul|/ol|/tr)\b[^>]*>", re.I)
+
+# Frases que son código de la página (CSS, comentarios HTML, widgets), no texto del puesto
+_CODE_BITS = re.compile(r"[{}<>]|-->")
+_CSS_RULE = re.compile(r"[^{}\n.]*\{[^{}]*\}")   # 'html { font-size: 62.5%; }'
+_CODE_BREAK = re.compile(r"<!--|-->|[<>]")       # restos que separan el texto real de los widgets
+_SELECTOR = re.compile(r"(?:^|\s)[.#][a-z]")   # selectores CSS sueltos: '.container,', '#mobile_menus'
+_WORD = re.compile(r"\b[A-Za-z]{3,}\b")
+
+
+def _is_code(sentence: str) -> bool:
+    selectors = len(_SELECTOR.findall(sentence))
+    return bool(_CODE_BITS.search(sentence)) or selectors >= 2 or (selectors == 1 and len(_WORD.findall(sentence)) < 6)
 
 
 def make_summary(text: str) -> str:
     """Extracto limpio de la descripción del empleador: primeras frases útiles, sin texto legal ni salarios repetidos."""
-    t = strip_html(text or "").replace("*", "").strip()
+    t = _CODE_BREAK.sub(" ", _CSS_RULE.sub(" ", _ATTR_JUNK.sub(" ", strip_html(text or "")))).replace("*", "").strip()
     if len(t) < SUMMARY_MIN:
         return ""
     sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z])", t)
     out, size = [], 0
     for s in sentences:
         s = s.strip()
-        if not s or _BOILER.search(s) or len(s) < 25:
+        if not s or _BOILER.search(s) or _is_code(s) or len(s) < 25:
             continue
         if size + len(s) > SUMMARY_MAX:
             if not out:  # una sola frase enorme: se corta en una palabra
@@ -391,6 +410,35 @@ def make_summary(text: str) -> str:
         size += len(s) + 1
     summary = " ".join(out).strip()
     return summary if len(summary) >= SUMMARY_MIN else ""
+
+
+def _useful_sentences(line: str) -> list[str]:
+    return [x.strip() for x in re.split(r"(?<=[.!?])\s+(?=[A-Z])", line)
+            if len(x.strip()) >= 3 and not _BOILER.search(x) and not _is_code(x)]
+
+
+def make_description(text: str) -> str:
+    """Descripción larga del empleador para los agregadores: funciones y requisitos en líneas, sin HTML ni texto legal."""
+    t = _BLOCK_END.sub("\n", html.unescape(text or ""))
+    t = _ATTR_JUNK.sub(" ", re.sub(r"<[^>]+>", " ", t)).replace("*", "")
+    t = _CODE_BREAK.sub("\n", _CSS_RULE.sub("\n", t))
+    lines, size = [], 0
+    for raw in t.split("\n"):
+        kept = []
+        for sent in _useful_sentences(" ".join(raw.split())):
+            if size + len(sent) + 1 > DESCRIPTION_MAX:
+                if not lines and not kept:  # una sola frase enorme: se corta en una palabra
+                    kept.append(sent[:DESCRIPTION_MAX - 1].rsplit(" ", 1)[0] + "…")
+                return _finish_description(lines + [" ".join(kept)])
+            kept.append(sent)
+            size += len(sent) + 1
+        lines.append(" ".join(kept))
+    return _finish_description(lines)
+
+
+def _finish_description(lines: list[str]) -> str:
+    desc = "\n".join(x for x in lines if x).strip()
+    return desc if len(desc) >= SUMMARY_MIN else ""
 
 
 # ---------------------------------------------------------------------------
@@ -1149,8 +1197,8 @@ def parse_jazz_job(html_text: str):
 
 
 def jazz_desc(html_text: str) -> str:
-    body = re.search(r'id="job-description"[\s\S]*?(?=<form|<div class="apply|$)', html_text)
-    return strip_html(re.sub(r"<script[\s\S]*?</script>", "", body.group(0) if body else html_text))[:6000]
+    body = re.search(r'id="job-description"[^>]*>([\s\S]*?)(?=<form|<div class="apply|$)', html_text)
+    return strip_html(re.sub(r"<script[\s\S]*?</script>", "", body.group(1) if body else html_text))[:6000]
 
 
 def fetch_jazz(company: str, board: str, keep: "re.Pattern") -> list[dict]:
@@ -1433,6 +1481,7 @@ def load_posted_jobs(path: Path, today: date) -> list[Job]:
         j.openings = int(d.get("openings") or 1)
         j.featured = bool(d.get("featured"))
         j.summary = (d.get("description") or "")[:900]
+        j.description = make_description(d.get("description") or "")
         out.append(j)
     return out
 

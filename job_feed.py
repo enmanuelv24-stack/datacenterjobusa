@@ -35,7 +35,7 @@ def job_feed_xml(jobs: list[dict], site_url: str, site_name: str, today: date, t
     rows = []
     for j in jobs:
         url = f"{site_url}/jobs/{j['slug']}.html?{UTM}"
-        desc = j.get("summary") or f"{title_of(j['title'])} at {j['company']} in {j.get('city') or j['state']}."
+        desc = j.get("description") or j.get("summary") or f"{title_of(j['title'])} at {j['company']} in {j.get('city') or j['state']}."
         pay = _salary(j)
         if pay:
             desc = f"Posted pay: {pay}. " + desc

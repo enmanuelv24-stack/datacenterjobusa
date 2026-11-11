@@ -266,6 +266,56 @@ def test_default_max_age_hides_ghost_postings():
     assert c.MAX_AGE_DAYS == 120
 
 
+def test_jazz_desc_drops_the_opening_tag_attributes():
+    page = '<div class="x" id="job-description"><p>Install and test servers in the data hall.</p></div><form>apply</form>'
+    out = c.jazz_desc(page)
+    assert 'id="' not in out and ">" not in out
+    assert "Install and test servers in the data hall." in out
+
+
+def test_description_keeps_duties_and_requirements_but_not_legal_text_or_markup():
+    text = ('id="job-description"> <h2>Responsibilities</h2><ul><li>Rack, stack and cable servers in a live data hall.</li>'
+            '<li>Replace failed drives, memory and power supplies.</li></ul><h2>Requirements</h2>'
+            '<p>One year of hands-on hardware experience or a CompTIA A+ certification.</p>'
+            '<p>We are an equal opportunity employer and value diversity at our company.</p>' + ' More duty text here.' * 40)
+    d = c.make_description(text)
+    assert "Replace failed drives" in d and "CompTIA A+" in d
+    assert "equal opportunity" not in d
+    assert "id=" not in d and "<" not in d and ">" not in d
+    assert len(d) <= c.DESCRIPTION_MAX
+    assert len(d) > c.SUMMARY_MAX
+
+
+def test_description_drops_css_and_page_widgets():
+    text = ('html { font-size: 62.5%; } .panel { margin-bottom: 20px; } Search the FAQ here Go Common Questions --> '
+            'Install fiber and copper cabling in customer data centers across Louisiana. '
+            "We'll respond within 72 hours. > TRANSMISSION_COMPLETE Request Received. " + 'Splice and test fiber links every day. ' * 10)
+    d = c.make_description(text)
+    assert "Install fiber and copper cabling" in d
+    assert "{" not in d and "}" not in d and ">" not in d and "-->" not in d
+
+def test_description_is_empty_when_page_is_only_template_code():
+    page = ('.gradient { filter: none; } ISP Technician - Baton Rouge, LA - SRI Telecom Jobs html { font-size: 62.5%; } '
+            '.container, .container-fluid, .container-lg { max-width: 90%; } #job_piper_alerts_widget .refer-first-pane-btn '
+            '{ font-size: 1.2em; } .fade.show, .show { opacity: 1; } Jobs Login #mobile_menus .list-group-item { border: 0; } '
+            '.text-left table, .text-left iframe, .text-left img { max-width : 100%!important; } Sign Up For Job Alerts! '
+            'Hiring Software Maintained by isolved Talent Acquisition - © 2026 Refresh body { margin-bottom: 60px; } '
+            'Search the FAQ here Go Common Questions -->')
+    assert c.make_description(page) == ""
+    assert c.make_summary(page) == ""
+
+def test_description_empty_when_text_too_short():
+    assert c.make_description("Short.") == ""
+
+
+def test_finalize_fills_description_from_full_text():
+    j = c.Job("x", "Acme", "1", "Data Center Technician", "Dallas", "TX", "Dallas, TX", "2026-11-10", "https://e.com",
+              desc="Maintain cooling and power systems in the data center every day. " * 30)
+    j = c.finalize(j)
+    assert j.description.startswith("Maintain cooling")
+    assert j.desc == ""
+
+
 if __name__ == "__main__":
     import sys
     fails = 0

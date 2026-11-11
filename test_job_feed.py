@@ -38,6 +38,15 @@ def test_pay_only_when_posted_and_cdata_is_escaped():
     assert jobs[1].find("description").text == "Technician at Oracle in OR."
 
 
+def test_feed_prefers_full_description_over_summary():
+    jobs = [dict(JOBS[0], description="Full duties: rack servers. Requirements: A+ certification.")]
+    xml = f.job_feed_xml(jobs, "https://datacenterjobusa.com", "Data Center Job USA", date(2026, 11, 9),
+                         title_of=lambda t: t, role_name=lambda r: r)
+    desc = ET.fromstring(xml).find("job/description").text
+    assert "Requirements: A+ certification." in desc
+    assert desc.startswith("Posted pay: $27.98 - $48.99 per hour.")
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
