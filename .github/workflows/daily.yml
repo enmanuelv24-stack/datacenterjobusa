@@ -31,6 +31,7 @@ jobs:
           python test_job_page.py
           python test_guides_page.py
           python test_state_pages.py
+          python test_es_page.py
       - name: Recolectar vacantes
         run: python collector.py --out data
       - name: Construir sitio
