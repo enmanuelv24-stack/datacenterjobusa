@@ -316,6 +316,23 @@ def test_finalize_fills_description_from_full_text():
     assert j.desc == ""
 
 
+def test_cut_to_title_drops_site_menu():
+    page = ("Data Center Tech 1 Job in Boston | Kelly Telecom EXPERTISE 5G / O-RAN FIBER ABOUT US CONTACT US SEARCH JOBS "
+            "Tech Jobs Data Center Tech 1 Data Center Tech 1 Boston, Massachusetts Onsite Contract "
+            "Keep critical data center infrastructure ready for service. You will install servers and run cable.")
+    out = c.cut_to_title(page, "Data Center Tech 1")
+    assert "EXPERTISE" not in out and out.startswith("Boston"), out
+
+
+def test_cut_to_title_jumps_to_job_description_heading():
+    page = "Fiber Splicing Technician | Telvero body. All Jobs Fiber Splicing Technician Full Time Benefits: Per Diem Job Description: Ribbon Splicer wanted."
+    assert c.cut_to_title(page, "Fiber Splicing Technician") == "Ribbon Splicer wanted."
+
+
+def test_cut_to_title_leaves_text_without_title():
+    assert c.cut_to_title("Install racks and run fiber.", "Data Center Technician") == "Install racks and run fiber."
+
+
 if __name__ == "__main__":
     import sys
     fails = 0
