@@ -23,6 +23,7 @@ from job_feed import write_job_feed
 from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
 from veterans_page import veteran_page
+from es_page import ES_PATH, STEPS as ES_STEPS, faq as es_faq, lede as es_lede, summary as es_summary
 from state_pages import entry_faq, entry_path, entry_states, pay_stats, salary_faq, salary_path, salary_states
 from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
@@ -387,7 +388,7 @@ class Site:
                             "founder": {"@type": "Person", "name": "Enmanuel V.", "jobTitle": "Inside plant / data center technician"}}}
         return f'<script type="application/ld+json">{json.dumps(ld)}</script>'
 
-    def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = ""):
+    def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = "", lang: str = "en"):
         depth = path.count("/")
         r = lambda p: self.rel(p, depth)  # noqa: E731
         section = nav_section(path)
@@ -396,7 +397,7 @@ class Site:
                + f'<a class="cta" href="{r("employers.html")}">For employers</a></nav>')
         url = f"{SITE_URL}/{path}".replace("/index.html", "/")
         bare = self.preview and path == "index.html"
-        doc_head = ("" if bare else "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+        doc_head = ("" if bare else f"<!doctype html><html lang=\"{lang}\"><head><meta charset=\"utf-8\">"
                     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">")
         h = (f"{doc_head}<title>{E(title)}</title>"
              f'<meta name="claude:viewport-fit-sides" content="cover">'
@@ -416,7 +417,7 @@ class Site:
                f'Every listing links to the employer\'s own career page; we never collect applications.</p>'
                f'<p class="upd">Last updated {self.today:%B %-d, %Y} · refreshed every morning</p></div>'
              + f'<div><b>Find jobs</b><a href="{r("index.html")}">All technician jobs</a><a href="{r("entry-level-jobs.html")}">Entry-level jobs</a>'
-               f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
+               f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a><a href="{r(ES_PATH)}" hreflang="es">En español</a></div>'
              + f'<div><b>Pay &amp; career</b><a href="{r("guides.html")}">All guides</a><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a>'
                f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
@@ -591,6 +592,42 @@ class Site:
             self.page(salary_path(name), f"Data Center Technician Salary in {name} {self.today.year}: {money(st['lo'])}–{money(st['hi'])}/hr | {SITE_NAME}",
                       f"Data center technicians in {name} are posted at {money(st['lo'])}–{money(st['hi'])}/hr typical, up to {money(st['top'])}, from {st['n']} employer postings. {upd}", body,
                       head_extra=faq_ld + self.breadcrumbs([("Jobs", "index.html"), ("Salaries", "salaries.html"), (name, salary_path(name))]))
+
+    def spanish_page(self, js):
+        """/es/: trabajos en data centers en español, para quien llega de los videos en español (es_page.py)."""
+        s = es_summary(js)
+        entry = [j for j in js if j.get("entry")]
+        by_state = Counter()
+        for j in entry:
+            by_state[j["state"]] += j["openings"]
+        ent = set(entry_states(js))
+        states = "".join(
+            f'<tr><td>{(f"<a href=\"../{entry_path(STATE_NAMES.get(st, st))}\">" + E(STATE_NAMES.get(st, st)) + "</a>") if st in ent else E(STATE_NAMES.get(st, st))}</td><td class=num>{n}</td></tr>'
+            for st, n in by_state.most_common(12))
+        steps = "".join(f"<li><b>{E(t)}.</b> {E(d)}</li>" for t, d in ES_STEPS)
+        faq_html, faq_ld = self.faq_block(es_faq(s["entry_openings"], s))
+        faq_html = faq_html.replace("Questions people ask", "Preguntas frecuentes")
+        paid_entry = [j for j in entry if j["hourly_min"]]
+        body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / Español</p>'
+                '<h1>Trabajos en data centers en Estados Unidos, con el sueldo a la vista</h1>'
+                f'<p class="lede">{E(es_lede(s))}</p>'
+                + (f'<div class="stats"><div class="stat"><b>{s["entry_openings"]:,}</b><span>vacantes sin experiencia</span></div>'
+                   f'<div class="stat"><b>{money(s["lo"])}–{money(s["hi"])}</b><span>sueldo típico por hora</span></div>'
+                   f'<div class="stat"><b>{s["employers"]}</b><span>empresas contratando</span></div></div>' if s["lo"] else "")
+                + f'<h2>Cómo empezar sin experiencia</h2><ol>{steps}</ol>'
+                + f'<h2>Estados con más vacantes para principiantes</h2><div class="tablebox"><table><thead><tr><th>Estado</th><th>Vacantes</th></tr></thead><tbody>{states}</tbody></table></div>'
+                + '<h2>Vacantes para principiantes con sueldo publicado</h2>'
+                + '<p class="note">Las ofertas están en inglés porque así las publica la empresa. Toca una para ver el sueldo y aplicar.</p>'
+                + self.job_list(paid_entry, 1, 30)
+                + f'<p class="note"><a href="../entry-level-jobs.html">Ver todas las vacantes para principiantes ({s["entry_openings"]:,})</a> · '
+                  '<a href="../salaries.html">Sueldos por estado</a> · <a href="../index.html">Todas las vacantes</a></p>'
+                + faq_html
+                + '<div class="callout leadbox"><h3>¿Quieres recibir trabajos nuevos?</h3>'
+                  '<p class="note">Deja tu correo y te avisamos cuando salgan vacantes nuevas con sueldo. Gratis, sin spam.</p>'
+                + self.lead_form("box", "Avísame", page="es") + '</div>')
+        self.page(ES_PATH, f"Trabajos en Data Centers en USA (Sin Experiencia): {s['entry_openings']:,} Vacantes con Sueldo | {SITE_NAME}",
+                  f"{s['entry_openings']:,} trabajos en data centers en Estados Unidos que aceptan gente sin experiencia, con el sueldo publicado por la empresa. Actualizado cada día.",
+                  body, head_extra=faq_ld + f'<link rel="alternate" hreflang="en" href="{SITE_URL}/entry-level-jobs.html">', lang="es")
 
     def build(self):
         js = self.jobs
@@ -1111,6 +1148,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                   "requirements, certifications that help and how to get hired.", body,
                   head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
         self.state_search_pages(js)
+        self.spanish_page(js)
 
         # ---- militares y veteranos (SkillBridge y puestos "Military & Veterans Encouraged")
         vp = veteran_page(js, self.job_list, self.signup())
