@@ -18,6 +18,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from employers_page import employer_pages
+from guides_page import guides_page
 from job_feed import write_job_feed
 from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
@@ -42,6 +43,22 @@ ROLE_BLURB = {
     "IT support": "Hands-on IT support roles based inside data centers.",
     "Other technician": "Technician roles that don't fit the other categories.",
 }
+
+NAV_LINKS = [("index.html", "Jobs"), ("entry-level-jobs.html", "Entry level"), ("salaries.html", "Salaries"),
+             ("companies.html", "Companies"), ("states.html", "States"), ("guides.html", "Guides")]
+# carpetas y páginas sueltas que pertenecen a cada sección del menú
+NAV_GROUPS = {"index.html": ("jobs/", "roles/", "levels/", "new-jobs.html", "travel-jobs.html"),
+              "companies.html": ("companies/",), "states.html": ("states/", "cities/"),
+              "guides.html": ("how-to-become", "certifications.html", "shift-schedules.html", "data-center-technician-", "military-", "job-ready-kit.html")}
+
+
+def nav_section(path: str) -> str:
+    """A qué enlace del menú pertenece una página (para marcarlo como la sección actual). '' si a ninguno."""
+    for href, _ in NAV_LINKS:
+        if path == href or path.startswith(NAV_GROUPS.get(href, ())):
+            return href
+    return ""
+
 
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -372,13 +389,10 @@ class Site:
     def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = ""):
         depth = path.count("/")
         r = lambda p: self.rel(p, depth)  # noqa: E731
-        nav = (f'<nav class="main" aria-label="Main"><a href="{r("index.html")}">Jobs</a>'
-               f'<a href="{r("new-jobs.html")}">New</a><a href="{r("entry-level-jobs.html")}">Entry level</a>'
-               f'<a href="{r("salaries.html")}">Salaries</a><a href="{r("companies.html")}">Companies</a>'
-               f'<a href="{r("states.html")}">States</a><a href="{r("certifications.html")}">Certifications</a>'
-               f'<a href="{r("travel-jobs.html")}">Per diem</a>'
-               f'<a href="{r("shift-schedules.html")}">Shifts</a>'
-               f'<a href="{r("employers.html")}">Employers</a></nav>')
+        section = nav_section(path)
+        nav = ('<nav class="main" aria-label="Main">'
+               + "".join(f'<a href="{r(href)}"{" aria-current=\"page\"" if href == section else ""}>{label}</a>' for href, label in NAV_LINKS)
+               + f'<a class="cta" href="{r("employers.html")}">For employers</a></nav>')
         url = f"{SITE_URL}/{path}".replace("/index.html", "/")
         bare = self.preview and path == "index.html"
         doc_head = ("" if bare else "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
@@ -402,7 +416,7 @@ class Site:
                f'<p class="upd">Last updated {self.today:%B %-d, %Y} · refreshed every morning</p></div>'
              + f'<div><b>Find jobs</b><a href="{r("index.html")}">All technician jobs</a><a href="{r("entry-level-jobs.html")}">Entry-level jobs</a>'
                f'<a href="{r("travel-jobs.html")}">Per diem &amp; housing</a><a href="{r("states.html")}">Jobs by state</a><a href="{r("companies.html")}">Jobs by company</a></div>'
-             + f'<div><b>Pay &amp; career</b><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
+             + f'<div><b>Pay &amp; career</b><a href="{r("guides.html")}">All guides</a><a href="{r("salaries.html")}">Technician salaries</a><a href="{r("shift-schedules.html")}">Shift schedules</a>'
                f'<a href="{r("certifications.html")}">Certifications</a><a href="{r("how-to-become-a-data-center-technician.html")}">How to become a tech</a>'
                f'<a href="{r("data-center-technician-interview-questions.html")}">Interview questions</a><a href="{r("data-center-technician-resume.html")}">Résumé guide</a><a href="{r("job-ready-kit.html")}">Job-Ready Kit</a><a href="{r("shift-survey.html")}">Tech survey</a></div>'
              + f'<div><b>About</b><a href="{r("about.html")}">Who runs this site</a><a href="{r("about.html")}#data">Where the data comes from</a>'
@@ -539,7 +553,8 @@ class Site:
         opts = lambda vals: "".join(f'<option value="{E(v)}">{E(v)}</option>' for v in vals)  # noqa: E731
         scale = max([j["hourly_max"] or 0 for j in js] + [1])
         top_states = [(STATE_NAMES.get(st, st), f"states/{slug(STATE_NAMES.get(st, st))}.html") for st, _ in states.most_common(4)]
-        quick = ('<a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">Entry level / no experience</a><a href="travel-jobs.html">Per diem &amp; housing</a><a href="how-to-become-a-data-center-technician.html">How to get in</a><a href="salaries.html">Compare pay</a><a href="shift-schedules.html">Shift schedules</a><a href="military-veteran-data-center-jobs.html">Military &amp; SkillBridge</a><a href="shift-survey.html">Tech survey</a>')
+        quick = ('<span>Popular:</span><a href="new-jobs.html">New this week</a><a href="entry-level-jobs.html">No experience</a>'
+                 '<a href="travel-jobs.html">Per diem &amp; housing</a><a href="how-to-become-a-data-center-technician.html">How to get in</a>')
         fresh_n = sum(j["openings"] for j in js if j.get("days_posted") is not None and j["days_posted"] <= 7)
         entry_n = sum(j["openings"] for j in js if j.get("entry"))
         perk_n = sum(j["openings"] for j in js if j.get("perks") and re.search(r"per_diem|housing", j["perks"]))
@@ -554,7 +569,7 @@ class Site:
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
                 '<button type="submit">Find jobs</button></form>'
                 f'<div class="quick">{quick}</div>'
-                '<div class="herolead"><p><b>Get new jobs sent to you.</b> Leave your email and we\'ll tell you when technician jobs with pay are posted near you.</p>'
+                '<div class="herolead"><p><b>Get new jobs by email</b></p>'
                 + self.lead_form("hero", "Send me jobs", page="index") + '</div></div>'
                 '<aside class="snap"><h2>Today on the site</h2><ul>'
                 f'<li><a href="index.html"><b>{total:,}</b><span>open technician jobs</span></a></li>'
@@ -564,31 +579,29 @@ class Site:
                 f'<p class="top">Most jobs: {top_states_snap}</p></aside>'
                 f'<p class="live"><a href="new-jobs.html"><b>{fresh_n:,}</b> posted this week</a><a href="entry-level-jobs.html"><b>{entry_n:,}</b> entry level</a>'
                 f'<a href="travel-jobs.html"><b>{perk_n:,}</b> mention per diem or housing</a><span><b>{len(companies)}</b> employers</span><span>Updated {self.today:%b %-d}</span><a href="employers.html">Hiring? Reach techs here</a></p>'
-                '</div></div></section><div class="wrap">'
-                f'<div class="stats"><div class="stat"><b>{self.today:%b %-d}</b><span>last updated · daily</span></div>'
-                f'<div class="stat"><b>{len(companies)}</b><span>employers tracked</span></div>'
-                f'<div class="stat"><b>{len(states)}</b><span>states</span></div>'
-                f'<div class="stat"><b>{paid / total:.0%}</b><span>with pay posted</span></div></div>'
-                '<section class="browse" id="browse"><div><h2>By type of work</h2><div class="quick">'
+                '</div></div></section><div class="wrap">')
+        browse = ('<section class="browse" id="browse"><div><h2>Browse by type of work</h2><div class="quick">'
                 + "".join(f'<a href="roles/{slug(r)}.html">{E(r)} <small>{n:,}</small></a>' for r, n in Counter({ROLE_EN.get(j["role"], j["role"]): 0 for j in js}).items() for n in [sum(x["openings"] for x in js if ROLE_EN.get(x["role"], x["role"]) == r)])
                 + '</div></div><div><h2>By level</h2><div class="quick">'
                 + "".join(f'<a href="levels/{slug(l)}.html">{E(n)} <small>{sum(x["openings"] for x in js if x.get("level") == l):,}</small></a>'
                           for l, n in [("I", "Level I / entry"), ("II", "Level II"), ("III", "Level III / senior"), ("IV", "Level IV")] if any(x.get("level") == l for x in js))
-                + '<a href="entry-level-jobs.html">No experience <small>guide</small></a></div></div></section>'
-                '<form class="filters" id="f" onsubmit="event.preventDefault()">'
+                + '<a href="entry-level-jobs.html">No experience <small>guide</small></a></div></div></section>')
+        body += ('<form class="filters" id="f" onsubmit="event.preventDefault()">'
                 '<label for="q">Search<input id="q" type="search" placeholder="Title or city"></label>'
                 f'<label for="st">State<select id="st"><option value="">All states</option>{opts(sorted(states))}</select></label>'
-                f'<label for="co">Company<select id="co"><option value="">All companies</option>{opts(sorted(companies))}</select></label>'
+                f'<label class="x" for="co">Company<select id="co"><option value="">All companies</option>{opts(sorted(companies))}</select></label>'
                 f'<label for="ro">Type<select id="ro"><option value="">All types</option>{opts(sorted({d["r"] for d in data}))}</select></label>'
-                '<label for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
+                '<label class="x" for="pay">Min $/hr<input id="pay" type="number" min="0" step="1" placeholder="e.g. 35"></label>'
                 '<label for="lv">Level<select id="lv"><option value="">Any level</option><option value="I">Level I</option><option value="II">Level II</option><option value="III">Level III / senior</option><option value="IV">Level IV</option></select></label>'
-                '<label for="ex">Experience<select id="ex"><option value="">Any</option><option value="1">Entry level / no experience</option></select></label>'
-                '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
+                '<label class="x" for="ex">Experience<select id="ex"><option value="">Any</option><option value="1">Entry level / no experience</option></select></label>'
+                '<label class="x" for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
                 '<option value="Travel">Travel job</option><option value="Schedule">Schedule stated (12s, 6 days…)</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
-                '<label for="so">Sort<select id="so"><option value="pay">Highest pay</option><option value="new">Newest</option></select></label>'
-                '</form><button class="more moref" id="mf" type="button" aria-expanded="false" aria-controls="f">Filter and sort</button><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
+                '<label for="so">Sort<select id="so"><option value="new">Newest</option><option value="pay">Highest pay</option></select></label>'
+                '<button class="more moref" id="mf" type="button" aria-expanded="false"><span class="d">More filters</span><span class="m">Filter and sort</span><span class="h">Fewer filters</span></button>'
+                '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
-                '<section class="how"><h2>How this site works</h2><ol>'
+                + browse
+                + '<section class="how"><h2>How this site works</h2><ol>'
                 '<li><b>We read the source.</b> Every morning the site reads the career pages of data center operators (Amazon, Google, Microsoft, QTS…) and the contractors who build and cable them (NTI, AFL, LINX, E2 Optics, ADB…).</li>'
                 '<li><b>We keep only technician work.</b> Data center techs, critical facilities, electricians, fiber and structured cabling, deployment. No sales, no managers, no fake "data entry" listings.</li>'
                 '<li><b>We put the pay first.</b> Hourly and salaried ranges are converted to $/hr so you can compare, and we flag per diem, housing and schedules when the employer states them.</li>'
@@ -614,7 +627,7 @@ function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$(
  $('list').innerHTML=out.join('');$('more').hidden=r.length<=N}
 ['q','st','co','ro','pay','lv','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
-$('mf').addEventListener('click',()=>{const o=$('f').classList.toggle('open');$('mf').setAttribute('aria-expanded',o);$('mf').textContent=o?'Hide filters':'Filter and sort'});
+$('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f').classList.toggle('open'))});
 </script></div>""")
         self.page("index.html", SITE_NAME if self.preview else f"Data Center Technician Jobs with Pay, Updated Daily | {SITE_NAME}",
                   f"{total:,} data center jobs for technicians, electricians and fiber techs at {len(companies)} employers, with posted pay ranges. "
@@ -875,17 +888,18 @@ $('mf').addEventListener('click',()=>{const o=$('f').classList.toggle('open');$(
                 body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../companies/{slug(j["company"])}.html">{E(j["company"])}</a></p>'
                         f'<h1>{E(clean_title(j["title"]))}</h1>'
                         f'<p class="lede">{E(j["company"])} · {E(where)}</p>'
+                        '<div class="jobgrid"><aside class="jobside"><div class="sidecard">'
                         + pay_hero(j)
                         + f'<p class="applyrow">{apply_link}</p>'
                         '<div class="tablebox facts"><table><tbody>'
                         f'<tr><th>Job type</th><td>{E(ROLE_EN.get(j["role"], j["role"]))}</td></tr>'
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
-                        + f'<tr><th>First posted</th><td>{posted_label(j["posted"])}</td></tr></tbody></table></div>'
+                        + f'<tr><th>First posted</th><td>{posted_label(j["posted"])}</td></tr></tbody></table></div></div></aside><div class="jobmain">'
                         + about
                         + f'<div class="applybar">{apply_link}</div>'
                         + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
-                        + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
+                        + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div></div></div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
                         + self.job_list([x for x in js if x["company"] == j["company"] and x["state"] == j["state"] and x is not j], 1, 10)
                         + self.signup(j["state"], j["company"], f'jobs/{j["slug"]}'))
@@ -1142,6 +1156,9 @@ $('mf').addEventListener('click',()=>{const o=$('f').classList.toggle('open');$(
             t = re.search(r"<!--title: (.*?)-->", raw).group(1)
             dsc = re.search(r"<!--desc: (.*?)-->", raw).group(1)
             self.page(f.name, t, dsc, re.sub(r"<!--.*?-->", "", raw) + self.signup())
+
+        gp = guides_page(set(self.pages))
+        self.page(gp["path"], gp["title"], gp["desc"], gp["body"])
 
         # ---- recursos estáticos (ícono, imagen para compartir)
         import shutil
