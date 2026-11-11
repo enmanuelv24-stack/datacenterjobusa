@@ -28,6 +28,7 @@ jobs:
           python test_collector.py
           python test_indexnow.py
           python test_job_feed.py
+          python test_job_page.py
       - name: Recolectar vacantes
         run: python collector.py --out data
       - name: Construir sitio
