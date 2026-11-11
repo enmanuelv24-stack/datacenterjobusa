@@ -33,12 +33,19 @@ from pathlib import Path
 # Configuración de fuentes. Para agregar una empresa, agrégala aquí.
 # ---------------------------------------------------------------------------
 GREENHOUSE_BOARDS = {"align46": "Align", "xai": "xAI", "coreweave": "CoreWeave", "nebius": "Nebius", "holderconstruction": "Holder Construction",
-                     "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics"}
+                     "tds": "TDS (Total Deployment Solutions)", "compudynamics": "Compu Dynamics",
+                     # nov 2026: operadores de colocation, IA y minería con técnicos de data center
+                     "flexentialcorp": "Flexential", "elementcritical": "Element Critical", "galaxydigitalservices": "Galaxy",
+                     "hut8": "Hut 8", "backblaze": "Backblaze", "lightningai": "Lightning AI", "trace3": "Trace3"}
 # Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
-LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix", "midtechgroup": "MidPoint Technology Group"}
-DC_ONLY = {"Network Connex", "AFL", "Align"}
+LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix", "midtechgroup": "MidPoint Technology Group",
+              "serverfarm": "Serverfarm", "wachter": "Wachter", "infraservices": "InfraServices", "lightedge": "LightEdge",
+              "t5datacenters": "T5 Data Centers", "ecldc": "ECL", "cagents": "CAI"}
+# Empresas que publican mucho fuera de data center: solo entran los puestos con data center / ISP / low voltage en el título
+DC_ONLY = {"Network Connex", "AFL", "Align", "Wachter", "CAI", "Galaxy", "Hut 8", "Backblaze", "Lightning AI", "Trace3",
+           "Vultr", "Fluidstack", "Iron Mountain", "Astreya"}
 DC_TITLE = re.compile(r"data ?cent|\bISP\b|\bDC\b|low voltage|structured cabl|white space", re.I)
-ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda"}
+ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda", "vultr": "Vultr", "fluidstack": "Fluidstack"}
 AMAZON_QUERIES = [
     "data center technician",
     "data center engineering operations",
@@ -127,6 +134,11 @@ class Job:
 # ---------------------------------------------------------------------------
 # Normalización
 # ---------------------------------------------------------------------------
+def dc_ok(company: str, title: str) -> bool:
+    """Las empresas de DC_ONLY solo aportan puestos que dicen data center / ISP / low voltage en el título."""
+    return company not in DC_ONLY or bool(DC_TITLE.search(title))
+
+
 def is_tech_title(title: str) -> bool:
     if re.search(r"deployment foreman|foreman.*data ?cent|data ?cent.*foreman|electrical (general )?foreman", title, re.I):
         return True  # en contratistas, foreman de cuadrilla es el siguiente paso del técnico
@@ -697,7 +709,13 @@ def fetch_ashby(org: str) -> list[dict]:
 
 # Workday: (empresa, host, tenant, sitio). Sus páginas de empleo usan este API público.
 WORKDAY_SITES = [("Equinix", "equinix.wd1.myworkdayjobs.com", "equinix", "External"),
-                 ("QTS", "qtsdatacenters.wd5.myworkdayjobs.com", "qtsdatacenters", "qts")]
+                 ("QTS", "qtsdatacenters.wd5.myworkdayjobs.com", "qtsdatacenters", "qts"),
+                 ("CyrusOne", "cyrusone.wd1.myworkdayjobs.com", "cyrusone", "CyrusOneCareerPortal"),
+                 ("NTT Global Data Centers", "nttglobaldatacenters.wd501.myworkdayjobs.com", "nttglobaldatacenters", "External"),
+                 ("Vantage Data Centers", "vantagedc.wd1.myworkdayjobs.com", "vantagedc", "Vantage"),
+                 ("Aligned Data Centers", "aligneddc.wd12.myworkdayjobs.com", "aligneddc", "aligneddc"),
+                 ("Iron Mountain", "ironmountain.wd5.myworkdayjobs.com", "ironmountain", "iron-mountain-jobs"),
+                 ("Astreya", "astreya.wd5.myworkdayjobs.com", "astreya", "life-at-astreya-opportunities")]
 WORKDAY_QUERIES = ["technician", "engineer", "data center", "facilities", "operations"]
 # Ciudades de Workday sin estado -> estado (Workday a veces solo da la ciudad)
 CITY_STATE = {"Englewood": "CO", "Sunnyvale": "CA", "Culpeper": "VA", "San Jose": "CA", "Torrance": "CA",
@@ -728,7 +746,7 @@ def fetch_workday(company: str, host: str, tenant: str, site: str) -> list[dict]
             time.sleep(0.3)
     out = []
     for path, p in seen.items():
-        if not is_tech_title(p.get("title", "")):
+        if not is_tech_title(p.get("title", "")) or not dc_ok(company, p.get("title", "")):
             continue
         info = get(base + path).get("jobPostingInfo", {})
         if "United States" not in ((info.get("country") or {}).get("descriptor") or "United States"):
@@ -1439,11 +1457,11 @@ def build(raw: dict, today: date, max_age_days: int | None = MAX_AGE_DAYS, us_on
             jobs.append(from_amazon(r))
     for board, rows in raw.get("greenhouse", {}).items():
         for r in rows:
-            if is_tech_title(r["title"]):
+            if is_tech_title(r["title"]) and dc_ok(GREENHOUSE_BOARDS.get(board, board), r["title"]):
                 jobs.append(from_greenhouse(board, GREENHOUSE_BOARDS.get(board, board), r))
     for org, rows in raw.get("ashby", {}).items():
         for r in rows:
-            if is_tech_title(r["title"]):
+            if is_tech_title(r["title"]) and dc_ok(ASHBY_ORGS.get(org, org), r["title"]):
                 jobs.append(from_ashby(org, ASHBY_ORGS.get(org, org), r))
     for r in raw.get("other", []):
         if is_tech_title(r["title"]):
