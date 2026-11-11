@@ -19,6 +19,7 @@ from pathlib import Path
 
 from employers_page import employer_pages
 from job_feed import write_job_feed
+from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
 from veterans_page import veteran_page
 from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
@@ -585,7 +586,7 @@ class Site:
                 '<label for="pk">Perks<select id="pk"><option value="">Any</option><option value="Per diem">Per diem</option><option value="Housing">Housing / lodging</option>'
                 '<option value="Travel">Travel job</option><option value="Schedule">Schedule stated (12s, 6 days…)</option><option value="Overtime">Overtime</option><option value="Sign-on bonus">Sign-on bonus</option></select></label>'
                 '<label for="so">Sort<select id="so"><option value="pay">Highest pay</option><option value="new">Newest</option></select></label>'
-                '</form><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
+                '</form><button class="more moref" id="mf" type="button" aria-expanded="false" aria-controls="f">Filter and sort</button><p class="count" id="cnt" aria-live="polite"></p><ul class="jobs" id="list"></ul>'
                 '<button class="more" id="more" type="button">Show more jobs</button>'
                 '<section class="how"><h2>How this site works</h2><ol>'
                 '<li><b>We read the source.</b> Every morning the site reads the career pages of data center operators (Amazon, Google, Microsoft, QTS…) and the contractors who build and cable them (NTI, AFL, LINX, E2 Optics, ADB…).</li>'
@@ -613,6 +614,7 @@ function draw(){const q=$('q').value.trim().toLowerCase(),st=$('st').value,co=$(
  $('list').innerHTML=out.join('');$('more').hidden=r.length<=N}
 ['q','st','co','ro','pay','lv','ex','pk','so'].forEach(id=>$(id).addEventListener('input',()=>{N=40;draw()}));
 $('more').addEventListener('click',()=>{N+=40;draw()});draw();
+$('mf').addEventListener('click',()=>{const o=$('f').classList.toggle('open');$('mf').setAttribute('aria-expanded',o);$('mf').textContent=o?'Hide filters':'Filter and sort'});
 </script></div>""")
         self.page("index.html", SITE_NAME if self.preview else f"Data Center Technician Jobs with Pay, Updated Daily | {SITE_NAME}",
                   f"{total:,} data center jobs for technicians, electricians and fiber techs at {len(companies)} employers, with posted pay ranges. "
@@ -841,7 +843,8 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                          + f"Job type: {role_en}. {ROLE_BLURB.get(role_en, '')} "
                          + "Apply on the employer's career site.").strip()
                 summary = (j.get("summary") or "").strip()
-                desc_html = (f"<p>{E(summary)}</p>" if summary else "") + f"<p>{E(facts)}</p>"
+                posting_html = description_html(j.get("description") or summary)
+                desc_html = posting_html + f"<p>{E(facts)}</p>"
                 address = {"@type": "PostalAddress", "addressRegion": j["state"], "addressCountry": "US"}
                 if j["city"]:
                     address["addressLocality"] = j["city"]
@@ -861,22 +864,26 @@ $('more').addEventListener('click',()=>{N+=40;draw()});draw();
                                                   "unitText": "HOUR" if j["pay_unit"] == "hour" else "YEAR"}}
                 pay = (f'{money(j["pay_min"], j["pay_unit"])}–{money(j["pay_max"], j["pay_unit"])} per {j["pay_unit"]}'
                        if j["pay_min"] else "Not posted by the employer")
+                apply_label = "Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "'s site"
+                apply_link = (f'<a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank" data-ev="apply" '
+                              f'data-co="{E(j["company"])}">{apply_label}</a>')
                 about = ('<h2>About this job</h2><div class="prose">'
-                         + (f'<p>{E(summary)}</p>' if summary else "")
+                         + posting_html
                          + f'<p>{E(facts)}</p>'
-                         + (f'<p class="note">Excerpt from {E(j["company"])}\'s posting. Full duties, requirements and benefits are on their site.</p>' if summary else "")
-                         + '</div>')
+                         + (f'<p class="note">From {E(j["company"])}\'s posting. Full details and benefits are on their site.</p>' if posting_html else "")
+                         + f'</div><p class="applyrow">{apply_link}</p>')
                 body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../companies/{slug(j["company"])}.html">{E(j["company"])}</a></p>'
                         f'<h1>{E(clean_title(j["title"]))}</h1>'
                         f'<p class="lede">{E(j["company"])} · {E(where)}</p>'
-                        '<div class="tablebox"><table><tbody>'
-                        f'<tr><th>Posted pay</th><td>{pay}</td></tr>'
+                        + pay_hero(j)
+                        + f'<p class="applyrow">{apply_link}</p>'
+                        '<div class="tablebox facts"><table><tbody>'
                         f'<tr><th>Job type</th><td>{E(ROLE_EN.get(j["role"], j["role"]))}</td></tr>'
                         f'<tr><th>Openings</th><td>{j["openings"]}</td></tr>'
                         + (f'<tr><th>Travel perks</th><td>{", ".join(E(t) for t in perk_labels(j))}</td></tr>' if perk_labels(j) else "")
-                        + f'<tr><th>First posted</th><td>{E(j["posted"] or "—")}</td></tr></tbody></table></div>'
-                        f'<p><a class="more primary" href="{E(j["url"])}" rel="nofollow noopener" target="_blank" data-ev="apply" data-co="{E(j["company"])}">{"Contact " + E(j["company"]) if j.get("source") == "posted" else "Apply on " + E(j["company"]) + "\'s site"}</a></p>'
+                        + f'<tr><th>First posted</th><td>{posted_label(j["posted"])}</td></tr></tbody></table></div>'
                         + about
+                        + f'<div class="applybar">{apply_link}</div>'
                         + f'<div class="leadjob"><b>Taken already, or not quite right?</b><span>Leave your email and we\'ll tell you when {E(j["company"])} or other employers post technician jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}.</span>'
                         + self.lead_form("job", "Alert me", j["state"], j["company"], f'jobs/{j["slug"]}') + '</div>'
                         f'<h2>More {E(j["company"])} jobs in {E(STATE_NAMES.get(j["state"], j["state"]))}</h2>'
