@@ -39,10 +39,10 @@ GREENHOUSE_BOARDS = {"align46": "Align", "xai": "xAI", "coreweave": "CoreWeave",
                      "hut8": "Hut 8", "backblaze": "Backblaze", "lightningai": "Lightning AI", "trace3": "Trace3"}
 # Lever: org -> empresa. Las contratistas de telecom también publican fibra/torres; DC_ONLY las limita a data center.
 LEVER_ORGS = {"networkconnex": "Network Connex", "cologix": "Cologix", "midtechgroup": "MidPoint Technology Group",
-              "serverfarm": "Serverfarm", "wachter": "Wachter", "infraservices": "InfraServices", "lightedge": "LightEdge",
-              "t5datacenters": "T5 Data Centers", "ecldc": "ECL", "cagents": "CAI"}
+              "serverfarm": "Serverfarm", "infraservices": "InfraServices", "lightedge": "LightEdge",
+              "ecldc": "ECL", "cagents": "CAI"}
 # Empresas que publican mucho fuera de data center: solo entran los puestos con data center / ISP / low voltage en el título
-DC_ONLY = {"Network Connex", "AFL", "Align", "Wachter", "CAI", "Galaxy", "Hut 8", "Backblaze", "Lightning AI", "Trace3",
+DC_ONLY = {"Network Connex", "AFL", "Align", "CAI", "Galaxy", "Hut 8", "Backblaze", "Lightning AI", "Trace3",
            "Vultr", "Fluidstack", "Iron Mountain", "Astreya"}
 DC_TITLE = re.compile(r"data ?cent|\bISP\b|\bDC\b|low voltage|structured cabl|white space", re.I)
 ASHBY_ORGS = {"crusoe": "Crusoe", "lambda": "Lambda", "vultr": "Vultr", "fluidstack": "Fluidstack"}
