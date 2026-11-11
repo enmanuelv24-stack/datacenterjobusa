@@ -110,7 +110,40 @@ def role_heading(role_en: str) -> str:
 def clean_title(t: str) -> str:
     t = re.sub(r"\s+,", ",", t)
     t = re.sub(r",\s*(DCC Communities|Amazon Web Services|AWS Support|AWS)\b", "", t)
-    return re.sub(r"\s{2,}", " ", t).strip(" ,-")
+    t = re.sub(r"\s{2,}", " ", t).strip(" ,-")
+    return t + ")" if t.count("(") > t.count(")") else t  # algunos empleadores cortan '(Travel Position'
+
+
+def job_page_title(title: str, company: str, place: str, ref: str = "") -> str:
+    """Título de la ficha: el puesto y el lugar siempre (distinguen fichas con el mismo puesto); empresa y marca si caben."""
+    for cand in (f"{title} – {company}, {place}{ref} | {SITE_NAME}", f"{title} – {company}, {place}{ref}", f"{title} – {place}{ref}"):
+        if len(cand) <= TITLE_MAX:
+            return cand
+    tail = f" – {place}{ref}"
+    return fit_title(title, max(20, TITLE_MAX - len(tail))) + tail
+
+
+TITLE_MAX = 62  # Google corta los títulos más largos en los resultados
+
+
+def fit_title(title: str, limit: int = TITLE_MAX) -> str:
+    """Título de página que cabe en Google: primero se quita ' | Data Center Job USA', después se corta en una palabra,
+    sin dejar paréntesis abiertos ni separadores colgando."""
+    def tidy(t: str) -> str:
+        if t.count("(") > t.count(")"):  # paréntesis sin cerrar: se quita el signo, no lo que viene detrás
+            k = t.rfind("(")
+            t = t[:k] + t[k + 1:] if len(t) - k > 4 else t[:k]
+        return re.sub(r"[\s–—\-|:,·(]+$", "", t).strip()
+    t = tidy(title)
+    if len(t) <= limit:
+        return t
+    suffix = f" | {SITE_NAME}"
+    if t.endswith(suffix):
+        t = tidy(t[: -len(suffix)])
+    while len(t) > limit:
+        cut = t[:limit + 1].rsplit(" ", 1)[0]
+        t = tidy(cut if cut != t else t[:limit])
+    return t
 
 
 # ---------------------------------------------------------------------------
@@ -388,6 +421,7 @@ class Site:
 
     def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = ""):
         depth = path.count("/")
+        title = fit_title(title)
         r = lambda p: self.rel(p, depth)  # noqa: E731
         section = nav_section(path)
         nav = ('<nav class="main" aria-label="Main">'
@@ -469,7 +503,9 @@ class Site:
 
     def job_list(self, rows, depth: int, limit: int | None = None) -> str:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
-        rows = sorted(rows, key=lambda j: (not j.get("featured"), -(j["hourly_max"] or 0)))  # destacados primero
+        # destacados primero, luego las más nuevas; a igual fecha, la mejor pagada
+        rows = sorted(rows, key=lambda j: (not j.get("featured"), j["days_posted"] if j.get("days_posted") is not None else 999,
+                                           -(j["hourly_max"] or 0)))
         shown = rows if limit is None else rows[:limit]
         items = [self.job_row(j, depth, scale) for j in shown]
         if len(items) >= 8:
@@ -563,7 +599,7 @@ class Site:
                 '<p class="kicker">Built by a working data center tech · Updated every morning</p>'
                 '<h1>Data center technician jobs with the <mark>pay up front</mark>.</h1>'
                 f'<p class="lede">{total:,} open jobs at {len(companies)} operators and contractors, read straight from their own career pages. '
-                f'{paid / total:.0%} show the pay range. No agencies, no résumé harvesting.</p>'
+                f'<span class="lx">{paid / total:.0%} show the pay range. No agencies, no résumé harvesting.</span></p>'
                 '<form class="search" onsubmit="event.preventDefault();const q=document.getElementById(\'q\'),st=document.getElementById(\'st\');q.value=this.s.value;st.value=this.st.value;q.dispatchEvent(new Event(\'input\'));document.getElementById(\'f\').scrollIntoView({behavior:\'smooth\'})">'
                 '<input name="s" type="search" placeholder="Job title, keyword or city — fiber, electrician, Abilene…" aria-label="Search jobs">'
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
@@ -905,7 +941,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                         + self.signup(j["state"], j["company"], f'jobs/{j["slug"]}'))
                 dup = same_title[(clean_title(j["title"]), j["company"], j["city"])] > 1
                 ref = f' (#{str(j["job_id"])[-6:]})' if dup else ""
-                self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"] or j["state"]}{ref} | {SITE_NAME}',
+                self.page(f'jobs/{j["slug"]}.html', job_page_title(clean_title(j["title"]), j["company"], j["city"] or j["state"], ref),
                           f'{clean_title(j["title"])} at {j["company"]} in {where}{ref}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}' + item_js(j, role_en))
 

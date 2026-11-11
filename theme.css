@@ -168,6 +168,7 @@ footer.site .upd{font:500 13px/1.4 var(--mono)}
 .browse h2{font-size:17px;margin:0 0 10px;border:0;padding:0}
 .browse .quick a small,.quick a small{font:600 12px/1 var(--mono);opacity:.7;margin-left:6px}
 @media (max-width:760px){.browse{grid-template-columns:1fr}}
+.browse>div{min-width:0} /* sin esto la fila de botones deslizable ensancha la página en el celular */
 .quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 main .quick a{color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;background:var(--panel)}
 main .quick a:hover{border-color:var(--accent);color:var(--accent-ink)}
@@ -410,3 +411,16 @@ form.lead.hero{padding:0;border:0;background:none}
 .grid-links{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
 .grid-links span{overflow:visible}
 @media (max-width:760px){nav.main a.cta{min-height:var(--tap)}}
+
+/* --- v6: en el celular la primera vacante entra en la primera pantalla --- */
+@media (max-width:760px){
+  .hero{padding:14px 0 12px}
+  .hero .kicker{font-size:11px;margin-bottom:8px}
+  .hero h1{font-size:25px;line-height:1.12}
+  .hero .lede{font-size:14.5px;margin-top:6px}
+  .hero .lede .lx{display:none}
+  .hero .search{margin-top:12px}
+  .hero .quick{margin-top:10px}
+  .moref{margin-top:10px}
+  .filters{margin-top:8px}
+}

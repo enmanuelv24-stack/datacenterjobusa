@@ -479,6 +479,33 @@ def page_text(html_text: str, title: str = "") -> str:
     return t[:6000]
 
 
+def cut_to_title(text: str, title: str, window: int = 4000) -> str:
+    """Quita el menú y la cabecera de la página: deja el texto desde la última mención del título del puesto
+    en los primeros `window` caracteres (el título del <h1>), sin contar menciones dentro de una frase."""
+    needle = title.lower().strip()
+    if len(needle) > 50:  # títulos largos: basta el principio, cortado en una palabra
+        needle = needle[:50].rsplit(" ", 1)[0]
+    tl = text.lower()
+    if not needle:
+        return text
+    best, k = -1, tl.find(needle)
+    while 0 <= k < window:
+        after = text[k + len(needle):k + len(needle) + 3].strip()
+        if not after or not after[0].islower():
+            best = k
+        k = tl.find(needle, k + 1)
+    if best < 0:
+        return text
+    rest = text[best + len(needle):]
+    m = _DESC_HEAD.search(rest[:1500])   # 'Job Description:' u otro encabezado: la descripción empieza ahí
+    return rest[m.end():].strip() if m else rest.strip()
+
+
+def page_body_text(page: str) -> str:
+    """Texto de una página sin scripts, estilos, menús ni pies."""
+    return strip_html(_PAGE_NOISE.sub(" ", re.sub(r"<(script|style)\b[\s\S]*?</\1>", " ", page, flags=re.I)))
+
+
 def add_page_descs(rows: list[dict], base: str = "", workers: int = 3) -> list[dict]:
     """Rellena r["desc"] visitando r["url"] en las filas que no la traen. Un fallo en una página no detiene el resto."""
     def one(r):
@@ -1241,7 +1268,7 @@ def fetch_careerplug(company: str, base: str) -> list[dict]:
     for r in rows:
         try:
             page = get(r["url"], as_json=False)
-            text = strip_html(re.sub(r"<script[\s\S]*?</script>", "", page))
+            text = page_body_text(page)
             m = CP_PAY.search(text)
             if m:
                 lo, hi, unit = parse_pay(m.group(1))
@@ -1249,7 +1276,7 @@ def fetch_careerplug(company: str, base: str) -> list[dict]:
                     r["pay"] = (lo, hi, unit)
             d = re.search(r'datePosted"\s*:\s*"(\d{4}-\d\d-\d\d)', page)
             r["posted"] = d.group(1) if d else ""
-            r["desc"] = text[:6000]
+            r["desc"] = cut_to_title(text, r["title"])[:6000]
         except Exception as e:
             print("aviso: careerplug", r["url"], e, file=sys.stderr)
         time.sleep(0.3)
@@ -1340,7 +1367,7 @@ def fetch_kelly() -> list[dict]:
             page = get(r["url"], as_json=False)
             d = re.search(r'datePosted"?\s*:\s*"(\d{4}-\d\d-\d\d)', page)
             r["posted"] = d.group(1) if d else ""
-            r["desc"] = strip_html(re.sub(r"<script[\s\S]*?</script>", "", page))[:6000]
+            r["desc"] = cut_to_title(page_body_text(page), r["title"])[:6000]
         except Exception as e:
             print("aviso: kelly", r["url"], e, file=sys.stderr)
         time.sleep(0.3)
