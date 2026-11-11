@@ -23,6 +23,7 @@ from job_feed import write_job_feed
 from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
 from veterans_page import veteran_page
+from state_pages import entry_faq, entry_path, entry_states, pay_stats, salary_faq, salary_path, salary_states
 from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
 
@@ -110,40 +111,7 @@ def role_heading(role_en: str) -> str:
 def clean_title(t: str) -> str:
     t = re.sub(r"\s+,", ",", t)
     t = re.sub(r",\s*(DCC Communities|Amazon Web Services|AWS Support|AWS)\b", "", t)
-    t = re.sub(r"\s{2,}", " ", t).strip(" ,-")
-    return t + ")" if t.count("(") > t.count(")") else t  # algunos empleadores cortan '(Travel Position'
-
-
-def job_page_title(title: str, company: str, place: str, ref: str = "") -> str:
-    """Título de la ficha: el puesto y el lugar siempre (distinguen fichas con el mismo puesto); empresa y marca si caben."""
-    for cand in (f"{title} – {company}, {place}{ref} | {SITE_NAME}", f"{title} – {company}, {place}{ref}", f"{title} – {place}{ref}"):
-        if len(cand) <= TITLE_MAX:
-            return cand
-    tail = f" – {place}{ref}"
-    return fit_title(title, max(20, TITLE_MAX - len(tail))) + tail
-
-
-TITLE_MAX = 62  # Google corta los títulos más largos en los resultados
-
-
-def fit_title(title: str, limit: int = TITLE_MAX) -> str:
-    """Título de página que cabe en Google: primero se quita ' | Data Center Job USA', después se corta en una palabra,
-    sin dejar paréntesis abiertos ni separadores colgando."""
-    def tidy(t: str) -> str:
-        if t.count("(") > t.count(")"):  # paréntesis sin cerrar: se quita el signo, no lo que viene detrás
-            k = t.rfind("(")
-            t = t[:k] + t[k + 1:] if len(t) - k > 4 else t[:k]
-        return re.sub(r"[\s–—\-|:,·(]+$", "", t).strip()
-    t = tidy(title)
-    if len(t) <= limit:
-        return t
-    suffix = f" | {SITE_NAME}"
-    if t.endswith(suffix):
-        t = tidy(t[: -len(suffix)])
-    while len(t) > limit:
-        cut = t[:limit + 1].rsplit(" ", 1)[0]
-        t = tidy(cut if cut != t else t[:limit])
-    return t
+    return re.sub(r"\s{2,}", " ", t).strip(" ,-")
 
 
 # ---------------------------------------------------------------------------
@@ -421,7 +389,6 @@ class Site:
 
     def page(self, path: str, title: str, desc: str, body: str, canonical: bool = True, head_extra: str = ""):
         depth = path.count("/")
-        title = fit_title(title)
         r = lambda p: self.rel(p, depth)  # noqa: E731
         section = nav_section(path)
         nav = ('<nav class="main" aria-label="Main">'
@@ -503,9 +470,7 @@ class Site:
 
     def job_list(self, rows, depth: int, limit: int | None = None) -> str:
         scale = max([j["hourly_max"] or 0 for j in self.jobs] + [1])
-        # destacados primero, luego las más nuevas; a igual fecha, la mejor pagada
-        rows = sorted(rows, key=lambda j: (not j.get("featured"), j["days_posted"] if j.get("days_posted") is not None else 999,
-                                           -(j["hourly_max"] or 0)))
+        rows = sorted(rows, key=lambda j: (not j.get("featured"), -(j["hourly_max"] or 0)))  # destacados primero
         shown = rows if limit is None else rows[:limit]
         items = [self.job_row(j, depth, scale) for j in shown]
         if len(items) >= 8:
@@ -569,6 +534,64 @@ class Site:
                 + self.lead_form("inline", "Notify me", state, company, page) + '</div></li>')
 
     # -------------------------------------------------------------- pages
+    def faq_block(self, faq) -> tuple[str, str]:
+        html_ = '<h2>Questions people ask</h2><div class="faq">' + "".join(f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in faq) + '</div>'
+        ld = {"@context": "https://schema.org", "@type": "FAQPage",
+              "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
+        return html_, f'<script type="application/ld+json">{json.dumps(ld)}</script>'
+
+    def state_search_pages(self, js):
+        """Páginas para "entry level data center jobs <estado>" y "data center technician salary <estado>" (state_pages.py)."""
+        upd = f"Updated {self.today:%B %-d, %Y}."
+        sal = set(salary_states(js))
+        for s in entry_states(js):
+            name = STATE_NAMES.get(s, s)
+            rows = [j for j in js if j["state"] == s and j.get("entry")]
+            n = sum(j["openings"] for j in rows)
+            cities = Counter(j["city"] for j in rows if j["city"])
+            st = pay_stats(rows)
+            faq_html, faq_ld = self.faq_block(entry_faq(name, st, n, [c for c, _ in cities.most_common()]))
+            body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../entry-level-jobs.html">Entry level</a> / {E(name)}</p>'
+                    f'<h1>Entry-level data center jobs in {E(name)}</h1>'
+                    f'<p class="lede">{n:,} openings in {E(name)} that take beginners — Level I technicians, cable pullers, deployment and fiber techs — '
+                    f'from {len({j["company"] for j in rows})} employers. '
+                    + (f'Typical posted pay: <b>{money(st["lo"])}–{money(st["hi"])}/hr</b>. ' if st else '')
+                    + 'Tagged when the posting says Level I, entry level, no experience required or paid training.</p>'
+                    + '<h2>Open entry-level jobs</h2>' + self.job_list(rows, 1)
+                    + ('<h2>Where they are</h2><div class="quick">' + "".join(f'<span class="chip">{E(c)} <small>{k}</small></span>' for c, k in cities.most_common(12)) + '</div>' if cities else '')
+                    + faq_html
+                    + f'<p class="note">See also: <a href="../states/{slug(name)}.html">all data center jobs in {E(name)}</a>'
+                    + (f', <a href="../{salary_path(name)}">data center salary in {E(name)}</a>' if s in sal else '')
+                    + ', <a href="../how-to-become-a-data-center-technician.html">how to become a data center technician</a>.</p>'
+                    + self.signup(state=s, page=entry_path(name)[:-5]))
+            self.page(entry_path(name), f"Entry-Level Data Center Jobs in {name} (No Experience): {n:,} Open | {SITE_NAME}",
+                      f"{n:,} entry-level data center jobs in {name} that hire without experience, with posted pay. {upd}", body,
+                      head_extra=faq_ld + self.breadcrumbs([("Jobs", "index.html"), ("Entry level", "entry-level-jobs.html"), (name, entry_path(name))]))
+        ent = set(entry_states(js))
+        for s in salary_states(js):
+            name = STATE_NAMES.get(s, s)
+            rows = [j for j in js if j["state"] == s]
+            st = pay_stats(rows)
+            faq_html, faq_ld = self.faq_block(salary_faq(name, st, self.today.year))
+            body = (f'<p class="crumbs"><a href="../index.html">Jobs</a> / <a href="../salaries.html">Salaries</a> / {E(name)}</p>'
+                    f'<h1>Data center technician salary in {E(name)} ({self.today.year})</h1>'
+                    f'<p class="lede">Typical posted range in {E(name)}: <b>{money(st["lo"])}–{money(st["hi"])} per hour</b> '
+                    f'({money(st["lo"] * 2080, "year")}–{money(st["hi"] * 2080, "year")} a year at 40 hours), from {st["n"]} current postings with pay. '
+                    'Every number is the range the employer wrote; no estimates.</p>'
+                    f'<div class="stats"><div class="stat"><b>{money(st["lo"])}</b><span>typical low $/hr</span></div><div class="stat"><b>{money(st["hi"])}</b><span>typical high $/hr</span></div>'
+                    f'<div class="stat"><b>{money(st["top"])}</b><span>highest posted $/hr</span></div><div class="stat"><b>{st["n"]}</b><span>postings with pay</span></div></div>'
+                    + '<h2>By employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
+                    + '<h2>By job type</h2>' + self.pay_table(rows, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 1, lambda k: f"roles/{slug(k)}.html")
+                    + faq_html
+                    + '<h2>Jobs with pay posted</h2>' + self.job_list([j for j in rows if j["hourly_min"]], 1, 20)
+                    + f'<p class="note">See also: <a href="../states/{slug(name)}.html">all data center jobs in {E(name)}</a>'
+                    + (f', <a href="../{entry_path(name)}">entry-level jobs in {E(name)}</a>' if s in ent else '')
+                    + ', <a href="../salaries.html">pay in every state</a>.</p>'
+                    + self.signup(state=s, page=salary_path(name)[:-5]))
+            self.page(salary_path(name), f"Data Center Technician Salary in {name} {self.today.year}: {money(st['lo'])}–{money(st['hi'])}/hr | {SITE_NAME}",
+                      f"Data center technicians in {name} are posted at {money(st['lo'])}–{money(st['hi'])}/hr typical, up to {money(st['top'])}, from {st['n']} employer postings. {upd}", body,
+                      head_extra=faq_ld + self.breadcrumbs([("Jobs", "index.html"), ("Salaries", "salaries.html"), (name, salary_path(name))]))
+
     def build(self):
         js = self.jobs
         total = sum(j["openings"] for j in js)
@@ -599,7 +622,7 @@ class Site:
                 '<p class="kicker">Built by a working data center tech · Updated every morning</p>'
                 '<h1>Data center technician jobs with the <mark>pay up front</mark>.</h1>'
                 f'<p class="lede">{total:,} open jobs at {len(companies)} operators and contractors, read straight from their own career pages. '
-                f'<span class="lx">{paid / total:.0%} show the pay range. No agencies, no résumé harvesting.</span></p>'
+                f'{paid / total:.0%} show the pay range. No agencies, no résumé harvesting.</p>'
                 '<form class="search" onsubmit="event.preventDefault();const q=document.getElementById(\'q\'),st=document.getElementById(\'st\');q.value=this.s.value;st.value=this.st.value;q.dispatchEvent(new Event(\'input\'));document.getElementById(\'f\').scrollIntoView({behavior:\'smooth\'})">'
                 '<input name="s" type="search" placeholder="Job title, keyword or city — fiber, electrician, Abilene…" aria-label="Search jobs">'
                 f'<select name="st" aria-label="State"><option value="">All states</option>{"".join(f"<option value=\"{E(st)}\">{E(STATE_NAMES.get(st, st))}</option>" for st, _ in states.most_common())}</select>'
@@ -670,6 +693,8 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                   f"Filter by state, company, entry level and per diem. Updated {self.today:%B %-d, %Y}.", body, head_extra=self.org_ld())
 
         # ---- salaries
+        ent_names = {STATE_NAMES.get(s, s) for s in entry_states(js)}
+        sal_names = {STATE_NAMES.get(s, s) for s in salary_states(js)}
         paid_js = [j for j in js if j["hourly_min"]]
         med = lambda rows, k: statistics.median([j[k] for j in rows]) if rows else None  # noqa: E731
         all_lo, all_hi = med(paid_js, "hourly_min"), med(paid_js, "hourly_max")
@@ -721,7 +746,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                 '<h2>By employer (all technician roles)</h2>' + self.pay_table(js, lambda j: j["company"], "Employer", 0, lambda k: f"companies/{slug(k)}.html")
                 + '<h2>By job type</h2>' + self.pay_table(js, lambda j: ROLE_EN.get(j["role"], j["role"]), "Job type", 0, lambda k: f"roles/{slug(k)}.html")
                 + '<h2>By state</h2>' + self.pay_table(js, lambda j: STATE_NAMES.get(j["state"], j["state"]), "State", 0,
-                                                      lambda k: f"states/{slug(k)}.html")
+                                                      lambda k: salary_path(k) if k in sal_names else f"states/{slug(k)}.html")
                 + '<h2>Questions people ask</h2><div class="faq">' + faq_html + '</div>'
                 + '<p class="note">Salaried ranges are divided by 2,080 hours. Pay ranges are the employer\'s posted range for the role, not what any one person earns. '
                   'Amazon, Google and Microsoft post pay in every state; some employers only post it where state law requires. Per diem, housing and overtime are tagged on the '
@@ -835,6 +860,9 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                     + (f'Typical posted pay: <b>{money(statistics.median([j["hourly_min"] for j in spaid]))}–{money(statistics.median([j["hourly_max"] for j in spaid]))}/hr</b>. ' if spaid else '')
                     + f'{sum(j["openings"] for j in rows if j.get("entry"))} entry level · {sum(j["openings"] for j in rows if j.get("days_posted") is not None and j["days_posted"] <= 7)} new this week.</p>'
                     + sguide
+                    + ((f'<div class="quick">' + (f'<a href="../{entry_path(name)}">Entry-level jobs in {E(name)}</a>' if name in ent_names else '')
+                        + (f'<a href="../{salary_path(name)}">Data center salary in {E(name)}</a>' if name in sal_names else '') + '</div>')
+                       if name in ent_names or name in sal_names else '')
                     + '<h2>Pay by employer</h2>' + self.pay_table(rows, lambda j: j["company"], "Employer", 1, lambda k: f"companies/{slug(k)}.html")
                     + '<h2>Cities</h2>' + f'<ul class="grid-links">{c_links}</ul>'
                     + (('<h2>By type of work</h2><div class="quick">'
@@ -941,7 +969,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                         + self.signup(j["state"], j["company"], f'jobs/{j["slug"]}'))
                 dup = same_title[(clean_title(j["title"]), j["company"], j["city"])] > 1
                 ref = f' (#{str(j["job_id"])[-6:]})' if dup else ""
-                self.page(f'jobs/{j["slug"]}.html', job_page_title(clean_title(j["title"]), j["company"], j["city"] or j["state"], ref),
+                self.page(f'jobs/{j["slug"]}.html', f'{clean_title(j["title"])} – {j["company"]}, {j["city"] or j["state"]}{ref} | {SITE_NAME}',
                           f'{clean_title(j["title"])} at {j["company"]} in {where}{ref}. Pay: {pay}.', body,
                           head_extra=f'<script type="application/ld+json">{json.dumps(ld)}</script>{crumbs_ld}' + item_js(j, role_en))
 
@@ -1032,7 +1060,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
         for j in entry:
             e_states[j["state"]] += j["openings"]
             e_cos[j["company"]] += j["openings"]
-        e_state_links = "".join(f'<li><a href="states/{slug(STATE_NAMES.get(st, st))}.html"><span>{E(STATE_NAMES.get(st, st))}</span><small>{n}</small></a></li>'
+        e_state_links = "".join(f'<li><a href="{entry_path(STATE_NAMES.get(st, st)) if STATE_NAMES.get(st, st) in ent_names else "states/" + slug(STATE_NAMES.get(st, st)) + ".html"}"><span>{E(STATE_NAMES.get(st, st))}</span><small>{n}</small></a></li>'
                                 for st, n in e_states.most_common(12))
         e_co_links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n}</small></a></li>'
                              for c, n in e_cos.most_common(12))
@@ -1082,6 +1110,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                   f"{sum(j['openings'] for j in entry):,} entry-level data center technician jobs with no experience required, posted pay ranges, "
                   "requirements, certifications that help and how to get hired.", body,
                   head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
+        self.state_search_pages(js)
 
         # ---- militares y veteranos (SkillBridge y puestos "Military & Veterans Encouraged")
         vp = veteran_page(js, self.job_list, self.signup())
