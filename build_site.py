@@ -131,14 +131,16 @@ LEAD_JS = ("<script>"
            "+'<a href=\"/how-to-become-a-data-center-technician.html\" data-ev=\"next\">how to get hired fast</a> \\u00b7 '"
            "+'<a href=\"/job-ready-kit.html\" data-ev=\"next\">the $27 Job-Ready Kit</a></p>';"
            "try{localStorage.setItem('dcj_sub','1')}catch(e){}return false}"
-           # Ventana emergente: tras 45 % de scroll o 25 s; no si ya se suscribió o la cerró hace menos de 5 días.
+           # Ventana emergente: solo desde la 2.ª página de la visita, tras 60 % de scroll o 40 s; no si ya se suscribió
+           # o la cerró hace menos de 5 días. (Antes salía en la 1.ª página: 202 vistas, 37 cierres, 7 altas en 28 días.)
            "(function(){var p=document.getElementById('lpop');if(!p)return;var last=null;"
+           "try{var pv=+(sessionStorage.getItem('dcj_pv')||0)+1;sessionStorage.setItem('dcj_pv',String(pv));if(pv<2){p.remove();return}}catch(e){}"
            "try{if(localStorage.getItem('dcj_sub')||+localStorage.getItem('dcj_pop')>Date.now()){p.remove();return}}catch(e){}"
            "function close(){p.hidden=true;if(window.gtag)gtag('event','popup_close');try{localStorage.setItem('dcj_pop',String(Date.now()+5*864e5))}catch(e){}if(last)last.focus()}"
            "var shown=false;function show(){if(shown)return;shown=true;last=document.activeElement;p.hidden=false;if(window.gtag)gtag('event','popup_view');"
            "var em=p.querySelector('input[type=email]');if(em)em.focus({preventScroll:true})}"
-           "window.addEventListener('scroll',function(){var h=document.documentElement;if(h.scrollTop/(h.scrollHeight-h.clientHeight)>.45)show()},{passive:true});"
-           "setTimeout(show,25000);p.querySelector('.x').addEventListener('click',close);"
+           "window.addEventListener('scroll',function(){var h=document.documentElement;if(h.scrollTop/(h.scrollHeight-h.clientHeight)>.6)show()},{passive:true});"
+           "setTimeout(show,40000);p.querySelector('.x').addEventListener('click',close);"
            "p.addEventListener('click',function(e){if(e.target===p)close()});"
            "document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden)close()})})();"
            # Vista de una vacante (las páginas de empleo definen window.dcjItem).
@@ -159,6 +161,9 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 # Google Analytics 4: solo se incluye si GA4_ID tiene valor en site_config.py.
 ANALYTICS = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA4_ID}"></script>'
              "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}"
+             # Robots: navegadores automatizados (webdriver/headless/bot) no se cuentan; en 28 días ~1/3 de las visitas eran
+             # de China y de pueblos con data centers (Luleå, Prineville, Boardman, Forest City) con 0 s de interacción.
+             f"if(navigator.webdriver||/bot|crawl|spider|headless|lighthouse|preview/i.test(navigator.userAgent))window['ga-disable-{GA4_ID}']=true;"
              f"gtag('js',new Date());gtag('config','{GA4_ID}');</script>") if GA4_ID else ""
 # Microsoft Clarity (grabaciones anónimas y mapas de calor): se activa al poner CLARITY_ID en site_config.py.
 ANALYTICS += ('<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
