@@ -13,6 +13,10 @@ from site_config import CONTACT_EMAIL, JOB_PLANS, POST_JOB_URL, SITE_NAME
 
 E = html.escape
 
+# Cifras reales de Google Analytics; actualízalas a mano cada mes (fecha incluida para que no envejezcan en silencio).
+PROOF = ("First week online (Nov 6-12, 2026): 280 technicians visited and clicked through to an employer's "
+         "application page 44 times. Listings also appear on Adzuna and Jooble.")
+
 
 def _plan_button(plan: dict, primary: bool) -> str:
     cls = "more primary" if primary else "more"
@@ -73,7 +77,7 @@ def employer_pages(jobs: list[dict], n_companies: int, signup_html: str, breadcr
              'Every listing links straight to you; we never collect applications or sell leads.')
     employers = ('<p class="crumbs"><a href="index.html">Jobs</a> / Employers</p>'
                  '<h1>Hire data center technicians who compare pay before they apply</h1>'
-                 f'<p class="lede">{E(reach)}</p>' + plans_html()
+                 f'<p class="lede">{E(reach)}</p><p><b>{E(PROOF)}</b></p>' + plans_html()
                  + f'<p>Questions, bulk postings or a custom plan? Email <a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>.</p>'
                  + '<h2>How it works</h2>' + STEPS
                  + '<section class="guide"><h2>Who posts here</h2><div class="prose">'
