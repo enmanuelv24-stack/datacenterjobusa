@@ -964,9 +964,10 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                 summary = (j.get("summary") or "").strip()
                 posting_html = description_html(j.get("description") or summary)
                 desc_html = posting_html + f"<p>{E(facts)}</p>"
-                address = {"@type": "PostalAddress", "addressRegion": j["state"], "addressCountry": "US"}
-                if j["city"]:
-                    address["addressLocality"] = j["city"]
+                # Google exige addressLocality en JobPosting (Search Console lo marcó el 16 nov): sin ciudad,
+                # el empleador contrata en todo el estado, así que va el nombre del estado.
+                address = {"@type": "PostalAddress", "addressLocality": j["city"] or STATE_NAMES.get(j["state"], j["state"]),
+                           "addressRegion": j["state"], "addressCountry": "US"}
                 ld = {"@context": "https://schema.org/", "@type": "JobPosting", "title": clean_title(j["title"]),
                       "description": desc_html,
                       "datePosted": str(posted_d), "validThrough": f"{valid}T23:59:59",
