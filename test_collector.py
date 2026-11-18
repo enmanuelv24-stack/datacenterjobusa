@@ -118,6 +118,53 @@ def test_keep_previous_if_source_failed():
     assert [j.company for j in out] == ["Amazon"]
 
 
+def test_keep_previous_drops_companies_removed_from_config():
+    import json, tempfile
+    from pathlib import Path
+    # Wachter se quitó de LEVER_ORGS a propósito: sus vacantes de ayer no deben conservarse
+    prev = [{"source": "lever", "company": "Wachter", "job_id": "w1", "title": "Low Voltage Technician",
+             "city": "Dallas", "state": "TX", "location_raw": "Dallas, TX", "posted": "2026-10-20",
+             "url": "https://example.com/w1", "openings": 1, "last_seen": "2026-10-29"}]
+    live = [c.Job("amazon", "Amazon", "new", "Data Center Technician", "Wink", "TX", "Wink, TX",
+                  "2026-10-29", "https://example.com/new")]
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "jobs.json"
+        p.write_text(json.dumps(prev))
+        out = c.keep_previous_if_source_failed(live, p, date(2026, 10, 30))
+    assert [j.company for j in out] == ["Amazon"]
+
+
+def test_configured_companies_cover_every_company_in_the_data():
+    # si una empresa real no está aquí, la red de seguridad de "fuente caída" dejaría de protegerla
+    import json
+    from pathlib import Path
+    data = Path(__file__).with_name("data") / "jobs.json"
+    if not data.exists():
+        return
+    companies = {j["company"] for j in json.loads(data.read_text(encoding="utf-8")) if j.get("source") != "posted"}
+    missing = companies - c.configured_companies() - {"Wachter"}  # Wachter: quitada el 11 nov, caduca sola
+    assert not missing, missing
+
+
+def test_report_source_changes_flags_dead_and_falling_sources():
+    import json, tempfile
+    from pathlib import Path
+    prev = ([{"source": "greenhouse", "company": "Align", "job_id": str(i), "title": "Data Center Cabling Foreman",
+              "url": "u", "openings": 1} for i in range(12)]
+            + [{"source": "workday", "company": "QTS", "job_id": f"q{i}", "title": "Data Center Technician",
+                "url": "u", "openings": 1} for i in range(10)]
+            + [{"source": "posted", "company": "Smart Data LLC", "job_id": "s1", "title": "Cable Tech", "url": "u", "openings": 1}])
+    live = [c.Job("workday", "QTS", f"q{i}", "Data Center Technician", "Irving", "TX", "Irving, TX", "2026-10-29", "u")
+            for i in range(3)]
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "jobs.json"
+        p.write_text(json.dumps(prev))
+        notes = c.report_source_changes(live, p)
+    assert "aviso: fuente caída: Align (ayer 12, hoy 0)" in notes
+    assert "aviso: bajada fuerte: QTS (ayer 10, hoy 3)" in notes
+    assert not any("Smart Data" in n for n in notes)  # los anuncios publicados a mano no son una fuente
+
+
 def test_linx():
     table = '''<table><tr><th>Job Position</th><th>Location</th></tr>
 <tr>

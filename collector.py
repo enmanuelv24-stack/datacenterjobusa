@@ -620,7 +620,8 @@ def get(url: str, as_json: bool = True):
             # 429 = demasiadas peticiones, 5xx = servidor caído: esperar y reintentar
             if e.code not in (429, 500, 502, 503, 504) or intento == 3:
                 raise
-            time.sleep(8 * (intento + 1))
+            # 429 (Microsoft lo devuelve a menudo) necesita esperas largas: 20, 40 y 60 s
+            time.sleep((20 if e.code == 429 else 8) * (intento + 1))
     raise RuntimeError("sin respuesta")  # no se llega aquí
 
 
@@ -681,8 +682,13 @@ BUILDER_KEEP = {"holderconstruction": re.compile(r"field engineer technician|eng
 def fetch_greenhouse(board: str) -> list[dict]:
     data = get(f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true")
     keep = BUILDER_KEEP.get(board)
-    return [j for j in data.get("jobs", [])
-            if (keep.search(j.get("title", "")) if keep else is_tech_title(j.get("title", "")))]
+    out = [j for j in data.get("jobs", [])
+           if (keep.search(j.get("title", "")) if keep else is_tech_title(j.get("title", "")))]
+    if not out:  # distinguir "tablero vacío o bloqueado" de "hay vacantes pero ninguna de técnico"
+        titles = ", ".join(sorted({j.get("title", "") for j in data.get("jobs", [])})[:8])
+        print(f"aviso: greenhouse {board}: {len(data.get('jobs', []))} vacantes en el tablero, 0 de técnico"
+              + (f" (p. ej. {titles})" if titles else ""), file=sys.stderr)
+    return out
 
 
 def fetch_rosendin() -> list[dict]:
@@ -777,6 +783,7 @@ def fetch_microsoft() -> list[dict]:
                 seen[p["id"]] = p
             if len(pos) < 10:
                 break
+            time.sleep(0.5)  # sin pausa, Microsoft responde 429 a mitad de la búsqueda
     out = []
     for p in seen.values():
         if not is_tech_title(p["name"]):
@@ -1552,6 +1559,52 @@ def write_outputs(jobs: list[Job], outdir: Path) -> None:
 MAX_KEEP_DAYS = 5
 
 
+# Empresas que se recolectan con una función propia (no están en ninguna tabla de configuración)
+HARDCODED_COMPANIES = {"Amazon", "Microsoft", "Google", "Introl", "AFL", "Oracle", "Black Box", "Rosendin",
+                       "Vision Technologies", "M.C. Dean", "E2 Optics", "Team LINX", "Kelly Telecom"}
+
+
+def configured_companies() -> set[str]:
+    """Todas las empresas que el recolector consulta hoy. Si una se quita de la configuración,
+    sus vacantes de ayer no deben conservarse como si la fuente hubiera fallado."""
+    out = set(HARDCODED_COMPANIES)
+    out |= set(GREENHOUSE_BOARDS.values()) | set(ASHBY_ORGS.values()) | set(LEVER_ORGS.values())
+    out |= {s[0] for s in WORKDAY_SITES} | {s[0] for s in ULTIPRO_SITES} | {s[0] for s in CAREERPLUG_SITES}
+    out |= {s[0] for s in APPLICANTPRO_SITES} | {s[0] for s in JAZZ_SITES}
+    return out
+
+
+def report_source_changes(jobs: list[Job], prev_path: Path) -> list[str]:
+    """Compara las vacantes por empresa con las de ayer y avisa de fuentes caídas o con bajadas fuertes.
+    Devuelve los avisos (también los imprime) para que queden en el registro del workflow."""
+    today_counts: dict[str, int] = {}
+    for j in jobs:
+        today_counts[j.company] = today_counts.get(j.company, 0) + 1
+    notes = []
+    try:
+        prev = json.loads(prev_path.read_text(encoding="utf-8")) if prev_path.exists() else []
+    except Exception:
+        prev = []
+    prev_counts: dict[str, int] = {}
+    for d in prev:
+        if d.get("source") != "posted":
+            prev_counts[d.get("company", "")] = prev_counts.get(d.get("company", ""), 0) + 1
+    for company, before in sorted(prev_counts.items()):
+        now = today_counts.get(company, 0)
+        if now == 0:
+            notes.append(f"aviso: fuente caída: {company} (ayer {before}, hoy 0)")
+        elif before >= 5 and now < before / 2:
+            notes.append(f"aviso: bajada fuerte: {company} (ayer {before}, hoy {now})")
+    silent = sorted(configured_companies() - set(today_counts) - set(prev_counts))
+    if silent:  # configuradas pero sin aportar nada: tablero vacío, filtro demasiado estricto o fuente rota
+        notes.append("aviso: fuentes configuradas sin vacantes ayer ni hoy: " + ", ".join(silent))
+    for n in notes:
+        print(n, file=sys.stderr)
+    print("fuentes hoy: " + ", ".join(f"{c} {n}" for c, n in sorted(today_counts.items(), key=lambda x: -x[1])),
+          file=sys.stderr)
+    return notes
+
+
 def keep_previous_if_source_failed(jobs: list[Job], prev_path: Path, today: date) -> list[Job]:
     """Si una empresa que ayer tenía vacantes hoy trae 0 (fuente caída o bloqueada),
     conserva sus vacantes de ayer para no publicar un sitio a medias."""
@@ -1562,12 +1615,16 @@ def keep_previous_if_source_failed(jobs: list[Job], prev_path: Path, today: date
     except Exception:
         return jobs
     live = {j.company for j in jobs}
+    configured = configured_companies()
     for j in jobs:
         j.last_seen = today.isoformat()
     names = set(Job.__dataclass_fields__)
-    kept, expired = [], 0
+    kept, expired, removed = [], 0, {}
     for d in prev:
-        if d.get("company") in live:
+        if d.get("company") in live or d.get("source") == "posted":
+            continue
+        if d.get("company") not in configured:  # la empresa se quitó de las fuentes a propósito
+            removed[d["company"]] = removed.get(d["company"], 0) + 1
             continue
         j = Job(**{k: v for k, v in d.items() if k in names})
         seen = date.fromisoformat(j.last_seen) if j.last_seen else today
@@ -1579,6 +1636,8 @@ def keep_previous_if_source_failed(jobs: list[Job], prev_path: Path, today: date
         kept.append(j)
     if expired:
         print(f"aviso: {expired} vacantes conservadas caducaron (fuente sin responder más de {MAX_KEEP_DAYS} días)", file=sys.stderr)
+    for company, n in sorted(removed.items()):
+        print(f"aviso: {company} ya no está en las fuentes: se descartan {n} vacantes de ayer", file=sys.stderr)
     if kept:
         print(f"aviso: se conservan {len(kept)} vacantes de ayer de: "
               + ", ".join(sorted({j.company for j in kept})), file=sys.stderr)
@@ -1599,6 +1658,7 @@ def main(argv=None) -> int:
     today = date.fromisoformat(a.today) if a.today else date.today()
     jobs = build(raw, today, a.max_age)
     if not a.src:
+        report_source_changes(jobs, Path(a.out) / "jobs.json")
         jobs = keep_previous_if_source_failed(jobs, Path(a.out) / "jobs.json", today)
     posted = [j for j in load_posted_jobs(Path(a.out) / "posted_jobs.json", today) if j.company not in {x.company for x in jobs} or True]
     jobs = [j for j in jobs if j.source != "posted"] + posted
