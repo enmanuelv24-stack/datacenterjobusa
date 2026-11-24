@@ -756,11 +756,21 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
         rank_rows = "".join(f'<tr><td>{i + 1}</td><td><a href="companies/{slug(c)}.html">{E(c)}</a></td><td class=num>{money(lo)}</td><td class=num>{money(hi)}</td><td class=num>{n}</td></tr>'
                             for i, (c, hi, lo, n) in enumerate(rank[:15]))
         perk_pd = [j for j in js if j.get("per_diem")]
+        # año de 52 semanas (igual que el 2,080 de arriba), extra a 1.5x después de 40 h, redondeado hacia abajo a miles
+        yr = lambda rate, h: int(week_pay(rate, 0, hours=h)["total"] * 52 // 1000) * 1000  # noqa: E731
+        hourly = [j for j in paid_js if j.get("pay_unit") == "hour"]  # los de sueldo anual no cobran horas extra
+        h_lo, h_hi = med(hourly, "hourly_min"), med(hourly, "hourly_max")
+        year_rows = "".join(f'<tr><td>{h} hours a week</td><td class=num>${yr(h_lo, h):,}</td><td class=num>${yr(h_hi, h):,}</td></tr>'
+                            for h in (40, 50, 60)) if h_lo else ""
         faq = [
             ("How much does a data center technician make?",
              f"Across {len(paid_js):,} technician postings with pay on this site, the typical employer-posted range is {money(all_lo)}–{money(all_hi)} per hour "
              f"(about {money(all_lo * 2080, 'year')}–{money(all_hi * 2080, 'year')} a year at 40 hours). Entry-level roles post around the low end; Level III, leads and critical-facilities roles post the high end. "
              "These are the ranges employers publish, not self-reported salaries."),
+            ("How much does a data center technician make a year with overtime?",
+             (f"For jobs paid by the hour, the typical posted range is {money(h_lo)}–{money(h_hi)}/hr. A 50-hour week with time-and-a-half after 40 comes to about "
+              f"${yr(h_lo, 50):,}–${yr(h_hi, 50):,} a year, and a 60-hour week to about ${yr(h_lo, 60):,}–${yr(h_hi, 60):,}, before taxes. " if h_lo else "")
+             + "Salaried operations roles usually don't pay overtime. Construction and deployment jobs often run 50–72 hours a week, so overtime is a big part of what those technicians take home."),
             ("Which companies pay data center technicians the most?",
              ("The highest posted ranges for data center technician roles right now come from " + ", ".join(c for c, *_ in rank[:3]) + ". " if len(rank) >= 3 else "")
              + "Hyperscalers and operators tend to post higher base ranges; contractors post lower hourly rates but add overtime and per diem, which often make the weekly check bigger."),
@@ -780,7 +790,12 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                 'No self-reported guesses, no estimates.</p>'
                 f'<div class="stats"><div class="stat"><b>{money(all_lo)}</b><span>typical low $/hr</span></div><div class="stat"><b>{money(all_hi)}</b><span>typical high $/hr</span></div>'
                 f'<div class="stat"><b>{len(paid_js):,}</b><span>postings with pay</span></div><div class="stat"><b>{len(perk_pd)}</b><span>state a per diem amount</span></div></div>'
-                '<h2>By level</h2><div class="tablebox"><table><thead><tr><th>Level</th><th>Openings</th><th>Typical low $/hr</th><th>Typical high $/hr</th><th>Postings with pay</th></tr></thead>'
+                + ('<h2>What hourly jobs come to in a year, with overtime</h2>'
+                   f'<p>Only postings paid by the hour ({len(hourly):,}), typical range {money(h_lo)}–{money(h_hi)}/hr. Salaried roles usually get no overtime.</p>'
+                   '<div class="tablebox"><table><thead><tr><th>Schedule</th><th>At typical low</th><th>At typical high</th></tr></thead>'
+                   f'<tbody>{year_rows}</tbody></table></div>'
+                   '<p class="note">52 weeks, overtime at 1.5× after 40 hours, before taxes, rounded down to the nearest thousand. Per diem not included.</p>' if year_rows else '')
+                + '<h2>By level</h2><div class="tablebox"><table><thead><tr><th>Level</th><th>Openings</th><th>Typical low $/hr</th><th>Typical high $/hr</th><th>Postings with pay</th></tr></thead>'
                 f'<tbody>{"".join(lvl_rows)}</tbody></table></div>'
                 '<h2>Highest-paying employers for "Data center technician" roles</h2>'
                 '<p class="note">Employers with at least two data center technician postings that include pay, ranked by the typical high end of their range.</p>'
@@ -795,7 +810,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                   'Amazon, Google and Microsoft post pay in every state; some employers only post it where state law requires. Per diem, housing and overtime are tagged on the '
                   '<a href="travel-jobs.html">per diem &amp; housing</a> page.</p>'
                 + self.signup())
-        self.page("salaries.html", f"Data Center Technician Salary {self.today.year}: Pay by Level, Company and State | {SITE_NAME}",
+        self.page("salaries.html", f"Data Center Technician Salary {self.today.year}: Hourly &amp; Yearly Pay by Level, Company, State | {SITE_NAME}".replace("&amp;", "&"),
                   f"How much data center technicians make in {self.today.year}: {money(all_lo)}–{money(all_hi)}/hr typical, from {len(paid_js):,} employer-posted ranges at {len(companies)} employers, "
                   "by level, company, job type and state. No estimates.", body, head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
 
