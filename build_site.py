@@ -24,7 +24,7 @@ from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
 from veterans_page import veteran_page
 from es_page import ES_PATH, STEPS as ES_STEPS, faq as es_faq, lede as es_lede, summary as es_summary
-from travel_guide import travel_faq, travel_math_html
+from travel_guide import travel_faq, travel_math_html, week_pay
 from state_pages import entry_faq, entry_path, entry_states, pay_stats, salary_faq, salary_path, salary_states
 from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
@@ -1108,7 +1108,16 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                                 for st, n in e_states.most_common(12))
         e_co_links = "".join(f'<li><a href="companies/{slug(c)}.html">{logo(c)}<span>{E(c)}</span><small>{n}</small></a></li>'
                              for c, n in e_cos.most_common(12))
+        # año de 50 semanas al sueldo bajo típico, redondeado hacia abajo a miles
+        e_year = (lambda h: int(week_pay(e_lo, 0, hours=h)["total"] * 50 // 1000) * 1000) if e_lo else None
         faq = [
+            ("Do you need a degree to work in a data center?",
+             "No. Entry-level technician, cable and fiber jobs ask for a high school diploma or GED, not a college degree. "
+             "What gets you hired is being able to pass a drug test and background check, lift 50 lb, work long shifts and show up every day."),
+            ("Can a data center job pay $100,000 with no experience?",
+             (f"Only with a lot of overtime. At the typical entry-level rate here ({money(e_lo)}/hr), 40-hour weeks come to about ${e_year(40):,} a year "
+              f"and 60-hour weeks with time-and-a-half come to about ${e_year(60):,}, before taxes. " if e_year else "Only with a lot of overtime. ")
+             + "Construction-side jobs often run 50–72 hours a week; Level II–III techs and leads reach six figures with fewer hours."),
             ("Can I get a data center job with no experience?",
              "Yes. Level I technician, cable puller, deployment technician and fiber technician 1 roles are hired without data center experience. "
              "Employers usually ask for a high school diploma or GED, a clean drug test and background check, the ability to lift 50 lb and work 10–12 hour shifts, and a driver's license. "
@@ -1130,10 +1139,10 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
         faq_ld = {"@context": "https://schema.org", "@type": "FAQPage",
                   "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Entry level</p>'
-                '<h1>Entry-level data center jobs: no experience required</h1>'
+                '<h1>Entry-level data center technician jobs: no experience, no degree</h1>'
                 f'<p class="lede">{sum(j["openings"] for j in entry):,} open entry-level data center jobs — Level I technicians, cable pullers, deployment and fiber techs — at {len(e_cos)} employers. '
                 + (f'Typical posted pay: <b>{money(e_lo)}–{money(e_hi)}/hr</b>. ' if e_lo else '')
-                + 'Tagged automatically when the employer\'s posting says Level I, entry level, no experience required or paid training.</p>'
+                + 'No college degree needed. Tagged automatically when the employer\'s posting says Level I, entry level, no experience required or paid training.</p>'
                 '<section class="guide"><h2>How to get your first data center job</h2><div class="prose">'
                 '<p><b>What they ask for.</b> High school diploma or GED, pass a drug test and background check, lift 50 lb, stand and climb ladders all shift, '
                 'a valid driver\'s license, and willingness to work nights, weekends or 10–12 hour shifts. Many contractor jobs also want OSHA 10.</p>'
@@ -1150,9 +1159,9 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                 '<h2>Open entry-level jobs</h2>' + self.job_list(entry, 0)
                 + '<h2>Questions people ask</h2><div class="faq">' + faq_html + '</div>'
                 + self.signup())
-        self.page("entry-level-jobs.html", f"Entry-Level Data Center Jobs (No Experience) {self.today.year}: Pay &amp; How to Start | {SITE_NAME}".replace("&amp;", "&"),
-                  f"{sum(j['openings'] for j in entry):,} entry-level data center technician jobs with no experience required, posted pay ranges, "
-                  "requirements, certifications that help and how to get hired.", body,
+        self.page("entry-level-jobs.html", f"Entry-Level Data Center Technician Jobs: No Experience, No Degree ({sum(j['openings'] for j in entry):,} Open) | {SITE_NAME}",
+                  f"{sum(j['openings'] for j in entry):,} entry-level data center technician jobs that hire with no experience and no degree: posted pay, "
+                  "what employers ask for, certifications that help and how to get hired.", body,
                   head_extra=f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>')
         self.state_search_pages(js)
         self.spanish_page(js)
