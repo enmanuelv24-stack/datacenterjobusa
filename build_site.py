@@ -24,6 +24,7 @@ from job_page import description_html, pay_hero, posted_label
 from kit_page import kit_page
 from veterans_page import veteran_page
 from es_page import ES_PATH, STEPS as ES_STEPS, faq as es_faq, lede as es_lede, summary as es_summary
+from travel_guide import travel_faq, travel_math_html
 from state_pages import entry_faq, entry_path, entry_states, pay_stats, salary_faq, salary_path, salary_states
 from site_config import (CLARITY_ID, CONTACT_EMAIL, PINTEREST_VERIFY, GA4_ID, INDEXNOW_KEY, JOB_ALERT_TYPES, NEWSLETTER_ACTION, NEWSLETTER_FIELDS, MIN_CITY_OPENINGS, MIN_ROLE_STATE_OPENINGS, POST_JOB_URL, SURVEY_URL, OWNER_BLURB, ROLE_EN, SITE_NAME, SITE_TAGLINE,
                          SITE_URL, STATE_NAMES)
@@ -1202,6 +1203,7 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                           f'<td>{E(", ".join(sorted({t for j in travel if j["company"] == c for t in perk_labels(j)})))}</td></tr>'
                           for c, n in by_co.most_common())
         med_pd = statistics.median([j["per_diem"] for j in pd]) if pd else None
+        faq_html, faq_ld = self.faq_block(travel_faq(travel))
         body = ('<p class="crumbs"><a href="index.html">Jobs</a> / Per diem &amp; housing</p>'
                 '<h1>Travel jobs with per diem, housing and rotations</h1>'
                 f'<p class="lede">{sum(j["openings"] for j in travel):,} openings where the employer\'s own posting mentions per diem, paid housing or lodging, '
@@ -1211,9 +1213,11 @@ $('mf').addEventListener('click',()=>{$('mf').setAttribute('aria-expanded',$('f'
                 '<p class="note">We only tag what the employer wrote in the posting. If a perk is not listed here, ask the recruiter; many contractors pay per diem without posting it.</p>'
                 '<h2>Employers posting travel perks</h2><div class="tablebox"><table><thead><tr><th>Employer</th><th>Openings</th><th>Perks mentioned</th></tr></thead>'
                 f'<tbody>{co_rows}</tbody></table></div>'
-                '<h2>Open jobs</h2>' + self.job_list(travel, 0) + self.signup())
-        self.page("travel-jobs.html", f"Data Center Travel Jobs with Per Diem and Housing | {SITE_NAME}",
-                  "Data center technician and fiber jobs that pay per diem, provide housing or run on a travel rotation, with pay ranges.", body)
+                + travel_math_html(travel, lambda j: f'jobs/{j["slug"]}.html')
+                + '<h2>Open jobs</h2>' + self.job_list(travel, 0) + faq_html + self.signup())
+        self.page("travel-jobs.html", f"Data Center Travel Jobs with Per Diem: Weekly Pay Math | {SITE_NAME}",
+                  "Data center and fiber travel jobs that pay per diem, housing or rotations, with posted pay and the weekly math: hourly, overtime and per diem added up.",
+                  body, head_extra=faq_ld)
 
         # ---- producto digital: Job-Ready Kit (kit_page.py)
         kp = kit_page(js, self.lead_form)
